@@ -1,0 +1,25 @@
+NEXUS_REQUIRED_SOURCE clean source package
+
+This folder contains only the files needed to build the current native host applications.
+
+Final build output:
+C:\Users\blade.DESKTOP-9QA7CAP\Desktop\NEXUS
+
+Expected output structure:
+- Nexus Loader.exe
+- configs\
+- nexus-ui\
+- recoil-ui\
+- recoilmaster-main\
+- runtime\
+
+Intentionally excluded:
+- Old Python/PyInstaller source and executables.
+- Generated Qt/CMake build folders.
+- Config backup history.
+- ZIP archives.
+- Logs.
+- Validation/helper scripts not used by the host apps.
+- Unused WebView2 package contents and non-x64 runtimes.
+
+Run build.bat from this folder to rebuild the Desktop NEXUS output.

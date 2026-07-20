@@ -1,0 +1,18 @@
+# Screen region where the operator name text appears.
+region_configured=false
+region_x=800
+region_y=420
+region_width=320
+region_height=120
+current_aspect_ratio=1.33333333333
+native_aspect_ratio=1.77777777778
+
+# OCR behavior.
+fps=10
+cooldown_ms=1000
+minimum_ocr_confidence=55
+language=eng
+tessdata=C:/msys64/mingw64/share/tessdata
+
+# All 76 supported operators. The overlay reads text in the region and matches against this list.
+operators=striker,sledge,thatcher,ash,thermite,twitch,montagne,glaz,fuze,blitz,iq,buck,blackbeard,capitao,hibana,jackal,ying,zofia,dokkaebi,lion,finka,maverick,nomad,gridlock,nokk,amaru,kali,iana,ace,zero,flores,osa,sens,grim,brava,ram,deimos,rauora,sentry,smoke,mute,castle,pulse,doc,rook,kapkan,tachanka,jager,bandit,frost,valkyrie,caveira,echo,mira,lesion,ela,vigil,maestro,alibi,clash,kaid,mozzie,warden,goyo,wamai,oryx,melusi,aruni,thunderbird,thorn,azami,solis,fenrir,tubarao,skopos,denari
