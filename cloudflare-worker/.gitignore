@@ -1,7 +1,0 @@
-node_modules/
-.wrangler/
-.dev.vars
-.env
-.generated-secrets.local.txt
-public-signing-key.json
-*.log
