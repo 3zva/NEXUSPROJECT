@@ -48,6 +48,7 @@ private:
     void setFpsVisible(bool visible);
     void setClientRefreshRate(int refreshRate);
     void setUiScale(const QVariant& value);
+    void setAuthWindowMode(bool enabled);
     void updateFpsLabel();
     void exitClient();
     void handleSensitivityConversion(const QVariantMap& inputs);
@@ -90,4 +91,5 @@ private:
     bool m_firebaseConfigured = false;
     bool m_autoEnterAuthenticatedArea = false;
     bool m_reloadAfterSignIn = false;
+    bool m_authWindowMode = false;
 };

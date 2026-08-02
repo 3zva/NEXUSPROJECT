@@ -374,6 +374,7 @@ MainWindow::MainWindow(QWidget* parent)
         session.localId = QStringLiteral("loader-handoff");
         enterAuthenticatedArea(session);
     } else {
+        setAuthWindowMode(true);
         m_rootStack->setCurrentWidget(m_authFlow);
     }
 }
@@ -1072,6 +1073,27 @@ void MainWindow::setUiScale(const QVariant& value) {
     updateFpsLabel();
 }
 
+void MainWindow::setAuthWindowMode(bool enabled) {
+    if (m_authWindowMode == enabled) {
+        return;
+    }
+    m_authWindowMode = enabled;
+
+    const bool wasVisible = isVisible();
+    setWindowFlag(Qt::FramelessWindowHint, enabled);
+    if (enabled) {
+        setMinimumSize(QSize(640, 900));
+        setMaximumSize(QSize(640, 900));
+        resize(640, 900);
+    } else {
+        setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        setUiScale(m_uiScale);
+    }
+    if (wasVisible) {
+        show();
+    }
+}
+
 void MainWindow::updateFpsLabel() {
     if (m_fpsLabel == nullptr || !m_fpsLabel->isVisible()) {
         return;
@@ -1375,6 +1397,7 @@ void MainWindow::enterAuthenticatedArea(const AuthSession& session) {
     m_authFlow->setBusy(false);
     m_authenticatedRoot->setSession(session);
     m_authenticatedRoot->resetToPathSelection();
+    setAuthWindowMode(false);
 
     QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
     auto previousPath = m_startupInstallPath.isEmpty()
@@ -1413,6 +1436,7 @@ void MainWindow::handleLogout() {
     m_authenticatedRoot->resetToPathSelection();
     m_authFlow->showSignIn();
     m_authFlow->setDemoMode(false);
+    setAuthWindowMode(true);
     m_rootStack->setCurrentWidget(m_authFlow);
 }
 

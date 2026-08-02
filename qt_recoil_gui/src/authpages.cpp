@@ -108,12 +108,11 @@ QWidget* AuthFlowWidget::wrapRightPanel(QWidget* form) {
 
     auto* scrollContent = new QWidget(scroll);
     auto* centering = new QVBoxLayout(scrollContent);
-    centering->setContentsMargins(48, 62, 48, 62);
-    centering->addStretch();
+    centering->setContentsMargins(0, 0, 0, 0);
 
     auto* panel = new QFrame(scrollContent);
     panel->setObjectName(QStringLiteral("authPanel"));
-    panel->setMinimumWidth(560);
+    panel->setMinimumSize(640, 900);
     panel->setMaximumWidth(640);
 
     auto* panelLayout = new QVBoxLayout(panel);
@@ -150,8 +149,7 @@ QWidget* AuthFlowWidget::wrapRightPanel(QWidget* form) {
     footer->setFont(NexusTheme::font(11));
     panelLayout->addWidget(footer);
 
-    centering->addWidget(panel, 0, Qt::AlignHCenter);
-    centering->addStretch();
+    centering->addWidget(panel, 0, Qt::AlignHCenter | Qt::AlignVCenter);
 
     scroll->setWidget(scrollContent);
     outerLayout->addWidget(scroll);
