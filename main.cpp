@@ -3660,11 +3660,22 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int show) {
     wc.hbrBackground = g_bgBrush;
     RegisterClassW(&wc);
 
+    const bool loaderUiMode = !g_recoilOnlyMode && !g_backendOnlyMode;
+    const DWORD windowStyle = loaderUiMode
+        ? WS_POPUP
+        : (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX);
+    const int windowWidth = loaderUiMode ? 640 : 1120;
+    const int windowHeight = loaderUiMode ? 900 : 760;
     g_hwnd = CreateWindowW(wc.lpszClassName, g_displayName.c_str(),
-                           WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-                           CW_USEDEFAULT, CW_USEDEFAULT, 1120, 760,
+                           windowStyle,
+                           CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight,
                            nullptr, nullptr, instance, nullptr);
     if (!g_hwnd) return 1;
+    if (loaderUiMode) {
+        const int x = (GetSystemMetrics(SM_CXSCREEN) - windowWidth) / 2;
+        const int y = (GetSystemMetrics(SM_CYSCREEN) - windowHeight) / 2;
+        SetWindowPos(g_hwnd, nullptr, std::max(0, x), std::max(0, y), windowWidth, windowHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+    }
 
     if (g_backendOnlyMode) {
         ShowWindow(g_hwnd, SW_HIDE);
