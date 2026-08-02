@@ -60,7 +60,7 @@ void setErrorLabel(QLabel* label, const QString& message) {
 
 AuthFlowWidget::AuthFlowWidget(QWidget* parent)
     : QWidget(parent) {
-    setObjectName(QStringLiteral("appRoot"));
+    setObjectName(QStringLiteral("authRoot"));
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -85,59 +85,18 @@ QWidget* AuthFlowWidget::buildBrandPanel(
     const QString& headline,
     const QString& body
 ) {
+    Q_UNUSED(eyebrow);
+    Q_UNUSED(headline);
+    Q_UNUSED(body);
     auto* panel = new QFrame(this);
-    panel->setObjectName(QStringLiteral("authBrandPanel"));
-    panel->setStyleSheet(QStringLiteral(
-        "QFrame#authBrandPanel { background: #0E1320; border-right: 1px solid #252D40; }"
-    ));
-    panel->setMinimumWidth(420);
-
-    auto* layout = new QVBoxLayout(panel);
-    layout->setContentsMargins(58, 34, 58, 54);
-    layout->setSpacing(0);
-
-    auto* brandRow = new QHBoxLayout();
-    brandRow->setSpacing(12);
-    auto* logo = new QLabel(panel);
-    logo->setPixmap(NexusTheme::pixmap(QStringLiteral("nexus_logo_64.png"), 54, 54));
-    auto* brand = new QLabel(QStringLiteral("NEXUS"), panel);
-    brand->setFont(NexusTheme::font(16, QFont::Bold));
-    brandRow->addWidget(logo);
-    brandRow->addWidget(brand);
-    brandRow->addStretch();
-    layout->addLayout(brandRow);
-
-    layout->addStretch(2);
-
-    auto* eyebrowLabel = new QLabel(eyebrow.toUpper(), panel);
-    eyebrowLabel->setProperty("accent", true);
-    eyebrowLabel->setFont(NexusTheme::font(10, QFont::Bold));
-
-    auto* headlineLabel = new QLabel(headline, panel);
-    headlineLabel->setFont(NexusTheme::font(30, QFont::Bold));
-    headlineLabel->setWordWrap(true);
-
-    auto* bodyLabel = makeSubtitle(body, panel);
-    bodyLabel->setFont(NexusTheme::font(13));
-
-    layout->addWidget(eyebrowLabel);
-    layout->addSpacing(30);
-    layout->addWidget(headlineLabel);
-    layout->addSpacing(22);
-    layout->addWidget(bodyLabel);
-    layout->addStretch(3);
-
-    auto* step = new QLabel(QStringLiteral("●   SECURE NEXUS ACCESS"), panel);
-    step->setStyleSheet(QStringLiteral("color: #4ED49A;"));
-    step->setFont(NexusTheme::font(10, QFont::DemiBold));
-    layout->addWidget(step);
-
+    panel->setFixedWidth(0);
+    panel->hide();
     return panel;
 }
 
 QWidget* AuthFlowWidget::wrapRightPanel(QWidget* form) {
     auto* outer = new QFrame(this);
-    outer->setStyleSheet(QStringLiteral("background: #070A12;"));
+    outer->setObjectName(QStringLiteral("authRoot"));
 
     auto* outerLayout = new QVBoxLayout(outer);
     outerLayout->setContentsMargins(0, 0, 0, 0);
@@ -148,12 +107,50 @@ QWidget* AuthFlowWidget::wrapRightPanel(QWidget* form) {
     scroll->setFrameShape(QFrame::NoFrame);
 
     auto* scrollContent = new QWidget(scroll);
-    auto* centering = new QHBoxLayout(scrollContent);
-    centering->setContentsMargins(46, 34, 46, 34);
+    auto* centering = new QVBoxLayout(scrollContent);
+    centering->setContentsMargins(48, 62, 48, 62);
     centering->addStretch();
-    form->setMaximumWidth(560);
-    form->setMinimumWidth(330);
-    centering->addWidget(form, 1, Qt::AlignVCenter);
+
+    auto* panel = new QFrame(scrollContent);
+    panel->setObjectName(QStringLiteral("authPanel"));
+    panel->setMinimumWidth(560);
+    panel->setMaximumWidth(640);
+
+    auto* panelLayout = new QVBoxLayout(panel);
+    panelLayout->setContentsMargins(82, 64, 82, 50);
+    panelLayout->setSpacing(0);
+
+    auto* brandRow = new QHBoxLayout();
+    brandRow->setSpacing(18);
+    brandRow->addStretch();
+    auto* logo = new QLabel(panel);
+    logo->setPixmap(NexusTheme::pixmap(QStringLiteral("nexus_logo_96.png"), 74, 74));
+    auto* brand = new QLabel(QStringLiteral("NEXUS"), panel);
+    brand->setFont(NexusTheme::font(20, QFont::Bold));
+    brandRow->addWidget(logo);
+    brandRow->addWidget(brand);
+    brandRow->addStretch();
+    panelLayout->addLayout(brandRow);
+    panelLayout->addSpacing(58);
+
+    form->setMinimumWidth(420);
+    panelLayout->addWidget(form);
+    panelLayout->addSpacing(42);
+
+    auto* divider = new QFrame(panel);
+    divider->setFrameShape(QFrame::NoFrame);
+    divider->setFixedHeight(1);
+    divider->setStyleSheet(QStringLiteral("background: #252D40;"));
+    panelLayout->addWidget(divider);
+    panelLayout->addSpacing(24);
+
+    auto* footer = new QLabel(QStringLiteral("© 2026 NEXUS   ·   Privacy   ·   Security"), panel);
+    footer->setProperty("subtle", true);
+    footer->setAlignment(Qt::AlignCenter);
+    footer->setFont(NexusTheme::font(11));
+    panelLayout->addWidget(footer);
+
+    centering->addWidget(panel, 0, Qt::AlignHCenter);
     centering->addStretch();
 
     scroll->setWidget(scrollContent);
@@ -175,7 +172,7 @@ QWidget* AuthFlowWidget::buildSignInPage() {
     auto* form = new QWidget(page);
     auto* formLayout = new QVBoxLayout(form);
     formLayout->setContentsMargins(0, 0, 0, 0);
-    formLayout->setSpacing(10);
+    formLayout->setSpacing(12);
 
     auto* createLink = new QPushButton(QStringLiteral("Create an account  →"), form);
     createLink->setFlat(true);
@@ -185,21 +182,24 @@ QWidget* AuthFlowWidget::buildSignInPage() {
     ));
     connect(createLink, &QPushButton::clicked, this, &AuthFlowWidget::showCreateAccount);
 
-    formLayout->addWidget(new QLabel(QStringLiteral("ACCOUNT ACCESS"), form));
-    formLayout->addWidget(makeTitle(QStringLiteral("Sign in to NEXUS"), form));
+    auto* eyebrow = new QLabel(QStringLiteral("WELCOME BACK"), form);
+    eyebrow->setProperty("accent", true);
+    eyebrow->setFont(NexusTheme::font(10, QFont::Bold));
+    formLayout->addWidget(eyebrow);
+    formLayout->addWidget(makeTitle(QStringLiteral("Sign in to your account"), form));
     formLayout->addWidget(makeSubtitle(
-        QStringLiteral("Enter the email and password connected to your NEXUS account."),
+        QStringLiteral("Enter your credentials to continue."),
         form
     ));
-    formLayout->addSpacing(10);
-    formLayout->addWidget(makeFieldLabel(QStringLiteral("Email address"), form));
+    formLayout->addSpacing(26);
+    formLayout->addWidget(makeFieldLabel(QStringLiteral("Email or username"), form));
     m_signInEmail = new QLineEdit(form);
     m_signInEmail->setPlaceholderText(QStringLiteral("name@example.com"));
     formLayout->addWidget(m_signInEmail);
     formLayout->addWidget(makeFieldLabel(QStringLiteral("Password"), form));
     m_signInPassword = new QLineEdit(form);
     m_signInPassword->setEchoMode(QLineEdit::Password);
-    m_signInPassword->setPlaceholderText(QStringLiteral("Your password"));
+    m_signInPassword->setPlaceholderText(QStringLiteral("Enter your password"));
     formLayout->addWidget(m_signInPassword);
 
     auto* forgot = new QPushButton(QStringLiteral("Forgot password?"), form);
@@ -220,8 +220,8 @@ QWidget* AuthFlowWidget::buildSignInPage() {
     m_signInStatus = makeStatus(form);
     formLayout->addWidget(m_signInStatus);
 
-    m_signInButton = createAccentButton(QStringLiteral("SIGN IN"), form);
-    m_signInButton->setMinimumHeight(46);
+    m_signInButton = createAccentButton(QStringLiteral("Sign in"), form);
+    m_signInButton->setMinimumHeight(58);
     connect(m_signInButton, &QPushButton::clicked, this, [this]() {
         clearError();
         const auto email = m_signInEmail->text().trimmed();
@@ -235,8 +235,8 @@ QWidget* AuthFlowWidget::buildSignInPage() {
     connect(m_signInPassword, &QLineEdit::returnPressed, m_signInButton, &QPushButton::click);
 
     formLayout->addWidget(m_signInButton);
-    formLayout->addSpacing(10);
-    formLayout->addWidget(createLink);
+    formLayout->addSpacing(20);
+    formLayout->addWidget(createLink, 0, Qt::AlignHCenter);
     formLayout->addStretch();
 
     layout->addWidget(wrapRightPanel(form), 1);

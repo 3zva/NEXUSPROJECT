@@ -39,8 +39,8 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
     sidebar->setObjectName(QStringLiteral("sidebar"));
     sidebar->setFixedWidth(NexusTheme::SidebarWidth);
     auto* sidebarLayout = new QVBoxLayout(sidebar);
-    sidebarLayout->setContentsMargins(18, 22, 18, 18);
-    sidebarLayout->setSpacing(7);
+    sidebarLayout->setContentsMargins(18, 18, 18, 24);
+    sidebarLayout->setSpacing(10);
     sidebar->setLayout(sidebarLayout);
 
     root->addWidget(sidebar);
@@ -54,21 +54,23 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
 
     auto* topBar = new QFrame(contentShell);
     topBar->setObjectName(QStringLiteral("authenticatedTopBar"));
-    topBar->setFixedHeight(58);
+    topBar->setFixedHeight(72);
     topBar->setStyleSheet(QStringLiteral(
-        "QFrame#authenticatedTopBar { background: #090D17; border-bottom: 1px solid #1D2534; }"
+        "QFrame#authenticatedTopBar { background: transparent; border: none; }"
     ));
     auto* topBarLayout = new QHBoxLayout(topBar);
-    topBarLayout->setContentsMargins(18, 8, 18, 8);
+    topBarLayout->setContentsMargins(20, 18, 22, 8);
     topBarLayout->addStretch();
 
-    m_moreButton = new QPushButton(QStringLiteral("•••"), topBar);
+    m_moreButton = new QPushButton(QStringLiteral("MORE"), topBar);
     m_moreButton->setObjectName(QStringLiteral("moreOptionsButton"));
     m_moreButton->setAccessibleName(QStringLiteral("More options"));
     m_moreButton->setToolTip(QStringLiteral("More options"));
     m_moreButton->setCursor(Qt::PointingHandCursor);
-    m_moreButton->setFixedSize(58, 40);
-    m_moreButton->setFont(NexusTheme::font(15, QFont::Bold));
+    m_moreButton->setIcon(NexusTheme::icon(QStringLiteral("settings_32.png")));
+    m_moreButton->setIconSize(QSize(18, 18));
+    m_moreButton->setFixedSize(108, 46);
+    m_moreButton->setFont(NexusTheme::font(10, QFont::Bold));
     connect(m_moreButton, &QPushButton::clicked, this, [this]() {
         showPage(QStringLiteral("more_options"));
     });
@@ -83,14 +85,14 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
     auto* brandRow = new QHBoxLayout();
     brandRow->setSpacing(10);
     auto* logo = new QLabel(sidebar);
-    logo->setPixmap(NexusTheme::pixmap(QStringLiteral("nexus_logo_64.png"), 46, 46));
+    logo->setPixmap(NexusTheme::pixmap(QStringLiteral("nexus_logo_64.png"), 44, 44));
     auto* brand = new QLabel(QStringLiteral("NEXUS"), sidebar);
     brand->setFont(NexusTheme::font(14, QFont::Bold));
     brandRow->addWidget(logo);
     brandRow->addWidget(brand);
     brandRow->addStretch();
     sidebarLayout->addLayout(brandRow);
-    sidebarLayout->addSpacing(18);
+    sidebarLayout->addSpacing(26);
 
     struct NavDefinition { QString key; QString label; QString icon; };
     const QList<NavDefinition> navigation{
@@ -114,8 +116,8 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
 
     auto* accountCard = new CardFrame(sidebar, false);
     auto* accountLayout = new QVBoxLayout(accountCard);
-    accountLayout->setContentsMargins(12, 12, 12, 12);
-    accountLayout->setSpacing(5);
+    accountLayout->setContentsMargins(14, 14, 14, 14);
+    accountLayout->setSpacing(7);
     auto* signedIn = new QLabel(QStringLiteral("SIGNED IN"), accountCard);
     signedIn->setProperty("subtle", true);
     signedIn->setFont(NexusTheme::font(8, QFont::Bold));
@@ -125,6 +127,7 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
     m_logoutButton = new QPushButton(QStringLiteral("Log out"), accountCard);
     m_logoutButton->setIcon(NexusTheme::icon(QStringLiteral("logout_32.png")));
     m_logoutButton->setCursor(Qt::PointingHandCursor);
+    m_logoutButton->setMinimumHeight(40);
     connect(m_logoutButton, &QPushButton::clicked, this, &AuthenticatedRoot::requestLogout);
     accountLayout->addWidget(signedIn);
     accountLayout->addWidget(m_emailLabel);

@@ -326,8 +326,8 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent) {
     setWindowTitle(QStringLiteral("NEXUS"));
     setWindowIcon(NexusTheme::icon(QStringLiteral("nexus_logo_64.png")));
-    resize(1180, 780);
-    setMinimumSize(960, 640);
+    resize(1086, 1086);
+    setMinimumSize(980, 860);
 
     m_rootStack = new QStackedWidget(this);
     m_authFlow = new AuthFlowWidget(m_rootStack);
@@ -1049,18 +1049,18 @@ void MainWindow::setUiScale(const QVariant& value) {
     m_uiScale = scale;
 
     const QSize minimumSize(
-        qMax(760, qRound(960 * scale)),
-        qMax(540, qRound(640 * scale))
+        qMax(900, qRound(980 * scale)),
+        qMax(760, qRound(860 * scale))
     );
     const QSize targetSize(
-        qMax(minimumSize.width(), qRound(1180 * scale)),
-        qMax(minimumSize.height(), qRound(780 * scale))
+        qMax(minimumSize.width(), qRound(1086 * scale)),
+        qMax(minimumSize.height(), qRound(1086 * scale))
     );
     QSize adjustedTargetSize = targetSize;
     if (scale <= 0.76) {
         adjustedTargetSize = QSize(
             qMax(targetSize.width(), 940),
-            qMax(targetSize.height(), 660)
+            qMax(targetSize.height(), 840)
         );
     }
     setMinimumSize(minimumSize);

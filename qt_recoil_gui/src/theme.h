@@ -23,8 +23,8 @@ inline const QColor AccentSoft{"#28204D"};
 inline const QColor Success{"#4ED49A"};
 inline const QColor Danger{"#FF6B82"};
 inline const QColor Warning{"#F4C96B"};
-inline constexpr int SidebarWidth = 232;
-inline constexpr int ContentPadding = 28;
+inline constexpr int SidebarWidth = 250;
+inline constexpr int ContentPadding = 24;
 
 inline QFont font(int pointSize, QFont::Weight weight = QFont::Normal) {
     QFont result(QStringLiteral("Segoe UI"), pointSize);
@@ -52,19 +52,27 @@ inline QString globalStyleSheet() {
         QMainWindow, QWidget#appRoot {
             background: #070A12;
         }
+        QWidget#authRoot {
+            background: #070A12;
+        }
         QFrame#sidebar {
-            background: #0B0F1A;
-            border: none;
+            background: #0A0F1C;
+            border-right: 1px solid #1D2534;
+        }
+        QFrame#authPanel {
+            background: #0A0F1C;
+            border: 1px solid #765BFF;
+            border-radius: 14px;
         }
         QFrame[card="true"] {
-            background: #0E1320;
+            background: #0F1726;
             border: 1px solid #252D40;
-            border-radius: 16px;
+            border-radius: 12px;
         }
         QFrame[card="elevated"] {
-            background: #131A2A;
+            background: #141D2F;
             border: 1px solid #252D40;
-            border-radius: 16px;
+            border-radius: 12px;
         }
         QLabel[muted="true"] { color: #98A2B7; }
         QLabel[subtle="true"] { color: #68738B; }
@@ -85,9 +93,9 @@ inline QString globalStyleSheet() {
         QPushButton {
             min-height: 34px;
             padding: 0 14px;
-            border-radius: 9px;
+            border-radius: 8px;
             border: 1px solid #252D40;
-            background: #182136;
+            background: #172238;
             color: #F7F9FF;
             font-weight: 600;
         }
@@ -124,8 +132,8 @@ inline QString globalStyleSheet() {
         }
         QPushButton[navButton="true"] {
             text-align: left;
-            padding-left: 14px;
-            min-height: 42px;
+            padding-left: 16px;
+            min-height: 52px;
             border: 1px solid transparent;
             background: transparent;
             color: #98A2B7;
@@ -135,16 +143,16 @@ inline QString globalStyleSheet() {
             color: #F7F9FF;
         }
         QPushButton[navActive="true"] {
-            background: #28204D;
+            background: #2B1E52;
             border-color: #765BFF;
             color: #F7F9FF;
         }
         QLineEdit, QComboBox, QPlainTextEdit {
-            min-height: 34px;
-            padding: 0 10px;
-            background: #0E1320;
-            border: 1px solid #252D40;
-            border-radius: 8px;
+            min-height: 38px;
+            padding: 0 12px;
+            background: #090E19;
+            border: 1px solid #2E3A50;
+            border-radius: 9px;
             selection-background-color: #765BFF;
         }
         QPlainTextEdit { padding: 10px; }
