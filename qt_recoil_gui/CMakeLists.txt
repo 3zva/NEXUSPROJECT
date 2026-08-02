@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(NexusClient VERSION 1.3.0 LANGUAGES CXX)
+project(NexusClient VERSION 1.5.17 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,10 +17,13 @@ qt_add_executable(NexusClient WIN32
     src/mainwindow.cpp
     src/theme.h
     src/authsession.h
+    src/operatorbackendinterface.h
     src/firebaseauthclient.h
     src/firebaseauthclient.cpp
     src/operatorcatalog.h
     src/operatorcatalog.cpp
+    src/operatorloadoutcatalog.h
+    src/operatorloadoutcatalog.cpp
     src/nexuswidgets.h
     src/nexuswidgets.cpp
     src/authpages.h
@@ -29,6 +32,8 @@ qt_add_executable(NexusClient WIN32
     src/pathselectionpage.cpp
     src/pages.h
     src/pages.cpp
+    src/moreoptionspage.h
+    src/moreoptionspage.cpp
     src/sensitivityfovconverterpage.h
     src/sensitivityfovconverterpage.cpp
     src/authenticatedroot.h
@@ -48,6 +53,23 @@ qt_add_executable(NexusClient WIN32
 target_include_directories(NexusClient PRIVATE src/nexus_license/include)
 target_link_libraries(NexusClient PRIVATE Qt6::Widgets Qt6::Network)
 target_link_libraries(NexusClient PRIVATE winhttp bcrypt crypt32 advapi32 shell32)
+
+add_executable(license_probe
+    src/license_probe.cpp
+    src/nexus_license/src/DeviceId.cpp
+    src/nexus_license/src/LicenseClient.cpp
+)
+target_include_directories(license_probe PRIVATE src/nexus_license/include)
+target_compile_features(license_probe PRIVATE cxx_std_20)
+target_compile_definitions(license_probe PRIVATE
+    UNICODE
+    _UNICODE
+    WIN32_LEAN_AND_MEAN
+    NOMINMAX
+    WINVER=0x0A00
+    _WIN32_WINNT=0x0A00
+)
+target_link_libraries(license_probe PRIVATE winhttp bcrypt advapi32)
 
 target_compile_definitions(NexusClient PRIVATE
     QT_NO_KEYWORDS

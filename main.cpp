@@ -16,12 +16,16 @@
 #include <winreg.h>
 #include <winhttp.h>
 #include <wrl.h>
+#include <tlhelp32.h>
+#include <initguid.h>
+#include <sapi.h>
 #include "WebView2.h"
 
 #include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <cctype>
 #include <cmath>
 #include <cstdint>
@@ -49,6 +53,7 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "winhttp.lib")
+#pragma comment(lib, "ole32.lib")
 
 namespace fs = std::filesystem;
 
@@ -83,9 +88,15 @@ std::vector<SOCKET> g_wsClients;
 double g_speed1 = 0.01;
 double g_x1 = 0.0;
 double g_y1 = 1.0;
+double g_rampX1 = 0.0;
+double g_rampY1 = 0.0;
+double g_rampStart1 = 0.75;
 double g_speed2 = 0.01;
 double g_x2 = 0.0;
 double g_y2 = 1.0;
+double g_rampX2 = 0.0;
+double g_rampY2 = 0.0;
+double g_rampStart2 = 0.75;
 int g_rapidFireEnabled = 0;
 int g_weaponIndex = 1;
 bool g_paused = false;
@@ -189,6 +200,9 @@ std::string ToLowerAscii(std::string value);
 std::wstring QuoteArg(const std::wstring& value);
 std::wstring PowerShellSingleQuoted(const std::wstring& value);
 void LaunchHiddenUtility(const std::wstring& commandLine);
+bool LaunchRainbowSixSiege(std::wstring* errorMessage = nullptr);
+bool IsRainbowSixSiegeRunning();
+void KillRainbowSixSiegeProcesses();
 void StartRuntimeThreads();
 void ShowLogin();
 void ShowRegister();
@@ -218,6 +232,111 @@ std::string WideToUtf8(const std::wstring& value) {
     std::string out(needed, '\0');
     WideCharToMultiByte(CP_UTF8, 0, value.data(), (int)value.size(), out.data(), needed, nullptr, nullptr);
     return out;
+}
+
+namespace AudioFeedback {
+class TextToSpeech {
+private:
+    ISpVoice* pVoice = nullptr;
+    bool comInitialized = false;
+    std::thread worker;
+    std::mutex mutex;
+    std::condition_variable changed;
+    std::wstring pendingPhrase;
+    bool hasPendingPhrase = false;
+    bool stopping = false;
+
+    std::wstring ConvertToWide(const std::string& str) {
+        if (str.empty()) return L"";
+        int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, str.data(), (int)str.size(), nullptr, 0);
+        if (sizeNeeded <= 0) return L"";
+        std::wstring result(sizeNeeded, L'\0');
+        MultiByteToWideChar(CP_UTF8, 0, str.data(), (int)str.size(), result.data(), sizeNeeded);
+        return result;
+    }
+
+    void InitializeVoice() {
+        HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+        comInitialized = SUCCEEDED(hr);
+        if (!comInitialized) {
+            return;
+        }
+
+        hr = CoCreateInstance(CLSID_SpVoice, nullptr, CLSCTX_ALL, IID_ISpVoice, reinterpret_cast<void**>(&pVoice));
+        if (FAILED(hr)) {
+            pVoice = nullptr;
+        }
+    }
+
+    void ShutdownVoice() {
+        if (pVoice != nullptr) {
+            pVoice->Speak(nullptr, SPF_PURGEBEFORESPEAK, nullptr);
+            pVoice->Release();
+            pVoice = nullptr;
+        }
+        if (comInitialized) {
+            CoUninitialize();
+            comInitialized = false;
+        }
+    }
+
+    void Run() {
+        InitializeVoice();
+        while (true) {
+            std::wstring phrase;
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+                changed.wait(lock, [this] { return stopping || hasPendingPhrase; });
+                if (stopping) {
+                    break;
+                }
+                phrase = std::move(pendingPhrase);
+                pendingPhrase.clear();
+                hasPendingPhrase = false;
+            }
+
+            if (pVoice != nullptr && !phrase.empty()) {
+                pVoice->Speak(phrase.c_str(), SPF_ASYNC | SPF_PURGEBEFORESPEAK, nullptr);
+            }
+        }
+        ShutdownVoice();
+    }
+
+public:
+    TextToSpeech()
+        : worker(&TextToSpeech::Run, this) {}
+
+    ~TextToSpeech() {
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            stopping = true;
+        }
+        changed.notify_one();
+        if (worker.joinable()) {
+            worker.join();
+        }
+    }
+
+    TextToSpeech(const TextToSpeech&) = delete;
+    TextToSpeech& operator=(const TextToSpeech&) = delete;
+
+    void TriggerLoadoutSpeech(const std::string& op, const std::string& primary, const std::string& secondary) {
+        std::wstring phrase = L"Operator " + ConvertToWide(op) + L" loaded.";
+        if (!primary.empty()) {
+            phrase += L" " + ConvertToWide(primary) + L".";
+        }
+        if (!secondary.empty()) {
+            phrase += L" " + ConvertToWide(secondary) + L".";
+        }
+
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            pendingPhrase = std::move(phrase);
+            hasPendingPhrase = true;
+        }
+        changed.notify_one();
+    }
+};
 }
 
 std::wstring GetWindowTextString(HWND hwnd) {
@@ -262,6 +381,11 @@ fs::path SessionPath() {
 
 fs::path SettingsPath() {
     return NexusDataDir() / L"settings.json";
+}
+
+std::wstring ToLowerWide(std::wstring value) {
+    std::transform(value.begin(), value.end(), value.begin(), [](wchar_t ch) { return (wchar_t)towlower(ch); });
+    return value;
 }
 
 std::string JsonEscape(const std::string& value) {
@@ -719,6 +843,270 @@ fs::path InstallAndLaunchRecoilCopy(const std::wstring& selectedDir) {
     );
     fs::remove(installDir / L"current_install.txt", ec);
     return installedExe;
+}
+
+std::wstring EnvironmentValue(const wchar_t* name) {
+    DWORD needed = GetEnvironmentVariableW(name, nullptr, 0);
+    if (needed == 0) {
+        return L"";
+    }
+    std::wstring value(needed, L'\0');
+    DWORD written = GetEnvironmentVariableW(name, value.data(), needed);
+    if (written == 0) {
+        return L"";
+    }
+    value.resize(written);
+    return value;
+}
+
+void AddUniquePath(std::vector<fs::path>& paths, const fs::path& path) {
+    if (path.empty()) {
+        return;
+    }
+    const std::wstring incoming = ToLowerWide(path.lexically_normal().wstring());
+    for (const fs::path& existing : paths) {
+        if (ToLowerWide(existing.lexically_normal().wstring()) == incoming) {
+            return;
+        }
+    }
+    paths.push_back(path);
+}
+
+std::vector<fs::path> RegistryStringValues(HKEY hive, const wchar_t* subkey, const wchar_t* valueName) {
+    std::vector<fs::path> values;
+    for (REGSAM view : {KEY_WOW64_64KEY, KEY_WOW64_32KEY}) {
+        HKEY key = nullptr;
+        if (RegOpenKeyExW(hive, subkey, 0, KEY_READ | view, &key) != ERROR_SUCCESS) {
+            continue;
+        }
+
+        DWORD type = 0;
+        DWORD bytes = 0;
+        if (RegQueryValueExW(key, valueName, nullptr, &type, nullptr, &bytes) == ERROR_SUCCESS
+            && (type == REG_SZ || type == REG_EXPAND_SZ)
+            && bytes > sizeof(wchar_t)) {
+            std::wstring value(bytes / sizeof(wchar_t), L'\0');
+            if (RegQueryValueExW(key, valueName, nullptr, nullptr, reinterpret_cast<LPBYTE>(value.data()), &bytes) == ERROR_SUCCESS) {
+                value.resize(wcsnlen(value.c_str(), value.size()));
+                if (type == REG_EXPAND_SZ) {
+                    wchar_t expanded[MAX_PATH * 4] = L"";
+                    if (ExpandEnvironmentStringsW(value.c_str(), expanded, (DWORD)std::size(expanded)) > 0) {
+                        value = expanded;
+                    }
+                }
+                AddUniquePath(values, value);
+            }
+        }
+        RegCloseKey(key);
+    }
+    return values;
+}
+
+std::vector<fs::path> DriveRoots() {
+    std::vector<fs::path> roots;
+    DWORD length = GetLogicalDriveStringsW(0, nullptr);
+    if (length == 0) {
+        return roots;
+    }
+
+    std::wstring buffer(length + 1, L'\0');
+    if (GetLogicalDriveStringsW(length, buffer.data()) == 0) {
+        return roots;
+    }
+
+    const wchar_t* cursor = buffer.c_str();
+    while (*cursor != L'\0') {
+        fs::path root(cursor);
+        const UINT type = GetDriveTypeW(cursor);
+        if (type == DRIVE_FIXED || type == DRIVE_REMOVABLE) {
+            AddUniquePath(roots, root);
+        }
+        cursor += wcslen(cursor) + 1;
+    }
+    return roots;
+}
+
+std::wstring SteamVdfUnescape(std::wstring value) {
+    std::wstring out;
+    out.reserve(value.size());
+    bool escaped = false;
+    for (wchar_t ch : value) {
+        if (escaped) {
+            out.push_back(ch);
+            escaped = false;
+        } else if (ch == L'\\') {
+            escaped = true;
+        } else {
+            out.push_back(ch);
+        }
+    }
+    return out;
+}
+
+std::vector<fs::path> SteamLibrariesFromVdf(const fs::path& steamRoot) {
+    std::vector<fs::path> libraries;
+    AddUniquePath(libraries, steamRoot);
+
+    const fs::path vdfPath = steamRoot / L"steamapps" / L"libraryfolders.vdf";
+    const std::wstring text = Utf8ToWide(ReadFileUtf8(vdfPath));
+    size_t pos = 0;
+    while ((pos = text.find(L"\"path\"", pos)) != std::wstring::npos) {
+        pos = text.find(L'"', pos + 6);
+        if (pos == std::wstring::npos) {
+            break;
+        }
+        const size_t begin = pos + 1;
+        const size_t end = text.find(L'"', begin);
+        if (end == std::wstring::npos) {
+            break;
+        }
+        AddUniquePath(libraries, SteamVdfUnescape(text.substr(begin, end - begin)));
+        pos = end + 1;
+    }
+    return libraries;
+}
+
+std::vector<fs::path> FindRainbowSixSiegeExecutables() {
+    constexpr wchar_t gameDir[] = L"Tom Clancy's Rainbow Six Siege";
+    std::vector<fs::path> candidates;
+    auto addExe = [&candidates](const fs::path& path) {
+        std::error_code ec;
+        if (fs::exists(path, ec) && fs::is_regular_file(path, ec)) {
+            AddUniquePath(candidates, path);
+        }
+    };
+
+    std::vector<fs::path> steamRoots;
+    for (const auto& path : RegistryStringValues(HKEY_CURRENT_USER, L"Software\\Valve\\Steam", L"SteamPath")) {
+        AddUniquePath(steamRoots, path);
+    }
+    for (const auto& path : RegistryStringValues(HKEY_LOCAL_MACHINE, L"Software\\Valve\\Steam", L"InstallPath")) {
+        AddUniquePath(steamRoots, path);
+    }
+    const std::wstring programFilesX86 = EnvironmentValue(L"ProgramFiles(x86)");
+    const std::wstring programFiles = EnvironmentValue(L"ProgramFiles");
+    if (!programFilesX86.empty()) {
+        AddUniquePath(steamRoots, fs::path(programFilesX86) / L"Steam");
+    }
+    if (!programFiles.empty()) {
+        AddUniquePath(steamRoots, fs::path(programFiles) / L"Steam");
+    }
+    for (const fs::path& drive : DriveRoots()) {
+        AddUniquePath(steamRoots, drive / L"Steam");
+        AddUniquePath(steamRoots, drive / L"SteamLibrary");
+        AddUniquePath(steamRoots, drive / L"Games" / L"Steam");
+        AddUniquePath(steamRoots, drive / L"Games" / L"SteamLibrary");
+        AddUniquePath(steamRoots, drive / L"Program Files" / L"Steam");
+        AddUniquePath(steamRoots, drive / L"Program Files (x86)" / L"Steam");
+    }
+
+    std::vector<fs::path> steamLibraries;
+    for (const fs::path& root : steamRoots) {
+        for (const fs::path& library : SteamLibrariesFromVdf(root)) {
+            AddUniquePath(steamLibraries, library);
+        }
+    }
+    for (const fs::path& library : steamLibraries) {
+        addExe(library / L"steamapps" / L"common" / gameDir / L"RainbowSix.exe");
+        addExe(library / L"steamapps" / L"common" / gameDir / L"RainbowSix_BE.exe");
+    }
+
+    std::vector<fs::path> ubisoftRoots;
+    for (const auto& path : RegistryStringValues(HKEY_LOCAL_MACHINE, L"Software\\Ubisoft\\Launcher", L"InstallDir")) {
+        AddUniquePath(ubisoftRoots, path);
+    }
+    for (const auto& path : RegistryStringValues(HKEY_LOCAL_MACHINE, L"Software\\WOW6432Node\\Ubisoft\\Launcher", L"InstallDir")) {
+        AddUniquePath(ubisoftRoots, path);
+    }
+    if (!programFilesX86.empty()) {
+        AddUniquePath(ubisoftRoots, fs::path(programFilesX86) / L"Ubisoft" / L"Ubisoft Game Launcher");
+    }
+    if (!programFiles.empty()) {
+        AddUniquePath(ubisoftRoots, fs::path(programFiles) / L"Ubisoft" / L"Ubisoft Game Launcher");
+    }
+    for (const fs::path& drive : DriveRoots()) {
+        AddUniquePath(ubisoftRoots, drive / L"Ubisoft" / L"Ubisoft Game Launcher");
+        AddUniquePath(ubisoftRoots, drive / L"Ubisoft Game Launcher");
+        AddUniquePath(ubisoftRoots, drive / L"Games" / L"Ubisoft" / L"Ubisoft Game Launcher");
+        AddUniquePath(ubisoftRoots, drive / L"Program Files" / L"Ubisoft" / L"Ubisoft Game Launcher");
+        AddUniquePath(ubisoftRoots, drive / L"Program Files (x86)" / L"Ubisoft" / L"Ubisoft Game Launcher");
+    }
+    for (const fs::path& root : ubisoftRoots) {
+        addExe(root / L"games" / gameDir / L"RainbowSix.exe");
+        addExe(root / L"games" / gameDir / L"RainbowSix_BE.exe");
+    }
+
+    return candidates;
+}
+
+bool LaunchRainbowSixSiege(std::wstring* errorMessage) {
+    const std::vector<fs::path> executables = FindRainbowSixSiegeExecutables();
+    if (executables.empty()) {
+        if (errorMessage != nullptr) {
+            *errorMessage = L"Rainbow Six Siege was not found in installed Steam or Ubisoft libraries on this computer.";
+        }
+        return false;
+    }
+
+    for (const fs::path& executable : executables) {
+        HINSTANCE result = ShellExecuteW(
+            nullptr,
+            L"open",
+            executable.c_str(),
+            nullptr,
+            executable.parent_path().c_str(),
+            SW_SHOWNORMAL
+        );
+        if (reinterpret_cast<intptr_t>(result) > 32) {
+            return true;
+        }
+    }
+
+    if (errorMessage != nullptr) {
+        *errorMessage = L"Rainbow Six Siege was found, but Windows could not launch it.";
+    }
+    return false;
+}
+
+std::vector<std::wstring> RainbowSixProcessNames() {
+    return {
+        L"RainbowSix.exe",
+        L"RainbowSix_BE.exe",
+        L"RainbowSix_Vulkan.exe",
+        L"RainbowSix_DX11.exe",
+        L"RainbowSixHelper.exe",
+    };
+}
+
+bool IsRainbowSixSiegeRunning() {
+    const std::vector<std::wstring> names = RainbowSixProcessNames();
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE) {
+        return false;
+    }
+
+    PROCESSENTRY32W entry{};
+    entry.dwSize = sizeof(entry);
+    bool found = false;
+    if (Process32FirstW(snapshot, &entry)) {
+        do {
+            const std::wstring processName = ToLowerWide(entry.szExeFile);
+            for (const std::wstring& name : names) {
+                if (processName == ToLowerWide(name)) {
+                    found = true;
+                    break;
+                }
+            }
+        } while (!found && Process32NextW(snapshot, &entry));
+    }
+    CloseHandle(snapshot);
+    return found;
+}
+
+void KillRainbowSixSiegeProcesses() {
+    for (const std::wstring& name : RainbowSixProcessNames()) {
+        LaunchHiddenUtility(L"taskkill.exe /IM " + QuoteArg(name) + L" /F /T");
+    }
 }
 
 void SaveLastInstallPath(const std::wstring& path) {
@@ -1284,17 +1672,36 @@ bool ApplySettings(const std::string& text) {
     } catch (...) {
         return false;
     }
-    if (values.size() != 3 && values.size() != 7) return false;
+    if (values.size() != 3 && values.size() != 7 && values.size() != 11 && values.size() != 13) return false;
 
     std::lock_guard<std::mutex> lock(g_stateMutex);
     g_speed1 = NormalizeDelaySeconds(values[0]);
     g_x1 = values[1];
     g_y1 = values[2];
+    g_rampX1 = 0.0;
+    g_rampY1 = 0.0;
+    g_rampX2 = 0.0;
+    g_rampY2 = 0.0;
+    g_rampStart1 = 0.75;
+    g_rampStart2 = 0.75;
     if (values.size() == 7) {
         g_speed2 = NormalizeDelaySeconds(values[3]);
         g_x2 = values[4];
         g_y2 = values[5];
         g_rapidFireEnabled = (int)values[6];
+    } else if (values.size() == 11 || values.size() == 13) {
+        g_speed2 = NormalizeDelaySeconds(values[3]);
+        g_x2 = values[4];
+        g_y2 = values[5];
+        g_rapidFireEnabled = (int)values[6];
+        g_rampX1 = values[7];
+        g_rampY1 = values[8];
+        g_rampX2 = values[9];
+        g_rampY2 = values[10];
+        if (values.size() == 13) {
+            g_rampStart1 = std::clamp(values[11], 0.0, 10.0);
+            g_rampStart2 = std::clamp(values[12], 0.0, 10.0);
+        }
     } else {
         g_rapidFireEnabled = 0;
     }
@@ -1581,6 +1988,8 @@ bool ApplyOperatorByName(const std::string& rawName, std::string* error = nullpt
     }
 
     BroadcastWebSocketText("OPERATOR_SELECTED:" + name);
+    static AudioFeedback::TextToSpeech ttsClient;
+    ttsClient.TriggerLoadoutSpeech(name, "", "");
     SetStatus(Utf8ToWide("Activated operator: " + name));
     return true;
 }
@@ -1769,7 +2178,15 @@ void InputControlThread() {
     double lastMoveAtMs = nextMoveAtMs;
     bool hasLastMoveTimestamp = false;
     std::mt19937 rng((unsigned)GetTickCount());
-    std::uniform_real_distribution<double> coin(0.0, 1.0);
+    int lastActiveWeaponIndex = 0;
+    double lastX = 0.0;
+    double lastY = 0.0;
+    double lastRampX = 0.0;
+    double lastRampY = 0.0;
+    double lastRampStart = 0.75;
+    double activeStartedAtMs = nextMoveAtMs;
+    bool hasActiveStart = false;
+    bool lastUseSwitchedPattern = false;
     while (g_running) {
         auto nowSteady = std::chrono::steady_clock::now();
         double nowMs = QpcNowMilliseconds();
@@ -1783,6 +2200,10 @@ void InputControlThread() {
         double speed = 0.01;
         double x = 0.0;
         double y = 1.0;
+        double rampX = 0.0;
+        double rampY = 0.0;
+        double rampStart = 0.75;
+        int weaponIndex = 1;
         {
             std::lock_guard<std::mutex> lock(g_stateMutex);
             g_rightHeld = currentRight;
@@ -1802,24 +2223,65 @@ void InputControlThread() {
             speed = g_weaponIndex == 1 ? g_speed1 : g_speed2;
             x = g_weaponIndex == 1 ? g_x1 : g_x2;
             y = g_weaponIndex == 1 ? g_y1 : g_y2;
+            rampX = g_weaponIndex == 1 ? g_rampX1 : g_rampX2;
+            rampY = g_weaponIndex == 1 ? g_rampY1 : g_rampY2;
+            rampStart = g_weaponIndex == 1 ? g_rampStart1 : g_rampStart2;
+            weaponIndex = g_weaponIndex;
         }
 
         if (!active) {
             nextMoveAtMs = nowMs;
             lastMoveAtMs = nowMs;
             hasLastMoveTimestamp = false;
+            lastActiveWeaponIndex = 0;
+            hasActiveStart = false;
+            lastUseSwitchedPattern = false;
+            RecoilCalculator().Reset();
             HighPrecisionDelayUntilMilliseconds(nowMs + 1.0, timingConfig.Spin_Lock_Window_MS);
             continue;
+        }
+        if (!hasActiveStart) {
+            activeStartedAtMs = nowMs;
+            hasActiveStart = true;
+        }
+        if (weaponIndex != lastActiveWeaponIndex
+            || std::fabs(x - lastX) > 0.000001
+            || std::fabs(y - lastY) > 0.000001
+            || std::fabs(rampX - lastRampX) > 0.000001
+            || std::fabs(rampY - lastRampY) > 0.000001
+            || std::fabs(rampStart - lastRampStart) > 0.000001) {
+            activeStartedAtMs = nowMs;
+            hasActiveStart = true;
+            lastUseSwitchedPattern = false;
+            RecoilCalculator().Reset();
+            lastActiveWeaponIndex = weaponIndex;
+            lastX = x;
+            lastY = y;
+            lastRampX = rampX;
+            lastRampY = rampY;
+            lastRampStart = rampStart;
         }
         const double targetBaseDelayMs = std::max(1.0, speed * 1000.0);
         timingConfig.Target_Base_Delay_MS = targetBaseDelayMs;
         if (nowMs >= nextMoveAtMs) {
+            const double activeElapsedSeconds = std::max(0.0, (nowMs - activeStartedAtMs) / 1000.0);
+            const bool patternSwitchActive = std::fabs(rampX) > 0.000001 || std::fabs(rampY) > 0.000001;
+            const bool useSwitchedPattern = patternSwitchActive && activeElapsedSeconds >= rampStart;
+            if (useSwitchedPattern != lastUseSwitchedPattern) {
+                RecoilCalculator().Reset();
+                hasLastMoveTimestamp = false;
+                lastUseSwitchedPattern = useSwitchedPattern;
+            }
+            const double switchedX = std::fabs(rampX) > 0.000001 ? rampX : x;
+            const double switchedY = std::fabs(rampY) > 0.000001 ? rampY : y;
+            const double activeX = useSwitchedPattern ? switchedX : x;
+            const double activeY = useSwitchedPattern ? switchedY : y;
             const double actualElapsedMs = hasLastMoveTimestamp
                 ? std::max(0.001, nowMs - lastMoveAtMs)
                 : timingConfig.Target_Base_Delay_MS;
             MoveMouseScaled(
-                coin(rng) < 0.5 ? x : 0.0,
-                y,
+                activeX,
+                activeY,
                 actualElapsedMs,
                 timingConfig.Target_Base_Delay_MS
             );
@@ -2326,8 +2788,20 @@ std::string HandleLoaderApi(const std::string& path, const std::string& body) {
         g_installDir = Utf8ToWide(JsonStringValue(body, "installPath"));
         if (g_installDir.empty()) return JsonError("Select an installation folder first.");
         try {
+            if (IsRainbowSixSiegeRunning()) {
+                MessageBoxW(
+                    g_hwnd,
+                    L"Never load NEXUS while Rainbow Six Siege is open.\n\nRainbow Six Siege will be closed first.",
+                    L"Rainbow Six Siege is open",
+                    MB_OK | MB_ICONWARNING
+                );
+                KillRainbowSixSiegeProcesses();
+                std::this_thread::sleep_for(std::chrono::milliseconds(800));
+            }
             SaveLastInstallPath(g_installDir);
             fs::path installedExe = InstallAndLaunchRecoilCopy(g_installDir);
+            std::wstring gameLaunchError;
+            LaunchRainbowSixSiege(&gameLaunchError);
             std::thread([] {
                 std::this_thread::sleep_for(std::chrono::milliseconds(650));
                 PostMessageW(g_hwnd, WM_CLOSE, 0, 0);
