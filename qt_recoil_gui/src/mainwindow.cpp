@@ -133,16 +133,40 @@ std::optional<QString> licenseApiBaseUrl() {
     return std::nullopt;
 }
 
+bool licensingPaused() {
+    const QStringList candidates{
+        QCoreApplication::applicationDirPath() + QStringLiteral("/config/license_config.json"),
+        QDir::currentPath() + QStringLiteral("/config/license_config.json"),
+    };
+
+    for (const QString& path : candidates) {
+        QFile file(path);
+        if (!file.open(QIODevice::ReadOnly)) {
+            continue;
+        }
+        const auto document = QJsonDocument::fromJson(file.readAll());
+        if (document.object().value(QStringLiteral("license_paused")).toBool(false)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 QString licenseMessage(const nexus::license::LicenseResult& result) {
     if (!result.message.empty()) {
         return QString::fromStdString(result.message);
     }
     if (result.valid) {
-        QString text = QStringLiteral("License validated.");
-        if (!result.expiresAt.empty()) {
-            text += QStringLiteral(" Expires %1.").arg(QString::fromStdString(result.expiresAt));
+        const QString licenseType = QString::fromStdString(result.licenseType);
+        if (licenseType == QStringLiteral("30_day")) {
+            return result.expiresAt.empty()
+                ? QStringLiteral("30-day license active. Expiration will be set by the license server.")
+                : QStringLiteral("30-day license active. Expires %1.").arg(QString::fromStdString(result.expiresAt));
         }
-        return text;
+        if (licenseType == QStringLiteral("lifetime")) {
+            return QStringLiteral("Lifetime license active.");
+        }
+        return QStringLiteral("License active.");
     }
     return QStringLiteral("License validation failed.");
 }
@@ -355,6 +379,10 @@ MainWindow::MainWindow(QWidget* parent)
 }
 
 bool MainWindow::ensureLicense() {
+    if (licensingPaused()) {
+        return true;
+    }
+
     const auto apiBaseUrl = licenseApiBaseUrl();
     if (!apiBaseUrl) {
         QMessageBox::critical(
@@ -489,6 +517,14 @@ void MainWindow::readStartupArguments() {
     };
     m_startupInstallPath = valueAfter(QStringLiteral("--install-path"));
     m_handoffEmail = valueAfter(QStringLiteral("--authenticated-email"));
+    const QString title = valueAfter(QStringLiteral("--window-title")).trimmed();
+    if (!title.isEmpty()) {
+        m_windowTitle = title;
+        setWindowTitle(m_windowTitle);
+        if (m_trayIcon != nullptr) {
+            m_trayIcon->setToolTip(m_windowTitle);
+        }
+    }
     m_autoEnterAuthenticatedArea = arguments.contains(QStringLiteral("--trusted-loader-handoff"));
 }
 
@@ -619,6 +655,7 @@ void MainWindow::connectApplicationPages() {
         QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
         settings.setValue(QStringLiteral("installationPath"), path);
         restoreSavedScreenRegion();
+        launchRainbowSixSiege();
     });
 
     // V5.4: AuthenticatedRoot owns the one global operator configuration.
@@ -888,6 +925,8 @@ void MainWindow::restoreSavedClientSettings() {
         {QStringLiteral("minimize_to_tray"), settings.value(QStringLiteral("settings/minimize_to_tray"), true)},
         {QStringLiteral("startup"), settings.value(QStringLiteral("settings/startup"), true)},
         {QStringLiteral("refresh_rate"), settings.value(QStringLiteral("settings/refresh_rate"), 60)},
+        {QStringLiteral("tts_enabled"), settings.value(QStringLiteral("settings/tts_enabled"), true)},
+        {QStringLiteral("tts_volume"), settings.value(QStringLiteral("settings/tts_volume"), 80)},
         {QStringLiteral("theme"), settings.value(QStringLiteral("settings/theme"), QStringLiteral("NEXUS Purple"))},
         {QStringLiteral("accent"), settings.value(QStringLiteral("settings/accent"), QStringLiteral("Purple"))},
         {QStringLiteral("ui_scale"), settings.value(QStringLiteral("settings/ui_scale"), QStringLiteral("100%"))},
@@ -898,6 +937,9 @@ void MainWindow::restoreSavedClientSettings() {
     m_authenticatedRoot->setGeneralAppSettings(values);
     for (auto iterator = values.begin(); iterator != values.end(); ++iterator) {
         applyClientSetting(iterator.key(), iterator.value());
+        if (iterator.key() == QStringLiteral("tts_enabled") || iterator.key() == QStringLiteral("tts_volume")) {
+            publishRuntimeSetting(iterator.key(), iterator.value());
+        }
     }
 }
 
@@ -916,6 +958,8 @@ void MainWindow::applyClientSetting(const QString& key, const QVariant& value) {
         setUpdatesEnabled(true);
     } else if (key == QStringLiteral("mute_sounds")) {
         // Stored setting. The current client has no sound playback path to mute.
+    } else if (key == QStringLiteral("tts_enabled") || key == QStringLiteral("tts_volume")) {
+        // Stored setting. Runtime audio feedback is handled by the native backend.
     } else if (key == QStringLiteral("outline_crosshairs")) {
         // Stored setting. Crosshair drawing is not part of the current Qt client surface.
     }
@@ -927,10 +971,10 @@ void MainWindow::setupTrayIcon() {
     }
 
     m_trayIcon = new QSystemTrayIcon(windowIcon(), this);
-    m_trayIcon->setToolTip(QStringLiteral("NEXUS"));
+    m_trayIcon->setToolTip(m_windowTitle);
 
     auto* trayMenu = new QMenu(this);
-    auto* showAction = trayMenu->addAction(QStringLiteral("Open NEXUS"));
+    auto* showAction = trayMenu->addAction(QStringLiteral("Open ") + m_windowTitle);
     connect(showAction, &QAction::triggered, this, [this]() {
         showNormal();
         raise();
@@ -1265,6 +1309,67 @@ void MainWindow::startVisionAutomationTool() {
     );
 }
 
+void MainWindow::launchRainbowSixSiege() {
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    const QString savedPath = settings.value(QStringLiteral("gamePath")).toString();
+    if (!savedPath.isEmpty() && QFileInfo::exists(savedPath)) {
+        QProcess::startDetached(savedPath);
+        return;
+    }
+
+    const QString steamPath = QStringLiteral(
+        "C:/Program Files (x86)/Steam/steamapps/common/Tom Clancy's Rainbow Six Siege/RainbowSix.exe"
+    );
+    const QString ubisoftPath = QStringLiteral(
+        "C:/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/games/Tom Clancy's Rainbow Six Siege/RainbowSix.exe"
+    );
+    const QString steamSubPath = QStringLiteral(
+        "Steam/steamapps/common/Tom Clancy's Rainbow Six Siege/RainbowSix.exe"
+    );
+    const QString ubisoftSubPath = QStringLiteral(
+        "Ubisoft/Ubisoft Game Launcher/games/Tom Clancy's Rainbow Six Siege/RainbowSix.exe"
+    );
+
+    const QStringList candidates{steamPath, ubisoftPath};
+    for (const QString& candidate : candidates) {
+        if (QFileInfo::exists(candidate)) {
+            settings.setValue(QStringLiteral("gamePath"), candidate);
+            settings.sync();
+            QProcess::startDetached(candidate);
+            return;
+        }
+    }
+
+    const QFileInfoList drives = QDir::drives();
+    for (const QFileInfo& driveInfo : drives) {
+        const QString drive = driveInfo.absoluteFilePath();
+        if (drive.startsWith(QStringLiteral("C:"), Qt::CaseInsensitive)) {
+            continue;
+        }
+
+        const QStringList driveCandidates{
+            QDir(drive).filePath(QStringLiteral("Program Files (x86)/") + steamSubPath),
+            QDir(drive).filePath(QStringLiteral("Program Files (x86)/") + ubisoftSubPath),
+            QDir(drive).filePath(steamSubPath),
+        };
+
+        for (const QString& candidate : driveCandidates) {
+            if (QFileInfo::exists(candidate)) {
+                settings.setValue(QStringLiteral("gamePath"), candidate);
+                settings.sync();
+                QProcess::startDetached(candidate);
+                return;
+            }
+        }
+    }
+
+    QMessageBox::warning(
+        this,
+        QStringLiteral("Game not found"),
+        QStringLiteral("Rainbow Six Siege was not found on any available drive.")
+    );
+}
+
 void MainWindow::enterAuthenticatedArea(const AuthSession& session) {
     m_pendingSession = session;
     m_authFlow->setBusy(false);
@@ -1452,6 +1557,12 @@ QString MainWindow::automationPayloadForSettings(const QVariantMap& settings) co
         convertedAxis(value(secondary, QStringLiteral("x_amount"), 0.0), m_sensitivityScaleX),
         -convertedAxis(value(secondary, QStringLiteral("y_amount"), 0.0), m_sensitivityScaleY),
         static_cast<double>(rapid),
+        convertedAxis(value(primary, QStringLiteral("horizontal_ramp"), 0.0), m_sensitivityScaleX),
+        -convertedAxis(value(primary, QStringLiteral("vertical_ramp"), 0.0), m_sensitivityScaleY),
+        convertedAxis(value(secondary, QStringLiteral("horizontal_ramp"), 0.0), m_sensitivityScaleX),
+        -convertedAxis(value(secondary, QStringLiteral("vertical_ramp"), 0.0), m_sensitivityScaleY),
+        value(primary, QStringLiteral("ramp_start_seconds"), 0.75),
+        value(secondary, QStringLiteral("ramp_start_seconds"), 0.75),
     };
 
     QStringList parts;

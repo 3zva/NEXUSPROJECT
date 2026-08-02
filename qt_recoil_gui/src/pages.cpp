@@ -1,8 +1,10 @@
 #include "pages.h"
 #include "nexuswidgets.h"
 #include "operatorcatalog.h"
+#include "operatorloadoutcatalog.h"
 #include "theme.h"
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QFileDialog>
 #include <QFrame>
@@ -10,25 +12,21 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QMenu>
-#include <QPainter>
 #include <QPlainTextEdit>
-#include <QPixmap>
 #include <QPushButton>
-#include <QResizeEvent>
 #include <QScrollArea>
-#include <QSet>
+#include <QSettings>
 #include <QSignalBlocker>
+#include <QSizePolicy>
+#include <QSlider>
+#include <QSet>
 #include <QStyle>
 #include <QVariantMap>
 #include <QVBoxLayout>
+#include <functional>
 #include <QtMath>
 
 namespace {
-double normalizeDelaySeconds(double value) {
-    return qMax(0.001, value > 1.0 ? value / 1000.0 : value);
-}
-
 QWidget* createScrollableBody(QWidget* page, QVBoxLayout*& bodyLayout) {
     auto* scroll = new QScrollArea(page);
     scroll->setWidgetResizable(true);
@@ -56,6 +54,38 @@ QLabel* bodyText(const QString& text, QWidget* parent) {
     return label;
 }
 
+QWidget* createFileAction(
+    const QString& iconName,
+    const QString& title,
+    const QString& description,
+    const QString& buttonText,
+    QWidget* parent,
+    const std::function<void()>& callback
+) {
+    auto* card = new CardFrame(parent, true);
+    auto* layout = new QHBoxLayout(card);
+    layout->setContentsMargins(18, 18, 16, 18);
+    layout->setSpacing(14);
+
+    auto* icon = new QLabel(card);
+    icon->setPixmap(NexusTheme::pixmap(iconName + QStringLiteral("_64.png"), 44, 44));
+
+    auto* text = new QVBoxLayout();
+    text->setSpacing(4);
+    auto* titleLabel = new QLabel(title, card);
+    titleLabel->setFont(NexusTheme::font(11, QFont::Bold));
+    text->addWidget(titleLabel);
+    text->addWidget(bodyText(description, card));
+
+    auto* button = createAccentButton(buttonText, card);
+    button->setFixedWidth(86);
+    QObject::connect(button, &QPushButton::clicked, card, callback);
+
+    layout->addWidget(icon);
+    layout->addLayout(text, 1);
+    layout->addWidget(button);
+    return card;
+}
 }
 
 DashboardPage::DashboardPage(QWidget* parent)
@@ -149,8 +179,13 @@ DashboardPage::DashboardPage(QWidget* parent)
 OperatorsPage::OperatorsPage(QWidget* parent)
     : QWidget(parent) {
     auto* root = new QVBoxLayout(this);
-    root->setContentsMargins(18, 16, 18, 14);
-    root->setSpacing(8);
+    root->setContentsMargins(
+        NexusTheme::ContentPadding,
+        NexusTheme::ContentPadding,
+        NexusTheme::ContentPadding,
+        NexusTheme::ContentPadding
+    );
+    root->setSpacing(14);
 
     root->addWidget(new PageHeading(
         QStringLiteral("OPERATORS"),
@@ -159,42 +194,41 @@ OperatorsPage::OperatorsPage(QWidget* parent)
     ));
 
     auto* controls = new QHBoxLayout();
-    controls->setSpacing(6);
+    controls->setSpacing(8);
     m_attackersButton = createAccentButton(QStringLiteral("ATTACKERS"), this);
     m_defendersButton = new QPushButton(QStringLiteral("DEFENDERS"), this);
-    m_attackersButton->setFixedWidth(104);
-    m_defendersButton->setFixedWidth(104);
+    m_attackersButton->setFixedWidth(112);
+    m_defendersButton->setFixedWidth(112);
     controls->addWidget(m_attackersButton);
     controls->addWidget(m_defendersButton);
     controls->addStretch();
 
     m_search = new QLineEdit(this);
     m_search->setPlaceholderText(QStringLiteral("Search operator..."));
-    m_search->setMaximumWidth(210);
+    m_search->setMaximumWidth(230);
     controls->addWidget(m_search);
-    m_filterButton = new QPushButton(this);
-    m_filterButton->setIcon(NexusTheme::icon(QStringLiteral("filter_32.png")));
-    m_filterButton->setFixedWidth(40);
-    m_filterButton->setToolTip(QStringLiteral("Filter operators"));
-    controls->addWidget(m_filterButton);
+    auto* filter = new QPushButton(this);
+    filter->setIcon(NexusTheme::icon(QStringLiteral("filter_32.png")));
+    filter->setFixedWidth(40);
+    filter->setToolTip(QStringLiteral("Filter options are ready for future operator metadata."));
+    controls->addWidget(filter);
     root->addLayout(controls);
 
-    m_scrollArea = new QScrollArea(this);
-    m_scrollArea->setWidgetResizable(true);
-    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_scrollArea->setFrameShape(QFrame::NoFrame);
-    m_gridContent = new QWidget(m_scrollArea);
+    auto* scroll = new QScrollArea(this);
+    scroll->setWidgetResizable(true);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setFrameShape(QFrame::NoFrame);
+    m_gridContent = new QWidget(scroll);
     m_grid = new QGridLayout(m_gridContent);
     m_grid->setContentsMargins(0, 0, 4, 0);
-    m_grid->setHorizontalSpacing(7);
-    m_grid->setVerticalSpacing(7);
-    m_scrollArea->setWidget(m_gridContent);
-    root->addWidget(m_scrollArea, 1);
+    m_grid->setSpacing(10);
+    scroll->setWidget(m_gridContent);
+    root->addWidget(scroll, 1);
 
     auto* footer = new QHBoxLayout();
     m_countLabel = bodyText(QString(), this);
     auto* viewAll = createAccentButton(QStringLiteral("VIEW ALL"), this);
-    viewAll->setFixedWidth(82);
+    viewAll->setFixedWidth(90);
     footer->addWidget(m_countLabel, 1);
     footer->addWidget(viewAll);
     root->addLayout(footer);
@@ -202,31 +236,6 @@ OperatorsPage::OperatorsPage(QWidget* parent)
     connect(m_attackersButton, &QPushButton::clicked, this, [this]() { setSide(QStringLiteral("attackers")); });
     connect(m_defendersButton, &QPushButton::clicked, this, [this]() { setSide(QStringLiteral("defenders")); });
     connect(m_search, &QLineEdit::textChanged, this, [this]() { rebuildGrid(); });
-    connect(viewAll, &QPushButton::clicked, this, [this]() {
-        m_search->clear();
-        m_filter = QStringLiteral("all");
-        rebuildGrid();
-    });
-    connect(m_filterButton, &QPushButton::clicked, this, [this]() {
-        QMenu menu(this);
-        struct FilterDefinition { QString key; QString label; };
-        const QList<FilterDefinition> filters{
-            {QStringLiteral("all"), QStringLiteral("All operators")},
-            {QStringLiteral("configured"), QStringLiteral("Configured")},
-            {QStringLiteral("unconfigured"), QStringLiteral("Unconfigured")},
-            {QStringLiteral("favorites"), QStringLiteral("Favorites")}
-        };
-        for (const auto& filter : filters) {
-            auto* action = menu.addAction(filter.label);
-            action->setCheckable(true);
-            action->setChecked(m_filter == filter.key);
-            connect(action, &QAction::triggered, this, [this, key = filter.key]() {
-                m_filter = key;
-                rebuildGrid();
-            });
-        }
-        menu.exec(m_filterButton->mapToGlobal(QPoint(0, m_filterButton->height())));
-    });
     rebuildGrid();
 }
 
@@ -254,396 +263,35 @@ void OperatorsPage::rebuildGrid() {
         : QStringLiteral("defender");
     const auto source = OperatorCatalog::forSide(catalogSide);
     const auto search = m_search->text().trimmed();
-    QList<OperatorRecord> visibleRecords;
-    visibleRecords.reserve(source.size());
 
+    int shown = 0;
+    constexpr int columns = 6;
     for (const auto& record : source) {
         if (!search.isEmpty()
             && !record.displayName.contains(search, Qt::CaseInsensitive)
             && !record.id.contains(search, Qt::CaseInsensitive)) {
             continue;
         }
-        if (m_filter == QStringLiteral("favorites")) {
-            continue;
-        }
-        visibleRecords.push_back(record);
-    }
 
-    const int viewportWidth = m_scrollArea != nullptr
-        ? m_scrollArea->viewport()->width()
-        : width();
-    const int viewportHeight = m_scrollArea != nullptr
-        ? m_scrollArea->viewport()->height()
-        : height();
-    const GridMetrics metrics = gridMetricsFor(viewportWidth, viewportHeight, visibleRecords.size());
-    m_grid->setHorizontalSpacing(metrics.spacing);
-    m_grid->setVerticalSpacing(metrics.spacing);
-    m_currentColumns = metrics.columns;
-    m_currentGridHeight = viewportHeight;
-
-    int shown = 0;
-    for (const auto& record : visibleRecords) {
         auto* tile = new OperatorTile(
             record.displayName,
             record.iconResource,
             m_gridContent
         );
-        tile->setDisplayMetrics(
-            metrics.iconSize,
-            metrics.tileSize,
-            metrics.fontSize,
-            metrics.radius,
-            metrics.padding
-        );
         connect(tile, &QToolButton::clicked, this, [this, operatorId = record.id]() {
             Q_EMIT operatorSelected(operatorId);
         });
-        m_grid->addWidget(tile, shown / metrics.columns, shown % metrics.columns);
+        m_grid->addWidget(tile, shown / columns, shown % columns);
         ++shown;
     }
 
-    for (int column = 0; column < metrics.columns; ++column) {
+    for (int column = 0; column < columns; ++column) {
         m_grid->setColumnStretch(column, 1);
     }
-    m_grid->setRowStretch((shown + metrics.columns - 1) / metrics.columns, 1);
-    const QString filterLabel = m_filter == QStringLiteral("all")
-        ? QStringLiteral("all")
-        : m_filter;
+    m_grid->setRowStretch((shown + columns - 1) / columns, 1);
     m_countLabel->setText(QStringLiteral(
-        "Showing %1 of %2 %3 (%4). Every tile opens the same reusable settings page with the matching icon."
-    ).arg(shown).arg(source.size()).arg(m_side, filterLabel));
-}
-
-OperatorsPage::GridMetrics OperatorsPage::gridMetricsFor(int width, int height, int itemCount) const {
-    const QList<GridMetrics> modes{
-        {qBound(4, width / 82, 12), 7, QSize(72, 78), QSize(42, 42), 8, 9, 5},
-        {qBound(5, width / 72, 13), 6, QSize(64, 68), QSize(36, 36), 8, 8, 4},
-        {qBound(6, width / 62, 14), 5, QSize(56, 58), QSize(30, 30), 7, 7, 3},
-    };
-
-    for (const GridMetrics& metrics : modes) {
-        const int rows = qMax(1, (itemCount + metrics.columns - 1) / metrics.columns);
-        const int requiredHeight = rows * metrics.tileSize.height() + qMax(0, rows - 1) * metrics.spacing;
-        if (requiredHeight <= qMax(180, height - 4)) {
-            return metrics;
-        }
-    }
-    return modes.last();
-}
-
-void OperatorsPage::resizeEvent(QResizeEvent* event) {
-    QWidget::resizeEvent(event);
-    if (m_scrollArea == nullptr) {
-        return;
-    }
-    const int viewportWidth = m_scrollArea->viewport()->width();
-    const int viewportHeight = m_scrollArea->viewport()->height();
-    const GridMetrics metrics = gridMetricsFor(viewportWidth, viewportHeight, 38);
-    if (metrics.columns != m_currentColumns || qAbs(viewportHeight - m_currentGridHeight) > 16) {
-        rebuildGrid();
-    }
-}
-
-MoreOptionsPage::MoreOptionsPage(QWidget* parent)
-    : QWidget(parent) {
-    auto* root = new QVBoxLayout(this);
-    root->setContentsMargins(0, 0, 0, 0);
-    QVBoxLayout* bodyLayout = nullptr;
-    root->addWidget(createScrollableBody(this, bodyLayout));
-
-    auto* headerRow = new QHBoxLayout();
-    headerRow->setSpacing(10);
-    auto* backButton = new QPushButton(QStringLiteral("Back"), this);
-    backButton->setIcon(style()->standardIcon(QStyle::SP_ArrowBack));
-    backButton->setFixedWidth(92);
-    backButton->setCursor(Qt::PointingHandCursor);
-    headerRow->addWidget(backButton);
-    headerRow->addWidget(new PageHeading(
-        QStringLiteral("MORE OPTIONS"),
-        QStringLiteral("Screen-region routing and overlay behavior."),
-        this
-    ), 1);
-    bodyLayout->addLayout(headerRow);
-    connect(backButton, &QPushButton::clicked, this, &MoreOptionsPage::backRequested);
-
-    auto* statusCard = new CardFrame(this, true);
-    auto* statusLayout = new QHBoxLayout(statusCard);
-    statusLayout->setContentsMargins(16, 12, 16, 12);
-    statusLayout->setSpacing(12);
-    m_statusPill = new QLabel(QStringLiteral("IDLE"), statusCard);
-    m_statusPill->setProperty("statusPill", true);
-    m_statusPill->setAlignment(Qt::AlignCenter);
-    m_statusPill->setMinimumWidth(88);
-    m_statusText = bodyText(QStringLiteral("No screen region is selected."), statusCard);
-    statusLayout->addWidget(m_statusPill);
-    statusLayout->addWidget(m_statusText, 1);
-    bodyLayout->addWidget(statusCard);
-
-    auto* regionCard = new CardFrame(this, true);
-    auto* regionLayout = new QVBoxLayout(regionCard);
-    regionLayout->setContentsMargins(18, 16, 18, 16);
-    regionLayout->setSpacing(12);
-    regionLayout->addWidget(createSectionLabel(QStringLiteral("SCREEN REGION"), regionCard));
-
-    auto* displayRow = new QHBoxLayout();
-    auto* displayLabel = new QLabel(QStringLiteral("Display"), regionCard);
-    displayLabel->setFont(NexusTheme::font(10, QFont::DemiBold));
-    m_displayBox = new QComboBox(regionCard);
-    displayRow->addWidget(displayLabel);
-    displayRow->addWidget(m_displayBox, 1);
-    regionLayout->addLayout(displayRow);
-
-    auto* previewAndFields = new QHBoxLayout();
-    previewAndFields->setSpacing(14);
-    m_preview = new QLabel(regionCard);
-    m_preview->setMinimumSize(300, 170);
-    m_preview->setAlignment(Qt::AlignCenter);
-    m_preview->setProperty("previewBox", true);
-    m_preview->setText(QStringLiteral("Region preview"));
-    previewAndFields->addWidget(m_preview, 1);
-
-    auto* fields = new QWidget(regionCard);
-    auto* fieldsLayout = new QGridLayout(fields);
-    fieldsLayout->setContentsMargins(0, 0, 0, 0);
-    fieldsLayout->setHorizontalSpacing(8);
-    fieldsLayout->setVerticalSpacing(8);
-    auto makeField = [fields](const QString& label, int row, QGridLayout* layout) {
-        auto* fieldLabel = new QLabel(label, fields);
-        fieldLabel->setProperty("muted", true);
-        auto* field = new QLineEdit(fields);
-        field->setReadOnly(true);
-        field->setProperty("valueBox", true);
-        layout->addWidget(fieldLabel, row, 0);
-        layout->addWidget(field, row, 1);
-        return field;
-    };
-    m_xField = makeField(QStringLiteral("X"), 0, fieldsLayout);
-    m_yField = makeField(QStringLiteral("Y"), 1, fieldsLayout);
-    m_widthField = makeField(QStringLiteral("Width"), 2, fieldsLayout);
-    m_heightField = makeField(QStringLiteral("Height"), 3, fieldsLayout);
-    m_displayField = makeField(QStringLiteral("Display ID"), 4, fieldsLayout);
-    previewAndFields->addWidget(fields);
-    regionLayout->addLayout(previewAndFields);
-
-    auto* actions = new QHBoxLayout();
-    m_selectButton = createAccentButton(QStringLiteral("SELECT REGION"), regionCard);
-    m_clearButton = new QPushButton(QStringLiteral("CLEAR"), regionCard);
-    m_saveButton = createAccentButton(QStringLiteral("SAVE REGION"), regionCard);
-    actions->addWidget(m_selectButton);
-    actions->addWidget(m_clearButton);
-    actions->addStretch();
-    actions->addWidget(m_saveButton);
-    regionLayout->addLayout(actions);
-    bodyLayout->addWidget(regionCard);
-
-    auto* monitorCard = new CardFrame(this, true);
-    auto* monitorLayout = new QVBoxLayout(monitorCard);
-    monitorLayout->setContentsMargins(18, 16, 18, 16);
-    monitorLayout->setSpacing(10);
-    monitorLayout->addWidget(createSectionLabel(QStringLiteral("OVERLAY BEHAVIOR"), monitorCard));
-    m_enableMonitoring = new ToggleRow(
-        QStringLiteral("Enable operator detection"),
-        QStringLiteral("Use the saved region to route detected operator names to the active settings page."),
-        false,
-        monitorCard
-    );
-    m_showBorder = new ToggleRow(
-        QStringLiteral("Show selected-region border"),
-        QStringLiteral("Draw a lightweight visual border when region selection is active."),
-        true,
-        monitorCard
-    );
-    m_pauseWhenForeground = new ToggleRow(
-        QStringLiteral("Idle while cursor is hidden"),
-        QStringLiteral("Keep monitoring paused whenever the cursor is not visible."),
-        false,
-        monitorCard
-    );
-    m_lowResourceMode = new ToggleRow(
-        QStringLiteral("Low resource mode"),
-        QStringLiteral("Use a lower capture rate while preserving operator routing."),
-        false,
-        monitorCard
-    );
-    monitorLayout->addWidget(m_enableMonitoring);
-    monitorLayout->addWidget(m_showBorder);
-    monitorLayout->addWidget(m_pauseWhenForeground);
-    monitorLayout->addWidget(m_lowResourceMode);
-    bodyLayout->addWidget(monitorCard);
-    bodyLayout->addStretch();
-
-    connect(m_selectButton, &QPushButton::clicked, this, [this]() {
-        setSelectionPending();
-        Q_EMIT regionSelectionRequested();
-    });
-    connect(m_clearButton, &QPushButton::clicked, this, [this]() {
-        clearSelectedRegion();
-        Q_EMIT regionClearRequested();
-    });
-    connect(m_saveButton, &QPushButton::clicked, this, [this]() {
-        if (!m_hasRegion || !m_region.isValid()) {
-            setRegionSaveResult(false, QStringLiteral("Select a valid region before saving."));
-            return;
-        }
-        setRegionSaveResult(true, QStringLiteral("Saving region settings..."));
-        Q_EMIT regionSaveRequested(m_region, m_displayId);
-    });
-    connect(m_enableMonitoring, &ToggleRow::toggled,
-            this, &MoreOptionsPage::overlayMonitoringEnabledChanged);
-    connect(m_showBorder, &ToggleRow::toggled,
-            this, &MoreOptionsPage::showSelectionBorderChanged);
-    connect(m_pauseWhenForeground, &ToggleRow::toggled,
-            this, &MoreOptionsPage::pauseWhenForegroundChanged);
-    connect(m_lowResourceMode, &ToggleRow::toggled,
-            this, &MoreOptionsPage::lowResourceMonitoringChanged);
-
-    setAvailableDisplays({});
-    updateRegionState();
-}
-
-void MoreOptionsPage::setAvailableDisplays(const QList<DisplayOption>& displays) {
-    m_displays = displays;
-    QSignalBlocker blocker(m_displayBox);
-    m_displayBox->clear();
-    if (m_displays.isEmpty()) {
-        m_displayBox->addItem(QStringLiteral("Primary display"), QStringLiteral("primary"));
-        return;
-    }
-    for (const auto& display : m_displays) {
-        m_displayBox->addItem(display.displayName, display.id);
-    }
-}
-
-void MoreOptionsPage::setSelectedRegion(const QRect& region, const QString& displayId) {
-    m_region = region.normalized();
-    m_displayId = displayId.isEmpty() ? QStringLiteral("primary") : displayId;
-    m_hasRegion = m_region.isValid();
-    for (int index = 0; index < m_displayBox->count(); ++index) {
-        if (m_displayBox->itemData(index).toString() == m_displayId) {
-            m_displayBox->setCurrentIndex(index);
-            break;
-        }
-    }
-    refreshRegionFields();
-    updateRegionPreview();
-    updateRegionState();
-}
-
-void MoreOptionsPage::clearSelectedRegion() {
-    m_region = QRect();
-    m_displayId.clear();
-    m_hasRegion = false;
-    m_preview->setPixmap(QPixmap());
-    m_preview->setText(QStringLiteral("Region preview"));
-    refreshRegionFields();
-    updateRegionState();
-}
-
-void MoreOptionsPage::setSelectionPending() {
-    m_statusPill->setText(QStringLiteral("SELECTING"));
-    m_statusText->setText(QStringLiteral("Drag across the screen to choose the reading area."));
-}
-
-void MoreOptionsPage::setSelectionError(const QString& message) {
-    m_statusPill->setText(QStringLiteral("ERROR"));
-    m_statusText->setText(message);
-}
-
-void MoreOptionsPage::setRegionSaveResult(bool success, const QString& message) {
-    m_statusPill->setText(success ? QStringLiteral("SAVED") : QStringLiteral("ERROR"));
-    m_statusText->setText(message);
-}
-
-void MoreOptionsPage::updateRegionPreview() {
-    if (!m_hasRegion || !m_region.isValid()) {
-        m_preview->setPixmap(QPixmap());
-        m_preview->setText(QStringLiteral("Region preview"));
-        return;
-    }
-
-    QSize targetSize = m_preview->contentsRect().size();
-    if (targetSize.isEmpty()) {
-        targetSize = m_preview->size();
-    }
-    targetSize = targetSize.expandedTo(QSize(160, 90));
-
-    QPixmap preview(targetSize);
-    preview.fill(Qt::transparent);
-
-    const QSize regionSize = m_region.normalized().size();
-    QSize fitted = regionSize;
-    fitted.scale(targetSize - QSize(20, 20), Qt::KeepAspectRatio);
-    fitted = fitted.expandedTo(QSize(18, 18));
-    const QRect regionRect(
-        QPoint((targetSize.width() - fitted.width()) / 2, (targetSize.height() - fitted.height()) / 2),
-        fitted
-    );
-
-    QPainter painter(&preview);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.fillRect(regionRect, QColor(118, 91, 255, 34));
-    painter.setPen(QPen(QColor(118, 91, 255), 2));
-    painter.drawRect(regionRect.adjusted(1, 1, -2, -2));
-    painter.end();
-
-    m_preview->setText(QString());
-    m_preview->setPixmap(preview);
-}
-
-void MoreOptionsPage::resizeEvent(QResizeEvent* event) {
-    QWidget::resizeEvent(event);
-    updateRegionPreview();
-}
-
-void MoreOptionsPage::setOverlaySettings(
-    bool monitoringEnabled,
-    bool showSelectionBorder,
-    bool pauseWhenCursorHidden,
-    bool lowResourceMode
-) {
-    const QSignalBlocker monitorBlocker(m_enableMonitoring);
-    const QSignalBlocker borderBlocker(m_showBorder);
-    const QSignalBlocker pauseBlocker(m_pauseWhenForeground);
-    const QSignalBlocker lowResourceBlocker(m_lowResourceMode);
-    m_enableMonitoring->setChecked(monitoringEnabled && m_hasRegion);
-    m_showBorder->setChecked(showSelectionBorder);
-    m_pauseWhenForeground->setChecked(pauseWhenCursorHidden);
-    m_lowResourceMode->setChecked(lowResourceMode);
-    updateRegionState();
-}
-
-QRect MoreOptionsPage::selectedRegion() const {
-    return m_region;
-}
-
-QString MoreOptionsPage::selectedDisplayId() const {
-    return m_displayId;
-}
-
-bool MoreOptionsPage::overlayMonitoringEnabled() const {
-    return m_enableMonitoring->isChecked();
-}
-
-void MoreOptionsPage::refreshRegionFields() {
-    m_xField->setText(m_hasRegion ? QString::number(m_region.x()) : QStringLiteral("-"));
-    m_yField->setText(m_hasRegion ? QString::number(m_region.y()) : QStringLiteral("-"));
-    m_widthField->setText(m_hasRegion ? QString::number(m_region.width()) : QStringLiteral("-"));
-    m_heightField->setText(m_hasRegion ? QString::number(m_region.height()) : QStringLiteral("-"));
-    m_displayField->setText(m_hasRegion ? m_displayId : QStringLiteral("-"));
-}
-
-void MoreOptionsPage::updateRegionState() {
-    m_saveButton->setEnabled(m_hasRegion);
-    m_clearButton->setEnabled(m_hasRegion);
-    m_enableMonitoring->setEnabled(m_hasRegion);
-    if (!m_hasRegion) {
-        m_enableMonitoring->setChecked(false);
-        m_statusPill->setText(QStringLiteral("IDLE"));
-        m_statusText->setText(QStringLiteral("No screen region is selected."));
-        return;
-    }
-    m_statusPill->setText(QStringLiteral("READY"));
-    m_statusText->setText(QStringLiteral("Region is ready for operator-name routing."));
+        "Showing %1 of %2 %3. Every tile opens the same reusable settings page with the matching icon."
+    ).arg(shown).arg(source.size()).arg(m_side));
 }
 
 SaveFilesPage::SaveFilesPage(QWidget* parent)
@@ -786,7 +434,6 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
     };
     for (const auto& toggle : toggles) {
         auto* row = new ToggleRow(toggle.title, toggle.description, toggle.value, settings);
-        m_toggles.insert(toggle.key, row);
         connect(row, &ToggleRow::toggled, this, [this, key = toggle.key](bool value) {
             Q_EMIT settingChanged(key, value);
         });
@@ -798,16 +445,92 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
     rateLayout->setContentsMargins(16, 10, 16, 10);
     auto* rateLabel = new QLabel(QStringLiteral("Maximum client refresh rate"), rate);
     rateLabel->setFont(NexusTheme::font(10, QFont::DemiBold));
-    m_refreshRateBox = new QComboBox(rate);
-    m_refreshRateBox->addItems({QStringLiteral("30"), QStringLiteral("60"), QStringLiteral("120"), QStringLiteral("144"), QStringLiteral("240")});
-    m_refreshRateBox->setCurrentText(QStringLiteral("60"));
-    m_refreshRateBox->setFixedWidth(96);
-    connect(m_refreshRateBox, &QComboBox::currentTextChanged, this, [this](const QString& value) {
+    auto* rateBox = new QComboBox(rate);
+    rateBox->addItems({QStringLiteral("30"), QStringLiteral("60"), QStringLiteral("120"), QStringLiteral("144"), QStringLiteral("240")});
+    rateBox->setCurrentText(QStringLiteral("60"));
+    rateBox->setFixedWidth(96);
+    connect(rateBox, &QComboBox::currentTextChanged, this, [this](const QString& value) {
         Q_EMIT settingChanged(QStringLiteral("refresh_rate"), value.toInt());
     });
     rateLayout->addWidget(rateLabel, 1);
-    rateLayout->addWidget(m_refreshRateBox);
+    rateLayout->addWidget(rateBox);
     settingsLayout->addWidget(rate);
+
+    QSettings storedSettings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    auto* speech = new CardFrame(settings, false);
+    auto* speechLayout = new QVBoxLayout(speech);
+    speechLayout->setContentsMargins(16, 12, 16, 12);
+    speechLayout->setSpacing(10);
+
+    auto* speechHeader = new QHBoxLayout();
+    auto* speechText = new QVBoxLayout();
+    speechText->setSpacing(2);
+    auto* speechLabel = new QLabel(QStringLiteral("TTS audio feedback"), speech);
+    speechLabel->setFont(NexusTheme::font(10, QFont::DemiBold));
+    auto* speechDescription = new QLabel(QStringLiteral("Announce operator loadouts when they change."), speech);
+    speechDescription->setProperty("muted", true);
+    speechDescription->setWordWrap(true);
+    speechText->addWidget(speechLabel);
+    speechText->addWidget(speechDescription);
+    auto* speechEnabled = new QCheckBox(speech);
+    speechEnabled->setChecked(storedSettings.value(QStringLiteral("settings/tts_enabled"), true).toBool());
+    speechEnabled->setCursor(Qt::PointingHandCursor);
+    connect(speechEnabled, &QCheckBox::toggled, this, [this](bool enabled) {
+        Q_EMIT settingChanged(QStringLiteral("tts_enabled"), enabled);
+    });
+    speechHeader->addLayout(speechText, 1);
+    speechHeader->addWidget(speechEnabled, 0, Qt::AlignTop);
+    speechLayout->addLayout(speechHeader);
+
+    auto* volumeRow = new QHBoxLayout();
+    auto* volumeLabel = new QLabel(QStringLiteral("Volume"), speech);
+    volumeLabel->setProperty("muted", true);
+    auto* volumeValue = new QLabel(QStringLiteral("80%"), speech);
+    volumeValue->setProperty("accent", true);
+    volumeValue->setMinimumWidth(44);
+    volumeValue->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    auto* volumeSlider = new QSlider(Qt::Horizontal, speech);
+    volumeSlider->setRange(0, 100);
+    volumeSlider->setSingleStep(5);
+    volumeSlider->setPageStep(10);
+    volumeSlider->setValue(storedSettings.value(QStringLiteral("settings/tts_volume"), 80).toInt());
+    volumeSlider->setCursor(Qt::PointingHandCursor);
+    volumeSlider->setStyleSheet(QStringLiteral(R"QSS(
+        QSlider::groove:horizontal {
+            height: 8px;
+            border-radius: 4px;
+            background: #252D40;
+        }
+        QSlider::sub-page:horizontal {
+            border-radius: 4px;
+            background: #765BFF;
+        }
+        QSlider::add-page:horizontal {
+            border-radius: 4px;
+            background: #131A2A;
+        }
+        QSlider::handle:horizontal {
+            width: 18px;
+            height: 18px;
+            margin: -6px 0;
+            border-radius: 9px;
+            background: #F7F9FF;
+            border: 2px solid #765BFF;
+        }
+        QSlider::handle:horizontal:hover {
+            background: #A898FF;
+        }
+    )QSS"));
+    volumeValue->setText(QStringLiteral("%1%").arg(volumeSlider->value()));
+    connect(volumeSlider, &QSlider::valueChanged, this, [this, volumeValue](int value) {
+        volumeValue->setText(QStringLiteral("%1%").arg(value));
+        Q_EMIT settingChanged(QStringLiteral("tts_volume"), value);
+    });
+    volumeRow->addWidget(volumeLabel);
+    volumeRow->addWidget(volumeSlider, 1);
+    volumeRow->addWidget(volumeValue);
+    speechLayout->addLayout(volumeRow);
+    settingsLayout->addWidget(speech);
 
     auto* close = new CardFrame(settings, false);
     auto* closeLayout = new QHBoxLayout(close);
@@ -844,33 +567,6 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
     columns->addWidget(about, 2);
     bodyLayout->addLayout(columns);
     bodyLayout->addStretch();
-}
-
-void ClientSettingsPage::setSavedSettings(const QVariantMap& settings) {
-    const QHash<QString, QVariant> defaults{
-        {QStringLiteral("mute_sounds"), false},
-        {QStringLiteral("show_fps"), true},
-        {QStringLiteral("performance_mode"), true},
-        {QStringLiteral("outline_crosshairs"), false},
-        {QStringLiteral("minimize_to_tray"), true},
-        {QStringLiteral("startup"), true},
-    };
-
-    for (auto iterator = m_toggles.begin(); iterator != m_toggles.end(); ++iterator) {
-        const QSignalBlocker blocker(iterator.value());
-        iterator.value()->setChecked(settings.value(
-            iterator.key(),
-            defaults.value(iterator.key(), false)
-        ).toBool());
-    }
-
-    if (m_refreshRateBox != nullptr) {
-        const QSignalBlocker blocker(m_refreshRateBox);
-        m_refreshRateBox->setCurrentText(QString::number(settings.value(
-            QStringLiteral("refresh_rate"),
-            60
-        ).toInt()));
-    }
 }
 
 SettingsPage::SettingsPage(QWidget* parent)
@@ -949,7 +645,7 @@ SettingsPage::SettingsPage(QWidget* parent)
     const QList<ComboDefinition> combos{
         {QStringLiteral("Theme Color"), {QStringLiteral("NEXUS Purple")}, QStringLiteral("theme")},
         {QStringLiteral("Accent Color"), {QStringLiteral("Purple"), QStringLiteral("Violet"), QStringLiteral("Lavender")}, QStringLiteral("accent")},
-        {QStringLiteral("UI Scale"), {QStringLiteral("75%"), QStringLiteral("90%"), QStringLiteral("100%"), QStringLiteral("110%"), QStringLiteral("125%")}, QStringLiteral("ui_scale")},
+        {QStringLiteral("UI Scale"), {QStringLiteral("90%"), QStringLiteral("100%"), QStringLiteral("110%"), QStringLiteral("125%")}, QStringLiteral("ui_scale")},
     };
     int comboRow = 1;
     for (const auto& definition : combos) {
@@ -957,7 +653,6 @@ SettingsPage::SettingsPage(QWidget* parent)
         label->setProperty("muted", true);
         auto* box = new QComboBox(appearance);
         box->addItems(definition.values);
-        m_combos.insert(definition.key, box);
         connect(box, &QComboBox::currentTextChanged, this, [this, key = definition.key](const QString& value) {
             Q_EMIT settingChanged(key, value);
         });
@@ -1004,23 +699,6 @@ SettingsPage::SettingsPage(QWidget* parent)
     columns->addWidget(right, 2);
     bodyLayout->addLayout(columns);
     bodyLayout->addStretch();
-}
-
-void SettingsPage::setSavedSettings(const QVariantMap& settings) {
-    for (auto iterator = m_combos.begin(); iterator != m_combos.end(); ++iterator) {
-        QString value = settings.value(iterator.key()).toString();
-        if (value.isEmpty()) {
-            continue;
-        }
-        if (iterator.key() == QStringLiteral("ui_scale") && value == QStringLiteral("50%")) {
-            value = QStringLiteral("75%");
-        }
-        const QSignalBlocker blocker(iterator.value());
-        const int index = iterator.value()->findText(value);
-        if (index >= 0) {
-            iterator.value()->setCurrentIndex(index);
-        }
-    }
 }
 
 OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
@@ -1111,6 +789,42 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
     workspace->setColumnStretch(1, 3);
     workspace->setColumnStretch(2, 2);
 
+    auto* loadoutCard = new CardFrame(this, true);
+    auto* loadoutLayout = new QGridLayout(loadoutCard);
+    loadoutLayout->setContentsMargins(16, 16, 16, 16);
+    loadoutLayout->setHorizontalSpacing(10);
+    loadoutLayout->setVerticalSpacing(8);
+    loadoutLayout->setColumnStretch(1, 1);
+    auto* loadoutHeading = createSectionLabel(QStringLiteral("LOADOUT SELECTION"), loadoutCard);
+    loadoutLayout->addWidget(loadoutHeading, 0, 0, 1, 2);
+
+    auto addLoadoutRow = [loadoutCard, loadoutLayout](
+        int row,
+        const QString& labelText,
+        QComboBox*& combo
+    ) {
+        auto* label = new QLabel(labelText, loadoutCard);
+        label->setFont(NexusTheme::font(9, QFont::DemiBold));
+        combo = new QComboBox(loadoutCard);
+        combo->setMinimumHeight(36);
+        combo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        loadoutLayout->addWidget(label, row, 0);
+        loadoutLayout->addWidget(combo, row, 1);
+    };
+
+    addLoadoutRow(1, QStringLiteral("WEAPON"), m_weaponSelector);
+    addLoadoutRow(2, QStringLiteral("OPTIC"), m_opticSelector);
+    addLoadoutRow(3, QStringLiteral("BARREL"), m_barrelSelector);
+    addLoadoutRow(4, QStringLiteral("GRIP"), m_gripSelector);
+    addLoadoutRow(5, QStringLiteral("UNDERBARREL"), m_underbarrelSelector);
+    m_adsBindingLabel = bodyText(
+        QStringLiteral("Selected optic uses the shared 1x ADS converter value."),
+        loadoutCard
+    );
+    m_adsBindingLabel->setWordWrap(true);
+    loadoutLayout->addWidget(m_adsBindingLabel, 6, 0, 1, 2);
+    populateAttachmentSelectors();
+
     auto* inputCard = new CardFrame(this, true);
     auto* inputLayout = new QVBoxLayout(inputCard);
     inputLayout->setContentsMargins(16, 16, 16, 16);
@@ -1121,8 +835,8 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
         QStringLiteral("X AMOUNT"),
         -100.0,
         100.0,
-        1.0,
-        0,
+        0.05,
+        2,
         0.0,
         QString(),
         inputCard
@@ -1131,24 +845,66 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
         QStringLiteral("Y AMOUNT"),
         -100.0,
         100.0,
-        1.0,
-        0,
+        0.05,
+        2,
         0.0,
         QString(),
         inputCard
     );
+    m_horizontalRamp = new NumericStepperRow(
+        QStringLiteral("HORIZONTAL AFTER"),
+        -100.0,
+        100.0,
+        0.05,
+        2,
+        0.0,
+        QString(),
+        inputCard
+    );
+    m_verticalRamp = new NumericStepperRow(
+        QStringLiteral("VERTICAL AFTER"),
+        -100.0,
+        100.0,
+        0.05,
+        2,
+        0.0,
+        QString(),
+        inputCard
+    );
+    m_rampStartSeconds = new NumericStepperRow(
+        QStringLiteral("RAMP START"),
+        0.0,
+        10.0,
+        0.1,
+        2,
+        0.75,
+        QStringLiteral("s"),
+        inputCard
+    );
     m_timeDelay = new NumericStepperRow(
         QStringLiteral("TIME DELAY"),
-        0.001,
+        0.0,
         1.0,
-        0.001,
-        3,
-        0.030,
+        0.000001,
+        6,
+        0.0,
         QStringLiteral("s"),
         inputCard
     );
     inputLayout->addWidget(m_xAmount);
     inputLayout->addWidget(m_yAmount);
+    inputLayout->addWidget(m_horizontalRamp);
+    inputLayout->addWidget(m_verticalRamp);
+    inputLayout->addWidget(m_rampStartSeconds);
+    auto* rampHint = bodyText(
+        QStringLiteral(
+            "After RAMP START, the pattern switches to the AFTER values. "
+            "Leave an AFTER value at 0 to keep that axis on the original amount."
+        ),
+        inputCard
+    );
+    rampHint->setWordWrap(true);
+    inputLayout->addWidget(rampHint);
     inputLayout->addWidget(m_timeDelay);
 
     auto* editActions = new QHBoxLayout();
@@ -1205,6 +961,7 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
     auto* leftLayout = new QVBoxLayout(leftColumn);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(12);
+    leftLayout->addWidget(loadoutCard);
     leftLayout->addWidget(inputCard);
     leftLayout->addWidget(optionsCard);
     leftLayout->addStretch();
@@ -1239,14 +996,25 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
     addStat(QStringLiteral("VECTOR"), m_vectorLabel);
     addStat(QStringLiteral("ANGLE"), m_angleLabel);
     addStat(QStringLiteral("SPEED"), m_speedLabel);
+    addStat(QStringLiteral("PULLING"), m_pullLabel);
+    addStat(QStringLiteral("RAMP START"), m_rampStartLabel);
 
     statsLayout->addSpacing(8);
-    statsLayout->addWidget(createSectionLabel(QStringLiteral("RAPID FIRE TARGET"), statsCard));
+    auto* rapidFireHeading = createSectionLabel(QStringLiteral("RAPID FIRE TARGET"), statsCard);
+    statsLayout->addWidget(rapidFireHeading);
     m_rapidFireButton = new QPushButton(QStringLiteral("RAPID FIRE: OFF"), statsCard);
     m_rapidFireButton->setCursor(Qt::PointingHandCursor);
     m_rapidFireButton->setMinimumHeight(44);
-    m_rapidFireButton->setToolTip(QStringLiteral("Click to cycle: Weapon 1, Weapon 2, both weapons, off."));
+    m_rapidFireButton->setToolTip(
+        QStringLiteral("Click to cycle: Weapon 1 → Weapon 2 → Both Weapons → Off")
+    );
     statsLayout->addWidget(m_rapidFireButton);
+    auto* rapidFireHint = bodyText(
+        QStringLiteral("Click to cycle Weapon 1, Weapon 2, both weapons, then off."),
+        statsCard
+    );
+    rapidFireHint->setWordWrap(true);
+    statsLayout->addWidget(rapidFireHint);
     m_rapidFireStatusLabel = new QLabel(QStringLiteral("RAPID FIRE DISABLED"), statsCard);
     m_rapidFireStatusLabel->setAlignment(Qt::AlignCenter);
     m_rapidFireStatusLabel->setProperty("rapidFireEnabled", false);
@@ -1288,14 +1056,70 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
         setWeaponSlot(QStringLiteral("secondary"));
     });
 
+    connect(m_weaponSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) {
+        if (m_loading || m_operatorId.isEmpty()) {
+            return;
+        }
+        const QString selectedWeapon = m_weaponSelector->currentData().toString();
+        const double defaultDelay = OperatorLoadoutCatalog::delaySecondsForWeapon(selectedWeapon);
+        setWeaponField(QStringLiteral("selected_weapon"), selectedWeapon);
+        m_timeDelay->setDefaultValue(defaultDelay, true);
+        setWeaponField(QStringLiteral("time_delay"), defaultDelay);
+        updateStatus(
+            defaultDelay > 0.0
+                ? QStringLiteral("Weapon selected. TIME DELAY reset to RPM / 60000.")
+                : QStringLiteral("Weapon selected. No RPM default is available for this weapon.")
+        );
+        emitCurrentLoadoutSelection();
+    });
+    connect(m_opticSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) {
+        if (m_loading || m_operatorId.isEmpty()) {
+            return;
+        }
+        setAttachmentField(QStringLiteral("optic"), m_opticSelector->currentData().toString());
+        updateAdsBindingLabel();
+        emitCurrentLoadoutSelection();
+    });
+    connect(m_barrelSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) {
+        if (!m_loading && !m_operatorId.isEmpty()) {
+            setAttachmentField(QStringLiteral("barrel"), m_barrelSelector->currentData().toString());
+            emitCurrentLoadoutSelection();
+        }
+    });
+    connect(m_gripSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) {
+        if (!m_loading && !m_operatorId.isEmpty()) {
+            setAttachmentField(QStringLiteral("grip"), m_gripSelector->currentData().toString());
+            emitCurrentLoadoutSelection();
+        }
+    });
+    connect(m_underbarrelSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) {
+        if (!m_loading && !m_operatorId.isEmpty()) {
+            setAttachmentField(QStringLiteral("underbarrel"), m_underbarrelSelector->currentData().toString());
+            emitCurrentLoadoutSelection();
+        }
+    });
+
     connect(m_xAmount, &NumericStepperRow::valueChanged, this, [this](double value) {
         setWeaponField(QStringLiteral("x_amount"), value);
     });
     connect(m_yAmount, &NumericStepperRow::valueChanged, this, [this](double value) {
         setWeaponField(QStringLiteral("y_amount"), value);
     });
+    connect(m_horizontalRamp, &NumericStepperRow::valueChanged, this, [this](double value) {
+        setWeaponField(QStringLiteral("horizontal_ramp"), value);
+        emitCurrentLoadoutSelection();
+    });
+    connect(m_verticalRamp, &NumericStepperRow::valueChanged, this, [this](double value) {
+        setWeaponField(QStringLiteral("vertical_ramp"), value);
+        emitCurrentLoadoutSelection();
+    });
+    connect(m_rampStartSeconds, &NumericStepperRow::valueChanged, this, [this](double value) {
+        setWeaponField(QStringLiteral("ramp_start_seconds"), value);
+        emitCurrentLoadoutSelection();
+    });
     connect(m_timeDelay, &NumericStepperRow::valueChanged, this, [this](double value) {
         setWeaponField(QStringLiteral("time_delay"), value);
+        emitCurrentLoadoutSelection();
     });
 
     connect(m_profileEnabled, &ToggleRow::toggled, this, [this](bool value) {
@@ -1343,7 +1167,7 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
         }
         m_undoSnapshot = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
         auto settings = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
-        settings.insert(m_weaponSlot, defaultWeaponSettings());
+        settings.insert(m_weaponSlot, defaultWeaponSettingsForSlot(m_weaponSlot));
         m_drafts.insert(m_operatorId, settings);
         applyActiveWeaponSettings();
         updateStatus(QStringLiteral("Cleared the current weapon values."), true);
@@ -1405,6 +1229,7 @@ bool OperatorSettingsPage::setOperator(const QString& operatorId) {
             .arg(record->displayName),
         true
     );
+    emitCurrentLoadoutSelection();
     return true;
 }
 
@@ -1424,8 +1249,12 @@ QVariantMap OperatorSettingsPage::currentSettings() const {
     settings.insert(QStringLiteral("auto_load"), m_autoLoad->isChecked());
     settings.insert(QStringLiteral("show_overlay"), m_showOverlay->isChecked());
     settings.insert(QStringLiteral("monitor_while_active"), m_monitorWhileActive->isChecked());
-    settings.insert(QStringLiteral("rapid_fire_enabled"), m_rapidFireValue != 0);
+    settings.insert(
+        QStringLiteral("rapid_fire_enabled"),
+        m_rapidFireValue != 0
+    );
     settings.insert(QStringLiteral("rapid_fire_value"), m_rapidFireValue);
+    // The exported schema intentionally does not contain rapid_fire_target.
     settings.remove(QStringLiteral("rapid_fire_target"));
     settings.insert(QStringLiteral("notes"), m_notes->toPlainText());
     settings.insert(m_weaponSlot, activeWeaponSettings());
@@ -1465,21 +1294,54 @@ void OperatorSettingsPage::setSettingsFor(
         merged.insert(iterator.key(), iterator.value());
     }
     merged.insert(QStringLiteral("operator_id"), record->id);
-    const int rapidValue = normalizedRapidFireValue(settings);
+
+    const int rapidFireValue = normalizedRapidFireValue(settings);
     merged.remove(QStringLiteral("rapid_fire_target"));
-    merged.insert(QStringLiteral("rapid_fire_value"), rapidValue);
-    merged.insert(QStringLiteral("rapid_fire_enabled"), rapidValue != 0);
+    merged.insert(QStringLiteral("rapid_fire_value"), rapidFireValue);
+    merged.insert(
+        QStringLiteral("rapid_fire_enabled"),
+        rapidFireValue != 0
+    );
 
     for (const QString& slot : {QStringLiteral("primary"), QStringLiteral("secondary")}) {
-        QVariantMap weapon = defaultWeaponSettings();
+        QVariantMap weapon = defaultWeaponSettingsForSlot(record->id, slot);
         const auto imported = merged.value(slot).toMap();
         for (auto iterator = imported.constBegin(); iterator != imported.constEnd(); ++iterator) {
             weapon.insert(iterator.key(), iterator.value());
         }
         weapon.insert(
-            QStringLiteral("time_delay"),
-            normalizeDelaySeconds(weapon.value(QStringLiteral("time_delay"), 0.030).toDouble())
+            QStringLiteral("horizontal_ramp"),
+            imported.value(
+                QStringLiteral("horizontal_ramp"),
+                weapon.value(QStringLiteral("horizontal_ramp"), 0.0)
+            ).toDouble()
         );
+        weapon.insert(
+            QStringLiteral("vertical_ramp"),
+            imported.value(
+                QStringLiteral("vertical_ramp"),
+                weapon.value(QStringLiteral("vertical_ramp"), 0.0)
+            ).toDouble()
+        );
+        weapon.insert(
+            QStringLiteral("ramp_start_seconds"),
+            imported.value(
+                QStringLiteral("ramp_start_seconds"),
+                weapon.value(QStringLiteral("ramp_start_seconds"), 0.75)
+            ).toDouble()
+        );
+        QVariantMap attachments = OperatorLoadoutCatalog::defaultAttachments();
+        const QVariantMap importedAttachments = imported.value(QStringLiteral("attachments")).toMap();
+        for (auto iterator = importedAttachments.constBegin(); iterator != importedAttachments.constEnd(); ++iterator) {
+            attachments.insert(iterator.key(), iterator.value());
+        }
+        weapon.insert(QStringLiteral("attachments"), attachments);
+        if (weapon.value(QStringLiteral("selected_weapon")).toString().isEmpty()) {
+            weapon.insert(
+                QStringLiteral("selected_weapon"),
+                OperatorLoadoutCatalog::defaultWeapon(record->id, slot)
+            );
+        }
         merged.insert(slot, weapon);
     }
 
@@ -1515,17 +1377,30 @@ void OperatorSettingsPage::resetAllOperatorSettings() {
     updateStatus(QStringLiteral("Reset all operator data to NEXUS defaults."), true);
 }
 
-QVariantMap OperatorSettingsPage::defaultWeaponSettings() const {
+QVariantMap OperatorSettingsPage::defaultWeaponSettingsForSlot(const QString& slot) const {
+    return defaultWeaponSettingsForSlot(m_operatorId, slot);
+}
+
+QVariantMap OperatorSettingsPage::defaultWeaponSettingsForSlot(
+    const QString& operatorId,
+    const QString& slot
+) const {
     return {
-        {QStringLiteral("x_amount"), 0.0},
-        {QStringLiteral("y_amount"), 0.0},
-        {QStringLiteral("time_delay"), 0.030},
+        {QStringLiteral("selected_weapon"), OperatorLoadoutCatalog::defaultWeapon(operatorId, slot)},
+        {QStringLiteral("attachments"), OperatorLoadoutCatalog::defaultAttachments()},
+        {QStringLiteral("x_amount"), 0},
+        {QStringLiteral("y_amount"), -1},
+        {QStringLiteral("horizontal_ramp"), 0.0},
+        {QStringLiteral("vertical_ramp"), 0.0},
+        {QStringLiteral("ramp_start_seconds"), 0.75},
+        {QStringLiteral("time_delay"), OperatorLoadoutCatalog::defaultDelaySeconds(operatorId, slot)},
     };
 }
 
 QVariantMap OperatorSettingsPage::defaultSettingsFor(const QString& operatorId) const {
+    const QString normalized = operatorId.trimmed().toLower();
     return {
-        {QStringLiteral("operator_id"), operatorId.trimmed().toLower()},
+        {QStringLiteral("operator_id"), normalized},
         {QStringLiteral("active_weapon"), QStringLiteral("primary")},
         {QStringLiteral("profile_enabled"), true},
         {QStringLiteral("auto_load"), true},
@@ -1533,16 +1408,21 @@ QVariantMap OperatorSettingsPage::defaultSettingsFor(const QString& operatorId) 
         {QStringLiteral("monitor_while_active"), true},
         {QStringLiteral("rapid_fire_enabled"), false},
         {QStringLiteral("rapid_fire_value"), 0},
-        {QStringLiteral("notes"), QString()},
-        {QStringLiteral("primary"), defaultWeaponSettings()},
-        {QStringLiteral("secondary"), defaultWeaponSettings()},
+        {QStringLiteral("notes"), QStringLiteral("(Click to Edit)")},
+        {QStringLiteral("primary"), defaultWeaponSettingsForSlot(normalized, QStringLiteral("primary"))},
+        {QStringLiteral("secondary"), defaultWeaponSettingsForSlot(normalized, QStringLiteral("secondary"))},
     };
 }
 
 QVariantMap OperatorSettingsPage::activeWeaponSettings() const {
     return {
+        {QStringLiteral("selected_weapon"), m_weaponSelector->currentData().toString()},
+        {QStringLiteral("attachments"), activeAttachmentSettings()},
         {QStringLiteral("x_amount"), m_xAmount->value()},
         {QStringLiteral("y_amount"), m_yAmount->value()},
+        {QStringLiteral("horizontal_ramp"), m_horizontalRamp->value()},
+        {QStringLiteral("vertical_ramp"), m_verticalRamp->value()},
+        {QStringLiteral("ramp_start_seconds"), m_rampStartSeconds->value()},
         {QStringLiteral("time_delay"), m_timeDelay->value()},
     };
 }
@@ -1576,14 +1456,47 @@ void OperatorSettingsPage::applyActiveWeaponSettings() {
         return;
     }
     const auto settings = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
-    const auto weapon = settings.value(m_weaponSlot, defaultWeaponSettings()).toMap();
+    const auto weapon = settings.value(m_weaponSlot, defaultWeaponSettingsForSlot(m_weaponSlot)).toMap();
     const bool previousLoadingState = m_loading;
     m_loading = true;
-    m_xAmount->setValue(weapon.value(QStringLiteral("x_amount"), 0.0).toDouble());
-    m_yAmount->setValue(weapon.value(QStringLiteral("y_amount"), 0.0).toDouble());
-    m_timeDelay->setValue(normalizeDelaySeconds(weapon.value(QStringLiteral("time_delay"), 0.030).toDouble()));
+    const auto defaults = defaultWeaponSettingsForSlot(m_weaponSlot);
+    m_xAmount->setDefaultValue(defaults.value(QStringLiteral("x_amount")).toDouble());
+    m_yAmount->setDefaultValue(defaults.value(QStringLiteral("y_amount")).toDouble());
+    m_xAmount->setValue(
+        weapon.value(QStringLiteral("x_amount"), defaults.value(QStringLiteral("x_amount"))).toDouble()
+    );
+    m_yAmount->setValue(
+        weapon.value(QStringLiteral("y_amount"), defaults.value(QStringLiteral("y_amount"))).toDouble()
+    );
+    m_horizontalRamp->setValue(
+        weapon.value(
+            QStringLiteral("horizontal_ramp"),
+            defaults.value(QStringLiteral("horizontal_ramp"))
+        ).toDouble()
+    );
+    m_verticalRamp->setValue(
+        weapon.value(
+            QStringLiteral("vertical_ramp"),
+            defaults.value(QStringLiteral("vertical_ramp"))
+        ).toDouble()
+    );
+    m_rampStartSeconds->setValue(
+        weapon.value(
+            QStringLiteral("ramp_start_seconds"),
+            defaults.value(QStringLiteral("ramp_start_seconds"))
+        ).toDouble()
+    );
+    applyLoadoutSelectors(weapon);
+    const QString selectedWeapon = m_weaponSelector->currentData().toString();
+    const double selectedWeaponDefaultDelay =
+        OperatorLoadoutCatalog::delaySecondsForWeapon(selectedWeapon);
+    m_timeDelay->setDefaultValue(selectedWeaponDefaultDelay);
+    m_timeDelay->setValue(
+        weapon.value(QStringLiteral("time_delay"), selectedWeaponDefaultDelay).toDouble()
+    );
     m_loading = previousLoadingState;
     updateVisualization();
+    updateAdsBindingLabel();
 }
 
 void OperatorSettingsPage::persistCurrentDraft() {
@@ -1612,17 +1525,190 @@ void OperatorSettingsPage::setWeaponField(const QString& key, const QVariant& va
     }
     m_undoSnapshot = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
     auto settings = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
-    auto weapon = settings.value(m_weaponSlot, defaultWeaponSettings()).toMap();
-    weapon.insert(key, value);
+    auto weapon = settings.value(m_weaponSlot, defaultWeaponSettingsForSlot(m_weaponSlot)).toMap();
+    const QVariant normalizedValue = key == QStringLiteral("time_delay")
+        ? QVariant(value.toDouble())
+        : value;
+    weapon.insert(key, normalizedValue);
     settings.insert(m_weaponSlot, weapon);
     settings.insert(QStringLiteral("active_weapon"), m_weaponSlot);
     m_drafts.insert(m_operatorId, settings);
     updateVisualization();
-    updateStatus(QStringLiteral("Unsaved input values are held in the shared NEXUS configuration."));
+    updateStatus(QStringLiteral("Unsaved weapon and attachment values are held in the shared NEXUS configuration."));
     Q_EMIT settingChanged(
         m_operatorId,
         m_weaponSlot + QStringLiteral(".") + key,
+        normalizedValue
+    );
+}
+
+void OperatorSettingsPage::setAttachmentField(const QString& key, const QVariant& value) {
+    if (m_loading || m_operatorId.isEmpty()) {
+        return;
+    }
+    m_undoSnapshot = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
+    auto settings = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
+    auto weapon = settings.value(m_weaponSlot, defaultWeaponSettingsForSlot(m_weaponSlot)).toMap();
+    auto attachments = weapon.value(
+        QStringLiteral("attachments"),
+        OperatorLoadoutCatalog::defaultAttachments()
+    ).toMap();
+    attachments.insert(key, value);
+    if (key == QStringLiteral("optic")) {
+        const auto* optic = OperatorLoadoutCatalog::findOptic(value.toString());
+        if (optic != nullptr) {
+            attachments.insert(QStringLiteral("ads_profile_key"), optic->adsProfileKey);
+            attachments.insert(QStringLiteral("optic_magnification"), optic->magnification);
+        }
+    }
+    weapon.insert(QStringLiteral("attachments"), attachments);
+    settings.insert(m_weaponSlot, weapon);
+    settings.insert(QStringLiteral("active_weapon"), m_weaponSlot);
+    m_drafts.insert(m_operatorId, settings);
+    updateStatus(QStringLiteral("Attachment selection saved in the shared operator draft."));
+    Q_EMIT settingChanged(
+        m_operatorId,
+        m_weaponSlot + QStringLiteral(".attachments.") + key,
         value
+    );
+}
+
+void OperatorSettingsPage::populateWeaponSelector() {
+    const QSignalBlocker blocker(m_weaponSelector);
+    const QString previous = m_weaponSelector->currentData().toString();
+    m_weaponSelector->clear();
+    const QStringList weapons = OperatorLoadoutCatalog::weaponsFor(m_operatorId, m_weaponSlot);
+    if (weapons.isEmpty()) {
+        m_weaponSelector->addItem(QStringLiteral("No weapon data configured"), QString());
+        m_weaponSelector->setEnabled(false);
+        return;
+    }
+    m_weaponSelector->setEnabled(true);
+    for (const QString& weapon : weapons) {
+        m_weaponSelector->addItem(weapon, weapon);
+    }
+    const int previousIndex = m_weaponSelector->findData(previous);
+    if (previousIndex >= 0) {
+        m_weaponSelector->setCurrentIndex(previousIndex);
+    }
+}
+
+void OperatorSettingsPage::populateAttachmentSelectors() {
+    auto populate = [](QComboBox* combo, const QList<AttachmentOption>& options) {
+        const QSignalBlocker blocker(combo);
+        combo->clear();
+        for (const auto& option : options) {
+            combo->addItem(option.displayName, option.id);
+        }
+    };
+    populate(m_opticSelector, OperatorLoadoutCatalog::opticOptions());
+    populate(m_barrelSelector, OperatorLoadoutCatalog::barrelOptions());
+    populate(m_gripSelector, OperatorLoadoutCatalog::gripOptions());
+    populate(m_underbarrelSelector, OperatorLoadoutCatalog::underbarrelOptions());
+}
+
+void OperatorSettingsPage::applyLoadoutSelectors(const QVariantMap& weaponSettings) {
+    populateWeaponSelector();
+    const auto defaults = defaultWeaponSettingsForSlot(m_weaponSlot);
+    const QString selectedWeapon = weaponSettings.value(
+        QStringLiteral("selected_weapon"),
+        defaults.value(QStringLiteral("selected_weapon"))
+    ).toString();
+    int weaponIndex = m_weaponSelector->findData(selectedWeapon);
+    if (weaponIndex < 0 && m_weaponSelector->count() > 0) {
+        weaponIndex = 0;
+    }
+
+    QVariantMap attachments = OperatorLoadoutCatalog::defaultAttachments();
+    const QVariantMap imported = weaponSettings.value(QStringLiteral("attachments")).toMap();
+    for (auto iterator = imported.constBegin(); iterator != imported.constEnd(); ++iterator) {
+        attachments.insert(iterator.key(), iterator.value());
+    }
+
+    auto select = [](QComboBox* combo, const QString& id) {
+        const QSignalBlocker blocker(combo);
+        const int index = combo->findData(id);
+        combo->setCurrentIndex(index >= 0 ? index : 0);
+    };
+    {
+        const QSignalBlocker blocker(m_weaponSelector);
+        m_weaponSelector->setCurrentIndex(weaponIndex);
+    }
+    select(m_opticSelector, attachments.value(QStringLiteral("optic"), QStringLiteral("iron_1x")).toString());
+    select(m_barrelSelector, attachments.value(QStringLiteral("barrel"), QStringLiteral("none")).toString());
+    select(m_gripSelector, attachments.value(QStringLiteral("grip"), QStringLiteral("none")).toString());
+    select(m_underbarrelSelector, attachments.value(QStringLiteral("underbarrel"), QStringLiteral("none")).toString());
+}
+
+QVariantMap OperatorSettingsPage::activeAttachmentSettings() const {
+    QVariantMap attachments = {
+        {QStringLiteral("optic"), m_opticSelector->currentData().toString()},
+        {QStringLiteral("barrel"), m_barrelSelector->currentData().toString()},
+        {QStringLiteral("grip"), m_gripSelector->currentData().toString()},
+        {QStringLiteral("underbarrel"), m_underbarrelSelector->currentData().toString()},
+    };
+    const auto* optic = OperatorLoadoutCatalog::findOptic(
+        m_opticSelector->currentData().toString()
+    );
+    attachments.insert(
+        QStringLiteral("ads_profile_key"),
+        optic == nullptr ? QStringLiteral("ads_1x") : optic->adsProfileKey
+    );
+    attachments.insert(
+        QStringLiteral("optic_magnification"),
+        optic == nullptr ? 1.0 : optic->magnification
+    );
+    return attachments;
+}
+
+void OperatorSettingsPage::updateAdsBindingLabel() {
+    const auto attachments = activeAttachmentSettings();
+    const QString profile = attachments.value(QStringLiteral("ads_profile_key")).toString();
+    const QString display = profile == QStringLiteral("ads_2_5x")
+        ? QStringLiteral("2.5x Optics ADS")
+        : QStringLiteral("1x Optics ADS");
+    m_adsBindingLabel->setText(
+        QStringLiteral("Selected optic is linked to the shared %1 converter value. The backend receives the complete converter input map.")
+            .arg(display)
+    );
+}
+
+void OperatorSettingsPage::emitCurrentLoadoutSelection() {
+    if (m_loading || m_operatorId.isEmpty()) {
+        return;
+    }
+    const QString selectedWeapon = m_weaponSelector->currentData().toString();
+    QVariantMap loadoutMetadata = activeAttachmentSettings();
+    loadoutMetadata.insert(
+        QStringLiteral("weapon_rpm"),
+        OperatorLoadoutCatalog::weaponRpm(selectedWeapon)
+    );
+    loadoutMetadata.insert(
+        QStringLiteral("default_delay_seconds"),
+        OperatorLoadoutCatalog::delaySecondsForWeapon(selectedWeapon)
+    );
+    loadoutMetadata.insert(
+        QStringLiteral("configured_time_delay_seconds"),
+        m_timeDelay->value()
+    );
+    loadoutMetadata.insert(
+        QStringLiteral("horizontal_ramp"),
+        m_horizontalRamp->value()
+    );
+    loadoutMetadata.insert(
+        QStringLiteral("vertical_ramp"),
+        m_verticalRamp->value()
+    );
+    loadoutMetadata.insert(
+        QStringLiteral("ramp_start_seconds"),
+        m_rampStartSeconds->value()
+    );
+
+    Q_EMIT loadoutSelectionChanged(
+        m_operatorId,
+        m_weaponSlot,
+        selectedWeapon,
+        loadoutMetadata
     );
 }
 
@@ -1644,8 +1730,23 @@ void OperatorSettingsPage::setWeaponSlot(const QString& slot) {
         button->style()->unpolish(button);
         button->style()->polish(button);
     }
+
+    if (!m_operatorId.isEmpty() && !previousLoadingState) {
+        auto settings = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
+        settings.insert(QStringLiteral("active_weapon"), m_weaponSlot);
+        m_drafts.insert(m_operatorId, settings);
+        Q_EMIT settingChanged(
+            m_operatorId,
+            QStringLiteral("active_weapon"),
+            m_weaponSlot
+        );
+    }
+
     applyActiveWeaponSettings();
     m_loading = previousLoadingState;
+    if (!m_loading) {
+        emitCurrentLoadoutSelection();
+    }
 }
 
 void OperatorSettingsPage::recordUndoSnapshot() {
@@ -1683,24 +1784,38 @@ void OperatorSettingsPage::updateHeader() {
 void OperatorSettingsPage::updateVisualization() {
     const double x = m_xAmount->value();
     const double y = m_yAmount->value();
-    const double delay = qMax(0.001, m_timeDelay->value());
-    m_vectorPreview->setValues(x, y, delay);
+    const double horizontalRamp = m_horizontalRamp->value();
+    const double verticalRamp = m_verticalRamp->value();
+    const double rampStartSeconds = m_rampStartSeconds->value();
+    const double rampedX = qFuzzyIsNull(horizontalRamp) ? x : horizontalRamp;
+    const double rampedY = qFuzzyIsNull(verticalRamp) ? y : verticalRamp;
+    const double delay = qMax(0.000001, m_timeDelay->value());
+    m_vectorPreview->setValues(x, y, delay, horizontalRamp, verticalRamp, rampStartSeconds);
 
-    const double magnitude = qSqrt((x * x) + (y * y));
-    const double angle = qRadiansToDegrees(qAtan2(y, x));
-    const double speed = magnitude / delay;
-    const QString slope = qFuzzyIsNull(x)
-        ? (qFuzzyIsNull(y) ? QStringLiteral("0") : QStringLiteral("∞"))
-        : QString::number(y / x, 'f', 2);
+    const double baseMagnitude = qSqrt((x * x) + (y * y));
+    const double rampedMagnitude = qSqrt((rampedX * rampedX) + (rampedY * rampedY));
+    const double angle = qRadiansToDegrees(qAtan2(rampedY, rampedX));
+    const double speed = rampedMagnitude / delay;
+    const QString slope = qFuzzyIsNull(rampedX)
+        ? (qFuzzyIsNull(rampedY) ? QStringLiteral("0") : QStringLiteral("∞"))
+        : QString::number(rampedY / rampedX, 'f', 2);
 
     m_slopeLabel->setText(slope);
     m_vectorLabel->setText(
-        QStringLiteral("%1, %2")
+        QStringLiteral("%1, %2 -> %3, %4")
             .arg(QString::number(x, 'f', 0))
             .arg(QString::number(y, 'f', 0))
+            .arg(QString::number(rampedX, 'f', 2))
+            .arg(QString::number(rampedY, 'f', 2))
     );
     m_angleLabel->setText(QString::number(angle, 'f', 1) + QStringLiteral("°"));
     m_speedLabel->setText(QString::number(speed, 'f', 1));
+    m_pullLabel->setText(
+        QStringLiteral("%1 -> %2")
+            .arg(QString::number(baseMagnitude, 'f', 2))
+            .arg(QString::number(rampedMagnitude, 'f', 2))
+    );
+    m_rampStartLabel->setText(QString::number(rampStartSeconds, 'f', 2) + QStringLiteral("s"));
 }
 
 void OperatorSettingsPage::updateStatus(const QString& text, bool success) {
@@ -1711,74 +1826,127 @@ void OperatorSettingsPage::updateStatus(const QString& text, bool success) {
     m_statusLabel->style()->polish(m_statusLabel);
 }
 
-int OperatorSettingsPage::normalizedRapidFireValue(const QVariantMap& settings) const {
+int OperatorSettingsPage::normalizedRapidFireValue(
+    const QVariantMap& settings
+) const {
+    // Exact schema-v2 format:
+    //   rapid_fire_enabled: bool
+    //   rapid_fire_value: 0..3
+    // 0 = off, 1 = Weapon 1, 2 = Weapon 2, 3 = both weapons.
     const bool hasEnabled = settings.contains(QStringLiteral("rapid_fire_enabled"));
-    const bool enabled = settings.value(QStringLiteral("rapid_fire_enabled"), false).toBool();
+    const bool enabled = settings.value(
+        QStringLiteral("rapid_fire_enabled"),
+        false
+    ).toBool();
 
+    bool hasNumericValue = settings.contains(QStringLiteral("rapid_fire_value"));
     int value = settings.value(QStringLiteral("rapid_fire_value"), 0).toInt();
-    bool hasValue = settings.contains(QStringLiteral("rapid_fire_value"));
 
-    if (!hasValue && settings.contains(QStringLiteral("rapid_fire_target"))) {
-        const QString target = settings.value(QStringLiteral("rapid_fire_target")).toString().trimmed().toLower();
-        if (target == QStringLiteral("weapon_1") || target == QStringLiteral("weapon1") || target == QStringLiteral("primary")) {
+    // Migration support for V5.4.2 development files. Export never writes this key.
+    if (!hasNumericValue && settings.contains(QStringLiteral("rapid_fire_target"))) {
+        const QString target = settings.value(QStringLiteral("rapid_fire_target"))
+                                   .toString()
+                                   .trimmed()
+                                   .toLower();
+        if (target == QStringLiteral("weapon_1") ||
+            target == QStringLiteral("weapon1") ||
+            target == QStringLiteral("primary")) {
             value = 1;
-        } else if (target == QStringLiteral("weapon_2") || target == QStringLiteral("weapon2") || target == QStringLiteral("secondary")) {
+        } else if (target == QStringLiteral("weapon_2") ||
+                   target == QStringLiteral("weapon2") ||
+                   target == QStringLiteral("secondary")) {
             value = 2;
-        } else if (target == QStringLiteral("both") || target == QStringLiteral("both_weapons")) {
+        } else if (target == QStringLiteral("both") ||
+                   target == QStringLiteral("both_weapons")) {
             value = 3;
         } else {
             value = 0;
         }
-        hasValue = true;
+        hasNumericValue = true;
     }
 
     value = qBound(0, value, 3);
+
+    // In schema v2 the boolean is authoritative when explicitly false.
     if (hasEnabled && !enabled) {
         return 0;
     }
+
     if (value > 0) {
         return value;
     }
+
+    // Old files that only had rapid_fire_enabled=true map safely to BOTH.
     return enabled ? 3 : 0;
 }
 
-void OperatorSettingsPage::setRapidFireValue(int value, bool persist) {
+void OperatorSettingsPage::setRapidFireValue(
+    int value,
+    bool persist
+) {
     const int normalized = qBound(0, value, 3);
     m_rapidFireValue = normalized;
 
     if (persist && !m_loading && !m_operatorId.isEmpty()) {
-        m_undoSnapshot = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
-        auto settings = m_drafts.value(m_operatorId, defaultSettingsFor(m_operatorId));
+        m_undoSnapshot = m_drafts.value(
+            m_operatorId,
+            defaultSettingsFor(m_operatorId)
+        );
+        auto settings = m_drafts.value(
+            m_operatorId,
+            defaultSettingsFor(m_operatorId)
+        );
         settings.remove(QStringLiteral("rapid_fire_target"));
         settings.insert(QStringLiteral("rapid_fire_value"), normalized);
         settings.insert(QStringLiteral("rapid_fire_enabled"), normalized != 0);
         settings.insert(QStringLiteral("operator_id"), m_operatorId);
         m_drafts.insert(m_operatorId, settings);
-        updateStatus(QStringLiteral("Rapid fire target updated inside the shared NEXUS configuration."));
-        Q_EMIT settingChanged(m_operatorId, QStringLiteral("rapid_fire_value"), normalized);
-        Q_EMIT settingChanged(m_operatorId, QStringLiteral("rapid_fire_enabled"), normalized != 0);
-        Q_EMIT rapidFireSelectionChanged(m_operatorId, normalized, normalized != 0);
+
+        updateStatus(
+            QStringLiteral("Rapid fire target updated inside the shared NEXUS configuration.")
+        );
+        Q_EMIT settingChanged(
+            m_operatorId,
+            QStringLiteral("rapid_fire_value"),
+            normalized
+        );
+        Q_EMIT settingChanged(
+            m_operatorId,
+            QStringLiteral("rapid_fire_enabled"),
+            normalized != 0
+        );
+        Q_EMIT rapidFireSelectionChanged(
+            m_operatorId,
+            normalized,
+            normalized != 0
+        );
     }
 
     updateRapidFireStatus();
 }
 
 void OperatorSettingsPage::cycleRapidFireValue() {
+    // Fourth click returns to Off. The third enabled state is BOTH weapons;
+    // it is not a third weapon profile.
     setRapidFireValue((m_rapidFireValue + 1) % 4, true);
 }
 
 void OperatorSettingsPage::updateRapidFireStatus() {
-    QString buttonText = QStringLiteral("RAPID FIRE: OFF");
-    QString statusText = QStringLiteral("RAPID FIRE DISABLED");
+    QString buttonText;
+    QString statusText;
+
     if (m_rapidFireValue == 1) {
         buttonText = QStringLiteral("RAPID FIRE: WEAPON 1");
-        statusText = QStringLiteral("RAPID FIRE - WEAPON 1");
+        statusText = QStringLiteral("RAPID FIRE · WEAPON 1");
     } else if (m_rapidFireValue == 2) {
         buttonText = QStringLiteral("RAPID FIRE: WEAPON 2");
-        statusText = QStringLiteral("RAPID FIRE - WEAPON 2");
+        statusText = QStringLiteral("RAPID FIRE · WEAPON 2");
     } else if (m_rapidFireValue == 3) {
         buttonText = QStringLiteral("RAPID FIRE: BOTH WEAPONS");
-        statusText = QStringLiteral("RAPID FIRE - BOTH WEAPONS");
+        statusText = QStringLiteral("RAPID FIRE · BOTH WEAPONS");
+    } else {
+        buttonText = QStringLiteral("RAPID FIRE: OFF");
+        statusText = QStringLiteral("RAPID FIRE DISABLED");
     }
 
     const bool enabled = m_rapidFireValue != 0;
@@ -1786,6 +1954,7 @@ void OperatorSettingsPage::updateRapidFireStatus() {
     m_rapidFireButton->setProperty("accentButton", enabled);
     m_rapidFireButton->style()->unpolish(m_rapidFireButton);
     m_rapidFireButton->style()->polish(m_rapidFireButton);
+
     m_rapidFireStatusLabel->setText(statusText);
     m_rapidFireStatusLabel->setProperty("rapidFireEnabled", enabled);
     m_rapidFireStatusLabel->style()->unpolish(m_rapidFireStatusLabel);

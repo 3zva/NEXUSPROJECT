@@ -243,7 +243,10 @@ private:
     std::mutex mutex;
     std::condition_variable changed;
     std::wstring pendingPhrase;
+    std::atomic_bool speechEnabled{true};
+    std::atomic_long speechVolume{80};
     bool hasPendingPhrase = false;
+    bool purgeRequested = false;
     bool stopping = false;
 
     std::wstring ConvertToWide(const std::string& str) {
@@ -284,18 +287,29 @@ private:
         InitializeVoice();
         while (true) {
             std::wstring phrase;
+            bool shouldPurge = false;
             {
                 std::unique_lock<std::mutex> lock(mutex);
-                changed.wait(lock, [this] { return stopping || hasPendingPhrase; });
+                changed.wait(lock, [this] { return stopping || hasPendingPhrase || purgeRequested; });
                 if (stopping) {
                     break;
                 }
+                shouldPurge = purgeRequested;
+                purgeRequested = false;
                 phrase = std::move(pendingPhrase);
                 pendingPhrase.clear();
                 hasPendingPhrase = false;
             }
 
-            if (pVoice != nullptr && !phrase.empty()) {
+            if (pVoice == nullptr) {
+                continue;
+            }
+
+            pVoice->SetVolume(static_cast<USHORT>(std::clamp<long>(speechVolume.load(), 0, 100)));
+            if (shouldPurge) {
+                pVoice->Speak(nullptr, SPF_PURGEBEFORESPEAK, nullptr);
+            }
+            if (speechEnabled.load() && !phrase.empty()) {
                 pVoice->Speak(phrase.c_str(), SPF_ASYNC | SPF_PURGEBEFORESPEAK, nullptr);
             }
         }
@@ -320,7 +334,28 @@ public:
     TextToSpeech(const TextToSpeech&) = delete;
     TextToSpeech& operator=(const TextToSpeech&) = delete;
 
+    void SetEnabled(bool enabled) {
+        speechEnabled.store(enabled);
+        if (!enabled) {
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                pendingPhrase.clear();
+                hasPendingPhrase = false;
+                purgeRequested = true;
+            }
+            changed.notify_one();
+        }
+    }
+
+    void SetVolume(int volume) {
+        speechVolume.store(std::clamp(volume, 0, 100));
+    }
+
     void TriggerLoadoutSpeech(const std::string& op, const std::string& primary, const std::string& secondary) {
+        if (!speechEnabled.load()) {
+            return;
+        }
+
         std::wstring phrase = L"Operator " + ConvertToWide(op) + L" loaded.";
         if (!primary.empty()) {
             phrase += L" " + ConvertToWide(primary) + L".";
@@ -337,6 +372,11 @@ public:
         changed.notify_one();
     }
 };
+
+TextToSpeech& LoadoutSpeechClient() {
+    static TextToSpeech client;
+    return client;
+}
 }
 
 std::wstring GetWindowTextString(HWND hwnd) {
@@ -1988,8 +2028,7 @@ bool ApplyOperatorByName(const std::string& rawName, std::string* error = nullpt
     }
 
     BroadcastWebSocketText("OPERATOR_SELECTED:" + name);
-    static AudioFeedback::TextToSpeech ttsClient;
-    ttsClient.TriggerLoadoutSpeech(name, "", "");
+    AudioFeedback::LoadoutSpeechClient().TriggerLoadoutSpeech(name, "", "");
     SetStatus(Utf8ToWide("Activated operator: " + name));
     return true;
 }
@@ -2070,6 +2109,21 @@ bool ApplyRuntimeAppSetting(const std::string& key, const std::string& value) {
             } catch (...) {
                 return false;
             }
+        }
+        return true;
+    }
+    if (normalized == "tts_enabled") {
+        const std::string lowered = ToLowerAscii(trimmedValue);
+        AudioFeedback::LoadoutSpeechClient().SetEnabled(
+            lowered == "true" || lowered == "1" || lowered == "yes" || lowered == "on"
+        );
+        return true;
+    }
+    if (normalized == "tts_volume") {
+        try {
+            AudioFeedback::LoadoutSpeechClient().SetVolume(std::stoi(trimmedValue));
+        } catch (...) {
+            return false;
         }
         return true;
     }
