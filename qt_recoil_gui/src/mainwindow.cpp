@@ -1584,6 +1584,18 @@ void MainWindow::publishOperatorSettings(const QVariantMap& settings) {
 
     m_lastPublishedOperatorSettings = settings;
     publishRuntimeCommand(QStringLiteral("settings"), automationPayloadForSettings(settings));
+
+    const QVariantMap primary = settings.value(QStringLiteral("primary")).toMap();
+    const QVariantMap secondary = settings.value(QStringLiteral("secondary")).toMap();
+    QJsonObject loadout{
+        {QStringLiteral("operator"), settings.value(QStringLiteral("operator_id")).toString()},
+        {QStringLiteral("primary"), primary.value(QStringLiteral("selected_weapon")).toString()},
+        {QStringLiteral("secondary"), secondary.value(QStringLiteral("selected_weapon")).toString()}
+    };
+    publishRuntimeCommand(
+        QStringLiteral("loadout"),
+        QString::fromUtf8(QJsonDocument(loadout).toJson(QJsonDocument::Compact))
+    );
 }
 
 void MainWindow::publishRuntimeSetting(const QString& key, const QVariant& value) {

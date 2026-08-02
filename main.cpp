@@ -2028,8 +2028,40 @@ bool ApplyOperatorByName(const std::string& rawName, std::string* error = nullpt
     }
 
     BroadcastWebSocketText("OPERATOR_SELECTED:" + name);
-    AudioFeedback::LoadoutSpeechClient().TriggerLoadoutSpeech(name, "", "");
     SetStatus(Utf8ToWide("Activated operator: " + name));
+    return true;
+}
+
+std::mutex g_ttsLoadoutMutex;
+std::string g_lastSpokenOperator;
+std::string g_lastSpokenPrimary;
+std::string g_lastSpokenSecondary;
+
+bool TriggerLoadoutSpeechIfChanged(
+    const std::string& rawOperator,
+    const std::string& rawPrimary,
+    const std::string& rawSecondary
+) {
+    const std::string operatorName = ToLowerAscii(Trim(rawOperator));
+    const std::string primary = Trim(rawPrimary);
+    const std::string secondary = Trim(rawSecondary);
+    if (operatorName.empty()) {
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(g_ttsLoadoutMutex);
+        if (operatorName == g_lastSpokenOperator
+            && primary == g_lastSpokenPrimary
+            && secondary == g_lastSpokenSecondary) {
+            return false;
+        }
+        g_lastSpokenOperator = operatorName;
+        g_lastSpokenPrimary = primary;
+        g_lastSpokenSecondary = secondary;
+    }
+
+    AudioFeedback::LoadoutSpeechClient().TriggerLoadoutSpeech(operatorName, primary, secondary);
     return true;
 }
 
@@ -2908,6 +2940,15 @@ void HttpClientThread(SOCKET client) {
             SendHttp(client, 200, "OK", "Activated operator: " + ToLowerAscii(Trim(operatorName)));
         } else {
             SendHttp(client, 400, "Bad Request", error);
+        }
+    } else if (isPost && firstLine.find(" /loadout ") != std::string::npos) {
+        const std::string operatorName = JsonStringValue(body, "operator");
+        const std::string primary = JsonStringValue(body, "primary");
+        const std::string secondary = JsonStringValue(body, "secondary");
+        if (TriggerLoadoutSpeechIfChanged(operatorName, primary, secondary)) {
+            SendHttp(client, 200, "OK", "Loadout announced");
+        } else {
+            SendHttp(client, 200, "OK", "Loadout unchanged");
         }
     } else if (isPost && firstLine.find(" /settings ") != std::string::npos) {
         const std::string settings = Trim(body);

@@ -1109,7 +1109,8 @@ int RunOverlay(const OverlayConfig& config) {
         const int requiredConfirmations = 3;
         if (detection.hasMatch
             && pendingCount >= requiredConfirmations
-            && (frameStart >= nextAllowedUpdate || detection.match.name != lastOperator)) {
+            && detection.match.name != lastOperator
+            && frameStart >= nextAllowedUpdate) {
             if (PostOperatorDetection(detection.match.name, detection.read.confidence)) {
                 lastOperator = detection.match.name;
                 nextAllowedUpdate = frameStart + cooldown;
