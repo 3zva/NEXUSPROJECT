@@ -1,5 +1,6 @@
 #include "authenticatedroot.h"
 #include "nexuswidgets.h"
+#include "moreoptionspage.h"
 #include "operatorcatalog.h"
 #include "pages.h"
 #include "pathselectionpage.h"
@@ -7,18 +8,16 @@
 #include "theme.h"
 
 #include <QApplication>
-#include <QCoreApplication>
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QJsonArray>
 #include <QFrame>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QSaveFile>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -28,136 +27,6 @@
 #include <QStyle>
 #include <QVBoxLayout>
 #include <utility>
-
-namespace {
-double legacyDelayToSeconds(double value) {
-    return qMax(0.001, value / 1000.0);
-}
-
-QVariantMap weaponSettingsFromLegacyRow(const QJsonArray& row, int offset) {
-    return {
-        {QStringLiteral("x_amount"), row.at(offset).toDouble()},
-        {QStringLiteral("y_amount"), row.at(offset + 1).toDouble()},
-        {QStringLiteral("time_delay"), legacyDelayToSeconds(row.at(offset + 2).toDouble())},
-    };
-}
-
-QVariantMap operatorSettingsFromLegacyRow(
-    const QString& operatorId,
-    const QString& rowText,
-    const QString& rapidText
-) {
-    QJsonParseError rowError;
-    const QJsonDocument rowDocument = QJsonDocument::fromJson(rowText.toUtf8(), &rowError);
-    if (rowError.error != QJsonParseError::NoError || !rowDocument.isArray()) {
-        return {};
-    }
-
-    const QJsonArray row = rowDocument.array();
-    if (row.size() < 6) {
-        return {};
-    }
-
-    bool rapidOk = false;
-    const int rapidValue = rapidText.toInt(&rapidOk);
-    const int preservedRapid = rapidOk ? rapidValue : 0;
-
-    QVariantMap settings;
-    settings.insert(QStringLiteral("operator_id"), operatorId);
-    settings.insert(QStringLiteral("active_weapon"), QStringLiteral("primary"));
-    settings.insert(QStringLiteral("profile_enabled"), true);
-    settings.insert(QStringLiteral("auto_load"), true);
-    settings.insert(QStringLiteral("show_overlay"), true);
-    settings.insert(QStringLiteral("monitor_while_active"), true);
-    settings.insert(QStringLiteral("rapid_fire_enabled"), preservedRapid != 0);
-    settings.insert(QStringLiteral("rapid_fire_value"), preservedRapid);
-    settings.insert(QStringLiteral("notes"), row.at(6).toString());
-    settings.insert(QStringLiteral("primary"), weaponSettingsFromLegacyRow(row, 0));
-    settings.insert(QStringLiteral("secondary"), weaponSettingsFromLegacyRow(row, 3));
-    return settings;
-}
-
-bool convertLegacyV5ConfigToGlobal(
-    const QByteArray& data,
-    QVariantMap& operators,
-    QString& errorMessage
-) {
-    const QByteArray trimmed = data.trimmed();
-    constexpr auto prefix = "^^^V5";
-    if (!trimmed.startsWith(prefix)) {
-        errorMessage = QStringLiteral("This is not a V5 operator config.");
-        return false;
-    }
-
-    QJsonParseError rootError;
-    const QJsonDocument rootDocument = QJsonDocument::fromJson(
-        trimmed.mid(static_cast<int>(std::char_traits<char>::length(prefix))),
-        &rootError
-    );
-    if (rootError.error != QJsonParseError::NoError || !rootDocument.isArray()) {
-        errorMessage = rootError.errorString();
-        return false;
-    }
-
-    const QJsonArray root = rootDocument.array();
-    QString operatorMapText;
-    QString rapidMapText;
-    for (int index = 0; index + 1 < root.size(); index += 2) {
-        const QString key = root.at(index).toString();
-        if (key == QStringLiteral("OPERATOR_SETTINGS_BY_NAME")) {
-            operatorMapText = root.at(index + 1).toString();
-        } else if (key == QStringLiteral("RAPID_FIRE_BY_NAME")) {
-            rapidMapText = root.at(index + 1).toString();
-        }
-    }
-
-    if (operatorMapText.isEmpty()) {
-        errorMessage = QStringLiteral("The V5 config is missing OPERATOR_SETTINGS_BY_NAME.");
-        return false;
-    }
-
-    QJsonParseError operatorError;
-    const QJsonDocument operatorDocument = QJsonDocument::fromJson(
-        operatorMapText.toUtf8(),
-        &operatorError
-    );
-    if (operatorError.error != QJsonParseError::NoError || !operatorDocument.isObject()) {
-        errorMessage = QStringLiteral("The V5 operator map is invalid.");
-        return false;
-    }
-
-    QJsonObject rapidObject;
-    if (!rapidMapText.isEmpty()) {
-        QJsonParseError rapidError;
-        const QJsonDocument rapidDocument = QJsonDocument::fromJson(
-            rapidMapText.toUtf8(),
-            &rapidError
-        );
-        if (rapidError.error == QJsonParseError::NoError && rapidDocument.isObject()) {
-            rapidObject = rapidDocument.object();
-        }
-    }
-
-    const QJsonObject operatorObject = operatorDocument.object();
-    QVariantMap imported;
-    for (const auto& record : OperatorCatalog::all()) {
-        const QString rowText = operatorObject.value(record.id).toString();
-        const QString rapidText = rapidObject.value(record.id).toString(QStringLiteral("0"));
-        const QVariantMap settings = operatorSettingsFromLegacyRow(record.id, rowText, rapidText);
-        if (!settings.isEmpty()) {
-            imported.insert(record.id, settings);
-        }
-    }
-
-    if (imported.size() != OperatorCatalog::all().size()) {
-        errorMessage = QStringLiteral("The V5 config did not contain all 76 operators.");
-        return false;
-    }
-
-    operators = imported;
-    return true;
-}
-}
 
 AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
     : QWidget(parent) {
@@ -176,22 +45,35 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
 
     root->addWidget(sidebar);
 
+    // Persistent content shell. The ellipsis / More button stays mounted while
+    // only the stacked page beneath it changes.
     auto* contentShell = new QWidget(this);
     auto* contentLayout = new QVBoxLayout(contentShell);
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
-    auto* topBar = new QHBoxLayout();
-    topBar->setContentsMargins(16, 14, 22, 0);
-    topBar->addStretch();
-    m_moreButton = new QPushButton(QStringLiteral("MORE"), contentShell);
+    auto* topBar = new QFrame(contentShell);
+    topBar->setObjectName(QStringLiteral("authenticatedTopBar"));
+    topBar->setFixedHeight(58);
+    topBar->setStyleSheet(QStringLiteral(
+        "QFrame#authenticatedTopBar { background: #090D17; border-bottom: 1px solid #1D2534; }"
+    ));
+    auto* topBarLayout = new QHBoxLayout(topBar);
+    topBarLayout->setContentsMargins(18, 8, 18, 8);
+    topBarLayout->addStretch();
+
+    m_moreButton = new QPushButton(QStringLiteral("•••"), topBar);
     m_moreButton->setObjectName(QStringLiteral("moreOptionsButton"));
-    m_moreButton->setIcon(NexusTheme::icon(QStringLiteral("settings_32.png")));
-    m_moreButton->setFixedWidth(96);
-    m_moreButton->setToolTip(QStringLiteral("Open More Options"));
+    m_moreButton->setAccessibleName(QStringLiteral("More options"));
+    m_moreButton->setToolTip(QStringLiteral("More options"));
     m_moreButton->setCursor(Qt::PointingHandCursor);
-    topBar->addWidget(m_moreButton);
-    contentLayout->addLayout(topBar);
+    m_moreButton->setFixedSize(58, 40);
+    m_moreButton->setFont(NexusTheme::font(15, QFont::Bold));
+    connect(m_moreButton, &QPushButton::clicked, this, [this]() {
+        showPage(QStringLiteral("more_options"));
+    });
+    topBarLayout->addWidget(m_moreButton);
+    contentLayout->addWidget(topBar);
 
     m_stack = new QStackedWidget(contentShell);
     contentLayout->addWidget(m_stack, 1);
@@ -214,8 +96,8 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
     const QList<NavDefinition> navigation{
         {QStringLiteral("dashboard"), QStringLiteral("Dashboard"), QStringLiteral("dashboard")},
         {QStringLiteral("operators"), QStringLiteral("Operators"), QStringLiteral("operators")},
-        {QStringLiteral("save_files"), QStringLiteral("Save Files"), QStringLiteral("save")},
         {QStringLiteral("sensitivity_converter"), QStringLiteral("Sensitivity & FOV"), QStringLiteral("target")},
+        {QStringLiteral("save_files"), QStringLiteral("Save Files"), QStringLiteral("save")},
         {QStringLiteral("client"), QStringLiteral("Client Settings"), QStringLiteral("client")},
         {QStringLiteral("settings"), QStringLiteral("Settings"), QStringLiteral("settings")},
     };
@@ -263,19 +145,9 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
     sidebarLayout->addLayout(footer);
 
     buildPages();
-    connect(m_moreButton, &QPushButton::clicked, this, [this]() {
-        showPage(QStringLiteral("more_options"));
-    });
     m_activeConfigPath = defaultGlobalConfigPath();
     if (QFileInfo::exists(m_activeConfigPath)) {
         readGlobalConfig(m_activeConfigPath, false);
-    } else {
-        const QString bundledConfigPath = QDir(QCoreApplication::applicationDirPath())
-            .filePath(QStringLiteral("Nexus Config.json"));
-        if (QFileInfo::exists(bundledConfigPath)
-            && readGlobalConfig(bundledConfigPath, false)) {
-            writeGlobalConfig(m_activeConfigPath, false);
-        }
     }
     resetToPathSelection();
 }
@@ -287,10 +159,10 @@ void AuthenticatedRoot::buildPages() {
     m_saveFiles = new SaveFilesPage(m_stack);
     m_clientSettings = new ClientSettingsPage(m_stack);
     m_settings = new SettingsPage(m_stack);
-    // Exactly one shared operator-settings page is created for all operators.
-    m_operatorSettings = new OperatorSettingsPage(m_stack);
     m_moreOptions = new MoreOptionsPage(m_stack);
     m_sensitivityConverter = new SensitivityFovConverterPage(m_stack);
+    // Exactly one shared operator-settings page is created for all operators.
+    m_operatorSettings = new OperatorSettingsPage(m_stack);
 
     m_stack->addWidget(m_pathPage);
     m_stack->addWidget(m_dashboard);
@@ -298,17 +170,17 @@ void AuthenticatedRoot::buildPages() {
     m_stack->addWidget(m_saveFiles);
     m_stack->addWidget(m_clientSettings);
     m_stack->addWidget(m_settings);
+    m_stack->addWidget(m_moreOptions);
     m_stack->addWidget(m_sensitivityConverter);
     m_stack->addWidget(m_operatorSettings);
-    m_stack->addWidget(m_moreOptions);
 
     m_pages.insert(QStringLiteral("dashboard"), m_dashboard);
     m_pages.insert(QStringLiteral("operators"), m_operators);
     m_pages.insert(QStringLiteral("save_files"), m_saveFiles);
     m_pages.insert(QStringLiteral("client"), m_clientSettings);
     m_pages.insert(QStringLiteral("settings"), m_settings);
-    m_pages.insert(QStringLiteral("sensitivity_converter"), m_sensitivityConverter);
     m_pages.insert(QStringLiteral("more_options"), m_moreOptions);
+    m_pages.insert(QStringLiteral("sensitivity_converter"), m_sensitivityConverter);
 
     connect(m_pathPage, &PathSelectionPage::loadRequested,
             this, &AuthenticatedRoot::handlePathLoad);
@@ -329,20 +201,58 @@ void AuthenticatedRoot::buildPages() {
     });
     connect(m_operatorSettings, &OperatorSettingsPage::settingChanged,
             this, &AuthenticatedRoot::operatorSettingsChanged);
+    connect(m_operatorSettings, &OperatorSettingsPage::rapidFireSelectionChanged,
+            this, &AuthenticatedRoot::rapidFireSelectionChanged);
+    connect(m_operatorSettings, &OperatorSettingsPage::loadoutSelectionChanged,
+            this, [this](
+                const QString& operatorId,
+                const QString& weaponSlot,
+                const QString& selectedWeapon,
+                const QVariantMap& attachments
+            ) {
+        QVariantMap resolvedAttachments = attachments;
+        const QVariantMap converterInputs = m_sensitivityConverter->currentInputs();
+        const QString profileKey = attachments.value(
+            QStringLiteral("ads_profile_key"),
+            QStringLiteral("ads_1x")
+        ).toString();
+        resolvedAttachments.insert(
+            QStringLiteral("resolved_ads_value"),
+            converterInputs.value(
+                profileKey == QStringLiteral("ads_2_5x")
+                    ? QStringLiteral("ads_2_5x")
+                    : QStringLiteral("ads_1x")
+            )
+        );
+        Q_EMIT operatorLoadoutSelectionChanged(
+            operatorId,
+            weaponSlot,
+            selectedWeapon,
+            resolvedAttachments,
+            converterInputs
+        );
+    });
     connect(m_operatorSettings, &OperatorSettingsPage::resetRequested,
             this, [this](const QString& operatorId) {
         Q_EMIT operatorSettingsResetRequested(operatorId);
         writeGlobalConfig(m_activeConfigPath, false);
     });
-    connect(m_operatorSettings, &OperatorSettingsPage::screenRegionPageRequested, this, [this]() {
+    connect(m_operatorSettings, &OperatorSettingsPage::screenRegionPageRequested,
+            this, [this]() {
         Q_EMIT screenRegionPageRequested();
         showPage(QStringLiteral("more_options"));
     });
 
     connect(m_moreOptions, &MoreOptionsPage::backRequested, this, [this]() {
-        showPage(m_previousAuthenticatedPageKey.isEmpty()
+        const QString destination = m_previousPageKey.isEmpty()
             ? QStringLiteral("dashboard")
-            : m_previousAuthenticatedPageKey);
+            : m_previousPageKey;
+        if (destination == QStringLiteral("operator_settings")
+            && !m_operatorSettings->currentOperatorId().isEmpty()) {
+            showOperatorSettings(m_operatorSettings->currentOperatorId());
+        } else {
+            showPage(destination);
+        }
     });
     connect(m_moreOptions, &MoreOptionsPage::regionSelectionRequested,
             this, &AuthenticatedRoot::regionSelectionRequested);
@@ -352,13 +262,20 @@ void AuthenticatedRoot::buildPages() {
             this, &AuthenticatedRoot::regionSaveRequested);
     connect(m_moreOptions, &MoreOptionsPage::overlayMonitoringEnabledChanged,
             this, &AuthenticatedRoot::overlayMonitoringEnabledChanged);
-    connect(m_moreOptions, &MoreOptionsPage::showSelectionBorderChanged,
-            this, &AuthenticatedRoot::showSelectionBorderChanged);
-    connect(m_moreOptions, &MoreOptionsPage::pauseWhenForegroundChanged,
-            this, &AuthenticatedRoot::pauseWhenForegroundChanged);
-    connect(m_moreOptions, &MoreOptionsPage::lowResourceMonitoringChanged,
-            this, &AuthenticatedRoot::lowResourceMonitoringChanged);
-    connect(m_sensitivityConverter, &SensitivityFovConverterPage::conversionRequested,
+    connect(m_moreOptions, &MoreOptionsPage::settingChanged,
+            this, [this](const QString& key, const QVariant& value) {
+        if (key == QStringLiteral("overlay/cursor_visible_only")) {
+            Q_EMIT pauseWhenForegroundChanged(value.toBool());
+        } else if (key == QStringLiteral("overlay/target_window_active_only")) {
+            Q_EMIT lowResourceMonitoringChanged(value.toBool());
+        } else if (key == QStringLiteral("overlay/show_selection_border")) {
+            Q_EMIT showSelectionBorderChanged(value.toBool());
+        }
+        Q_EMIT settingChanged(key, value);
+    });
+
+    connect(m_sensitivityConverter,
+            &SensitivityFovConverterPage::conversionRequested,
             this, &AuthenticatedRoot::sensitivityConversionRequested);
 
     connect(m_saveFiles, &SaveFilesPage::settingChanged,
@@ -379,7 +296,7 @@ void AuthenticatedRoot::buildPages() {
             this,
             QStringLiteral("Import complete NEXUS configuration"),
             QString(),
-            QStringLiteral("NEXUS configuration (*.nexus *.json *.txt);;Original V5 config (*.txt *.json);;All files (*.*)")
+            QStringLiteral("NEXUS configuration (*.nexus *.json);;All files (*.*)")
         );
         if (!path.isEmpty() && readGlobalConfig(path, true)) {
             // The selected file updates all operator records, then becomes the
@@ -431,95 +348,68 @@ AuthSession AuthenticatedRoot::session() const {
 
 void AuthenticatedRoot::resetToPathSelection() {
     m_installationPath.clear();
+    m_currentPageKey.clear();
+    m_previousPageKey = QStringLiteral("dashboard");
     setNavigationAvailable(false);
-    m_previousAuthenticatedPageKey = QStringLiteral("dashboard");
     for (auto* button : std::as_const(m_navButtons)) {
         button->setActive(false);
     }
-    m_moreButton->setProperty("navActive", false);
-    m_moreButton->style()->unpolish(m_moreButton);
-    m_moreButton->style()->polish(m_moreButton);
     m_stack->setCurrentWidget(m_pathPage);
 }
 
 void AuthenticatedRoot::showPage(const QString& key) {
     if (!m_pages.contains(key)) {
-        qWarning("Unknown NEXUS page requested: %s", qPrintable(key));
         return;
     }
-    const QString previousKey = currentPageKey();
-    if (key == QStringLiteral("more_options")
-        && !previousKey.isEmpty()
-        && previousKey != QStringLiteral("more_options")) {
-        m_previousAuthenticatedPageKey = previousKey == QStringLiteral("operator_settings")
-            ? QStringLiteral("operators")
-            : previousKey;
+
+    if (key == QStringLiteral("more_options")) {
+        if (!m_currentPageKey.isEmpty()
+            && m_currentPageKey != QStringLiteral("more_options")) {
+            m_previousPageKey = m_currentPageKey;
+        }
+    } else {
+        m_previousPageKey = key;
     }
+
+    m_currentPageKey = key;
     setNavigationAvailable(true);
     m_stack->setCurrentWidget(m_pages.value(key));
+
     for (auto iterator = m_navButtons.begin(); iterator != m_navButtons.end(); ++iterator) {
-        iterator.value()->setActive(
-            iterator.key() == key
-            || (key == QStringLiteral("more_options")
-                && iterator.key() == m_previousAuthenticatedPageKey)
-        );
+        iterator.value()->setActive(iterator.key() == key);
     }
-    m_moreButton->setProperty("navActive", key == QStringLiteral("more_options"));
+
+    const bool moreActive = key == QStringLiteral("more_options");
+    m_moreButton->setProperty("accentButton", moreActive);
     m_moreButton->style()->unpolish(m_moreButton);
     m_moreButton->style()->polish(m_moreButton);
 }
 
 void AuthenticatedRoot::showOperatorSettings(const QString& operatorId) {
-    const QString resolvedId = OperatorCatalog::resolveId(operatorId);
-    if (resolvedId.isEmpty() || !m_operatorSettings->setOperator(resolvedId)) {
+    if (!m_operatorSettings->setOperator(operatorId)) {
         return;
     }
 
+    if (!m_currentPageKey.isEmpty()
+        && m_currentPageKey != QStringLiteral("more_options")
+        && m_currentPageKey != QStringLiteral("operator_settings")) {
+        m_previousPageKey = m_currentPageKey;
+    }
+    m_currentPageKey = QStringLiteral("operator_settings");
     setNavigationAvailable(true);
     m_stack->setCurrentWidget(m_operatorSettings);
     for (auto iterator = m_navButtons.begin(); iterator != m_navButtons.end(); ++iterator) {
         iterator.value()->setActive(iterator.key() == QStringLiteral("operators"));
     }
-    m_moreButton->setProperty("navActive", false);
+    m_moreButton->setProperty("accentButton", false);
     m_moreButton->style()->unpolish(m_moreButton);
     m_moreButton->style()->polish(m_moreButton);
 }
 
-void AuthenticatedRoot::setScreenRegion(const QRect& region, const QString& displayId) {
-    m_moreOptions->setSelectedRegion(region, displayId);
-}
-
-void AuthenticatedRoot::clearScreenRegion() {
-    m_moreOptions->clearSelectedRegion();
-}
-
-void AuthenticatedRoot::setScreenRegionSaveResult(bool success, const QString& message) {
-    m_moreOptions->setRegionSaveResult(success, message);
-}
-
-void AuthenticatedRoot::setOverlayAppSettings(
-    bool monitoringEnabled,
-    bool showSelectionBorder,
-    bool pauseWhenCursorHidden,
-    bool lowResourceMode
+void AuthenticatedRoot::setSensitivityScaleFactors(
+    double horizontalScale,
+    double verticalScale
 ) {
-    m_moreOptions->setOverlaySettings(
-        monitoringEnabled,
-        showSelectionBorder,
-        pauseWhenCursorHidden,
-        lowResourceMode
-    );
-}
-
-void AuthenticatedRoot::setClientAppSettings(const QVariantMap& settings) {
-    m_clientSettings->setSavedSettings(settings);
-}
-
-void AuthenticatedRoot::setGeneralAppSettings(const QVariantMap& settings) {
-    m_settings->setSavedSettings(settings);
-}
-
-void AuthenticatedRoot::setSensitivityScaleFactors(double horizontalScale, double verticalScale) {
     if (m_sensitivityConverter != nullptr) {
         m_sensitivityConverter->setScaleFactors(horizontalScale, verticalScale);
     }
@@ -531,14 +421,10 @@ void AuthenticatedRoot::setSensitivityConversionError(const QString& message) {
     }
 }
 
-bool AuthenticatedRoot::overlayMonitoringEnabled() const {
-    return m_moreOptions->overlayMonitoringEnabled();
-}
-
 void AuthenticatedRoot::showOperatorDetail(const QString& operatorName) {
-    const QString resolvedId = OperatorCatalog::resolveId(operatorName);
-    if (!resolvedId.isEmpty()) {
-        showOperatorSettings(resolvedId);
+    const auto* record = OperatorCatalog::findByDisplayName(operatorName);
+    if (record != nullptr) {
+        showOperatorSettings(record->id);
         return;
     }
 
@@ -554,11 +440,46 @@ void AuthenticatedRoot::setOperatorSettings(
 }
 
 QVariantMap AuthenticatedRoot::operatorSettingsFor(const QString& operatorId) const {
-    return m_operatorSettings->settingsFor(operatorId);
+    return m_operatorSettings != nullptr
+        ? m_operatorSettings->settingsFor(operatorId)
+        : QVariantMap{};
+}
+
+void AuthenticatedRoot::setScreenRegion(const QRect& region, const QString& displayId) {
+    setSelectedScreenRegion(region, displayId);
+}
+
+void AuthenticatedRoot::setSelectedScreenRegion(
+    const QRect& region,
+    const QString& displayId,
+    const QPixmap& preview
+) {
+    m_moreOptions->setSelectedRegion(region, displayId, preview);
+}
+
+void AuthenticatedRoot::clearSelectedScreenRegion() {
+    m_moreOptions->clearSelectedRegion();
+}
+
+void AuthenticatedRoot::clearScreenRegion() {
+    clearSelectedScreenRegion();
+}
+
+void AuthenticatedRoot::setScreenRegionSaveResult(
+    bool success,
+    const QString& message
+) {
+    m_moreOptions->setRegionSaveResult(success, message);
 }
 
 QString AuthenticatedRoot::installationPath() const {
     return m_installationPath;
+}
+
+QVariantMap AuthenticatedRoot::allOperatorSettings() const {
+    return m_operatorSettings != nullptr
+        ? m_operatorSettings->allOperatorSettings()
+        : QVariantMap{};
 }
 
 void AuthenticatedRoot::setSuggestedInstallationPath(const QString& path) {
@@ -568,8 +489,35 @@ void AuthenticatedRoot::setSuggestedInstallationPath(const QString& path) {
 void AuthenticatedRoot::setLoadedInstallationPath(const QString& path) {
     m_installationPath = path;
     m_pathPage->setSelectedPath(path);
-    m_pathPage->showStatus(QStringLiteral("NEXUS Recoil loaded."));
-    showPage(QStringLiteral("dashboard"));
+    if (!path.trimmed().isEmpty()) {
+        showPage(QStringLiteral("dashboard"));
+    }
+}
+
+void AuthenticatedRoot::setOverlayAppSettings(
+    bool monitoringEnabled,
+    bool showSelectionBorder,
+    bool pauseWhenCursorHidden,
+    bool lowResourceMode
+) {
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    settings.setValue(QStringLiteral("overlay/enabled"), monitoringEnabled);
+    settings.setValue(QStringLiteral("overlay/showBorder"), showSelectionBorder);
+    settings.setValue(QStringLiteral("overlay/idleWhenCursorHidden"), pauseWhenCursorHidden);
+    settings.setValue(QStringLiteral("overlay/lowResourceMode"), lowResourceMode);
+}
+
+void AuthenticatedRoot::setClientAppSettings(const QVariantMap& settings) {
+    Q_UNUSED(settings);
+}
+
+void AuthenticatedRoot::setGeneralAppSettings(const QVariantMap& settings) {
+    Q_UNUSED(settings);
+}
+
+bool AuthenticatedRoot::overlayMonitoringEnabled() const {
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    return settings.value(QStringLiteral("overlay/enabled"), true).toBool();
 }
 
 void AuthenticatedRoot::setNavigationAvailable(bool available) {
@@ -603,17 +551,6 @@ void AuthenticatedRoot::handlePathLoad(const QString& path) {
     showPage(QStringLiteral("dashboard"));
 }
 
-QString AuthenticatedRoot::currentPageKey() const {
-    if (m_stack->currentWidget() == m_operatorSettings) {
-        return QStringLiteral("operator_settings");
-    }
-    for (auto iterator = m_pages.constBegin(); iterator != m_pages.constEnd(); ++iterator) {
-        if (iterator.value() == m_stack->currentWidget()) {
-            return iterator.key();
-        }
-    }
-    return QString();
-}
 
 QString AuthenticatedRoot::defaultGlobalConfigPath() const {
     const QString directory = QStandardPaths::writableLocation(
@@ -633,7 +570,8 @@ bool AuthenticatedRoot::writeGlobalConfig(
 
     QJsonObject root;
     root.insert(QStringLiteral("format"), QStringLiteral("nexus-global-config"));
-    root.insert(QStringLiteral("schema_version"), 1);
+    root.insert(QStringLiteral("schema_version"), 2);
+    root.insert(QStringLiteral("source_format"), QStringLiteral("^^^V5"));
     root.insert(QStringLiteral("operator_count"), OperatorCatalog::all().size());
     root.insert(
         QStringLiteral("operators"),
@@ -692,26 +630,9 @@ bool AuthenticatedRoot::readGlobalConfig(
         return false;
     }
 
-    const QByteArray rawData = file.readAll();
-    QVariantMap legacyOperators;
-    QString legacyError;
-    if (convertLegacyV5ConfigToGlobal(rawData, legacyOperators, legacyError)) {
-        m_operatorSettings->replaceAllOperatorSettings(legacyOperators);
-        if (showFeedback) {
-            QMessageBox::information(
-                this,
-                QStringLiteral("NEXUS configuration imported"),
-                QStringLiteral(
-                    "Imported the original V5 operator config and preserved all 76 operator values."
-                )
-            );
-        }
-        return true;
-    }
-
     QJsonParseError parseError;
     const QJsonDocument document = QJsonDocument::fromJson(
-        rawData,
+        file.readAll(),
         &parseError
     );
     if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
@@ -726,9 +647,13 @@ bool AuthenticatedRoot::readGlobalConfig(
     }
 
     const QJsonObject root = document.object();
+    const int schemaVersion = root.value(QStringLiteral("schema_version")).toInt(1);
+    const QString sourceFormat = root.value(QStringLiteral("source_format")).toString();
     if (root.value(QStringLiteral("format")).toString()
             != QStringLiteral("nexus-global-config")
-        || !root.value(QStringLiteral("operators")).isObject()) {
+        || !root.value(QStringLiteral("operators")).isObject()
+        || schemaVersion < 1 || schemaVersion > 2
+        || (schemaVersion == 2 && sourceFormat != QStringLiteral("^^^V5"))) {
         if (showFeedback) {
             QMessageBox::warning(
                 this,
@@ -744,7 +669,34 @@ bool AuthenticatedRoot::readGlobalConfig(
     const QVariantMap operators = root.value(
         QStringLiteral("operators")
     ).toObject().toVariantMap();
+
+    if (schemaVersion == 2) {
+        const int declaredCount = root.value(QStringLiteral("operator_count")).toInt(-1);
+        bool hasEveryCatalogOperator = declaredCount == OperatorCatalog::all().size()
+            && operators.size() == OperatorCatalog::all().size();
+        for (const auto& record : OperatorCatalog::all()) {
+            if (!operators.contains(record.id)) {
+                hasEveryCatalogOperator = false;
+                break;
+            }
+        }
+        if (!hasEveryCatalogOperator) {
+            if (showFeedback) {
+                QMessageBox::warning(
+                    this,
+                    QStringLiteral("Incomplete NEXUS configuration"),
+                    QStringLiteral(
+                        "Schema version 2 requires exactly all 76 non-Recruit operator records."
+                    )
+                );
+            }
+            return false;
+        }
+    }
+
     m_operatorSettings->replaceAllOperatorSettings(operators);
+    const QVariantMap normalizedOperators = m_operatorSettings->allOperatorSettings();
+    Q_EMIT globalOperatorConfigurationImported(normalizedOperators);
 
     if (showFeedback) {
         QMessageBox::information(

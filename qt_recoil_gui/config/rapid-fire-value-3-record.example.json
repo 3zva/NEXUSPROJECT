@@ -1,0 +1,21 @@
+{
+  "operator_id": "example_operator",
+  "active_weapon": "primary",
+  "profile_enabled": true,
+  "auto_load": true,
+  "show_overlay": true,
+  "monitor_while_active": true,
+  "rapid_fire_enabled": true,
+  "rapid_fire_value": 3,
+  "notes": "(Click to Edit)",
+  "primary": {
+    "x_amount": 0,
+    "y_amount": -1,
+    "time_delay": 0.0
+  },
+  "secondary": {
+    "x_amount": 0,
+    "y_amount": -1,
+    "time_delay": 0.0
+  }
+}

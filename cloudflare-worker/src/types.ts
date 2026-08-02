@@ -2,25 +2,35 @@ export interface Env {
   NEXUS_DB: D1Database;
   PRODUCT_NAME: string;
   ALLOWED_ORIGIN: string;
-  STRIPE_PRICE_30_DAY: string;
-  STRIPE_PRICE_LIFETIME: string;
   LATEST_VERSION: string;
   LATEST_PACKAGE_URL: string;
   LATEST_PACKAGE_SHA256: string;
   LATEST_PACKAGE_SIZE: string;
   MINIMUM_WINDOWS_BUILD: string;
   SETUP_DOWNLOAD_URL: string;
-  STRIPE_SECRET_KEY: string;
-  STRIPE_WEBHOOK_SECRET: string;
+  STRIPE_TEST_SECRET_KEY: string;
+  STRIPE_LIVE_SECRET_KEY: string;
+  STRIPE_TEST_WEBHOOK_SECRET: string;
+  STRIPE_LIVE_WEBHOOK_SECRET: string;
+  STRIPE_TEST_PRICE_30_DAY: string;
+  STRIPE_TEST_PRICE_LIFETIME: string;
+  STRIPE_LIVE_PRICE_30_DAY: string;
+  STRIPE_LIVE_PRICE_LIFETIME: string;
+  STRIPE_SECRET_KEY?: string;
+  STRIPE_WEBHOOK_SECRET?: string;
+  STRIPE_PRICE_30_DAY?: string;
+  STRIPE_PRICE_LIFETIME?: string;
   LICENSE_HASH_PEPPER: string;
   LICENSE_ENCRYPTION_KEY_B64: string;
   LICENSE_SIGNING_PRIVATE_JWK: string;
 }
 
 export type LicenseType = "30_day" | "lifetime";
+export type StripeMode = "test" | "live";
 
 export interface StripeCheckoutSession {
   id: string;
+  livemode?: boolean;
   payment_status: string;
   payment_intent?: string | null;
   customer_email?: string | null;

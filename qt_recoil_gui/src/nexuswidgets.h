@@ -82,6 +82,7 @@ public:
     [[nodiscard]] double value() const;
     [[nodiscard]] double defaultValue() const;
     void setValue(double value, bool emitSignal = false);
+    void setDefaultValue(double defaultValue, bool updateCurrent = false);
     void resetValue();
 
 Q_SIGNALS:
@@ -89,6 +90,7 @@ Q_SIGNALS:
 
 private:
     void changeBy(double delta);
+    void commitText();
     void updateDisplay();
     [[nodiscard]] double bounded(double value) const;
 
@@ -110,7 +112,14 @@ class OperatorVectorPreview final : public QWidget {
     Q_OBJECT
 public:
     explicit OperatorVectorPreview(QWidget* parent = nullptr);
-    void setValues(double xAmount, double yAmount, double timeDelay);
+    void setValues(
+        double xAmount,
+        double yAmount,
+        double timeDelay,
+        double horizontalRamp = 0.0,
+        double verticalRamp = 0.0,
+        double rampStartSeconds = 0.75
+    );
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -118,7 +127,10 @@ protected:
 private:
     double m_xAmount = 0.0;
     double m_yAmount = 0.0;
-    double m_timeDelay = 0.001;
+    double m_timeDelay = 30.0;
+    double m_horizontalRamp = 0.0;
+    double m_verticalRamp = 0.0;
+    double m_rampStartSeconds = 0.75;
 };
 
 class ActionCard final : public CardFrame {
@@ -145,7 +157,6 @@ public:
     );
     [[nodiscard]] QString operatorName() const;
     [[nodiscard]] QString iconResource() const;
-    void setDisplayMetrics(const QSize& iconSize, const QSize& minimumSize, int fontSize, int radius, int verticalPadding);
 
 private:
     QString m_name;

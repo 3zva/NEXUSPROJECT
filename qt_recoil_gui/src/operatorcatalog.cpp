@@ -1,25 +1,9 @@
 #include "operatorcatalog.h"
 
-namespace {
-QString lookupKey(const QString& value) {
-    QString normalized;
-    const QString decomposed = value.trimmed().normalized(QString::NormalizationForm_D);
-    normalized.reserve(decomposed.size());
-    for (const QChar ch : decomposed) {
-        if (ch.category() == QChar::Mark_NonSpacing) {
-            continue;
-        }
-        if (ch.isLetterOrNumber()) {
-            normalized.append(ch.toLower());
-        }
-    }
-    return normalized;
-}
-}
-
 namespace OperatorCatalog {
 const QList<OperatorRecord>& all() {
     static const QList<OperatorRecord> records{
+        {QStringLiteral("striker"), QStringLiteral("Striker"), QStringLiteral("attacker"), QStringLiteral("operators/striker.png")},
         {QStringLiteral("sledge"), QStringLiteral("Sledge"), QStringLiteral("attacker"), QStringLiteral("operators/sledge.png")},
         {QStringLiteral("thatcher"), QStringLiteral("Thatcher"), QStringLiteral("attacker"), QStringLiteral("operators/thatcher.png")},
         {QStringLiteral("ash"), QStringLiteral("Ash"), QStringLiteral("attacker"), QStringLiteral("operators/ash.png")},
@@ -28,8 +12,8 @@ const QList<OperatorRecord>& all() {
         {QStringLiteral("montagne"), QStringLiteral("Montagne"), QStringLiteral("attacker"), QStringLiteral("operators/montagne.png")},
         {QStringLiteral("glaz"), QStringLiteral("Glaz"), QStringLiteral("attacker"), QStringLiteral("operators/glaz.png")},
         {QStringLiteral("fuze"), QStringLiteral("Fuze"), QStringLiteral("attacker"), QStringLiteral("operators/fuze.png")},
-        {QStringLiteral("iq"), QStringLiteral("IQ"), QStringLiteral("attacker"), QStringLiteral("operators/iq.png")},
         {QStringLiteral("blitz"), QStringLiteral("Blitz"), QStringLiteral("attacker"), QStringLiteral("operators/blitz.png")},
+        {QStringLiteral("iq"), QStringLiteral("IQ"), QStringLiteral("attacker"), QStringLiteral("operators/iq.png")},
         {QStringLiteral("buck"), QStringLiteral("Buck"), QStringLiteral("attacker"), QStringLiteral("operators/buck.png")},
         {QStringLiteral("blackbeard"), QStringLiteral("Blackbeard"), QStringLiteral("attacker"), QStringLiteral("operators/blackbeard.png")},
         {QStringLiteral("capitao"), QStringLiteral("Capitão"), QStringLiteral("attacker"), QStringLiteral("operators/capitao.png")},
@@ -56,8 +40,8 @@ const QList<OperatorRecord>& all() {
         {QStringLiteral("brava"), QStringLiteral("Brava"), QStringLiteral("attacker"), QStringLiteral("operators/brava.png")},
         {QStringLiteral("ram"), QStringLiteral("Ram"), QStringLiteral("attacker"), QStringLiteral("operators/ram.png")},
         {QStringLiteral("deimos"), QStringLiteral("Deimos"), QStringLiteral("attacker"), QStringLiteral("operators/deimos.png")},
-        {QStringLiteral("striker"), QStringLiteral("Striker"), QStringLiteral("attacker"), QStringLiteral("operators/striker.png")},
         {QStringLiteral("rauora"), QStringLiteral("Rauora"), QStringLiteral("attacker"), QStringLiteral("operators/rauora.png")},
+        {QStringLiteral("sentry"), QStringLiteral("Sentry"), QStringLiteral("defender"), QStringLiteral("operators/sentry.png")},
         {QStringLiteral("smoke"), QStringLiteral("Smoke"), QStringLiteral("defender"), QStringLiteral("operators/smoke.png")},
         {QStringLiteral("mute"), QStringLiteral("Mute"), QStringLiteral("defender"), QStringLiteral("operators/mute.png")},
         {QStringLiteral("castle"), QStringLiteral("Castle"), QStringLiteral("defender"), QStringLiteral("operators/castle.png")},
@@ -94,7 +78,6 @@ const QList<OperatorRecord>& all() {
         {QStringLiteral("fenrir"), QStringLiteral("Fenrir"), QStringLiteral("defender"), QStringLiteral("operators/fenrir.png")},
         {QStringLiteral("tubarao"), QStringLiteral("Tubarão"), QStringLiteral("defender"), QStringLiteral("operators/tubarao.png")},
         {QStringLiteral("skopos"), QStringLiteral("Skopós"), QStringLiteral("defender"), QStringLiteral("operators/skopos.png")},
-        {QStringLiteral("sentry"), QStringLiteral("Sentry"), QStringLiteral("defender"), QStringLiteral("operators/sentry.png")},
         {QStringLiteral("denari"), QStringLiteral("Denari"), QStringLiteral("defender"), QStringLiteral("operators/denari.png")},
     };
     return records;
@@ -112,9 +95,9 @@ QList<OperatorRecord> forSide(const QString& side) {
 }
 
 const OperatorRecord* findById(const QString& id) {
-    const auto normalized = lookupKey(id);
+    const auto normalized = id.trimmed().toLower();
     for (const auto& record : all()) {
-        if (lookupKey(record.id) == normalized) {
+        if (record.id == normalized) {
             return &record;
         }
     }
@@ -122,26 +105,22 @@ const OperatorRecord* findById(const QString& id) {
 }
 
 const OperatorRecord* findByDisplayName(const QString& displayName) {
-    const auto normalized = lookupKey(displayName);
+    const auto normalized = displayName.trimmed();
     for (const auto& record : all()) {
-        if (lookupKey(record.displayName) == normalized) {
+        if (record.displayName.compare(normalized, Qt::CaseInsensitive) == 0) {
             return &record;
         }
     }
     return nullptr;
 }
 
-QString resolveId(const QString& nameOrId) {
-    const auto* idRecord = findById(nameOrId);
-    if (idRecord != nullptr) {
-        return idRecord->id;
+QString resolveId(const QString& idOrDisplayName) {
+    if (const auto* byId = findById(idOrDisplayName)) {
+        return byId->id;
     }
-
-    const auto* displayRecord = findByDisplayName(nameOrId);
-    if (displayRecord != nullptr) {
-        return displayRecord->id;
+    if (const auto* byName = findByDisplayName(idOrDisplayName)) {
+        return byName->id;
     }
-
-    return {};
+    return idOrDisplayName.trimmed().toLower();
 }
 }

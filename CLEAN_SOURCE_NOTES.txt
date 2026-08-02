@@ -3,7 +3,7 @@ NEXUS_REQUIRED_SOURCE clean source package
 This folder contains only the files needed to build the current native host applications.
 
 Final build output:
-C:\Users\blade.DESKTOP-9QA7CAP\Desktop\NEXUS
+%USERPROFILE%\Desktop\NEXUS
 
 Expected output structure:
 - Nexus Loader.exe
@@ -23,3 +23,11 @@ Intentionally excluded:
 - Unused WebView2 package contents and non-x64 runtimes.
 
 Run build.bat from this folder to rebuild the Desktop NEXUS output.
+
+Single-file release:
+Run deployment\BUILD-SINGLE-EXE.ps1 after build.bat to create one public EXE
+that contains the full Desktop NEXUS runtime and launches it after extraction.
+On first use, pass -GitHubOwner and -GitHubRepo. The script remembers them in
+deployment\release-settings.json, updates cloudflare-worker\wrangler.jsonc
+with the new version, GitHub download URL, SHA-256, and size, then refreshes
+the Desktop NEXUS-GitHub-Release folder.

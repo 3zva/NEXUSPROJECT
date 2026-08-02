@@ -109,4 +109,8 @@
     <file alias="operators/sentry.png">../assets/operators/sentry.png</file>
     <file alias="operators/denari.png">../assets/operators/denari.png</file>
   </qresource>
+  <qresource prefix="/config">
+    <file alias="operator_loadouts.json">../config/operator_loadouts.json</file>
+    <file alias="weapon_rpm_defaults.json">../config/weapon_rpm_defaults.json</file>
+  </qresource>
 </RCC>

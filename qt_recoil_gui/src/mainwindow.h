@@ -57,6 +57,7 @@ private:
     bool writeScreenRegionConfigForRoot(const QString& rootPath, const QRect& region, const QString& displayId);
     void stopVisionAutomationTool();
     void startVisionAutomationTool();
+    void launchRainbowSixSiege();
     void publishOperatorProfile(const QString& operatorId);
     void publishOperatorSettings(const QVariantMap& settings);
     void publishRuntimeSetting(const QString& key, const QVariant& value);
@@ -78,6 +79,7 @@ private:
     QVariantMap m_lastPublishedOperatorSettings;
     QString m_startupInstallPath;
     QString m_handoffEmail;
+    QString m_windowTitle = QStringLiteral("NEXUS");
     int m_clientRefreshRate = 60;
     double m_uiScale = 1.0;
     double m_sensitivityScaleX = 1.0;

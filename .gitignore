@@ -1,0 +1,11 @@
+single-exe-output/
+single-exe-output-test/
+release-output/
+qt_recoil_gui/build*/
+cloudflare-worker/node_modules/
+cloudflare-worker/.wrangler/
+cloudflare-worker/.dev.vars
+cloudflare-worker/.env
+cloudflare-worker/.generated-secrets.local.txt
+deployment/release-settings.json
+*.log

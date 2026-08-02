@@ -94,8 +94,11 @@ std::string JsonStringValue(const std::string& body, const std::string& key) {
     if (keyPos == std::string::npos) return {};
     std::size_t colon = body.find(':', keyPos + needle.size());
     if (colon == std::string::npos) return {};
-    std::size_t quote = body.find('"', colon + 1);
-    if (quote == std::string::npos) return {};
+    ++colon;
+    while (colon < body.size() && std::isspace(static_cast<unsigned char>(body[colon]))) ++colon;
+    if (body.compare(colon, 4, "null") == 0) return {};
+    if (colon >= body.size() || body[colon] != '"') return {};
+    std::size_t quote = colon;
     std::string out;
     bool escaped = false;
     for (std::size_t i = quote + 1; i < body.size(); ++i) {
@@ -165,7 +168,15 @@ LicenseResult LicenseClient::Validate(std::string_view licenseKey) const {
     return Request(L"/v1/license/validate", licenseKey);
 }
 
+std::string LicenseClient::DebugActivateRaw(std::string_view licenseKey) const {
+    return RequestRaw(L"/v1/license/activate", licenseKey);
+}
+
 LicenseResult LicenseClient::Request(std::wstring_view endpoint, std::string_view licenseKey) const {
+    return ParseResult(RequestRaw(endpoint, licenseKey));
+}
+
+std::string LicenseClient::RequestRaw(std::wstring_view endpoint, std::string_view licenseKey) const {
     if (licenseKey.empty() || licenseKey.size() > 128) {
         throw LicenseException("Enter a valid NEXUS license key.");
     }
@@ -252,11 +263,11 @@ LicenseResult LicenseClient::Request(std::wstring_view endpoint, std::string_vie
         responseBody.resize(oldSize + read);
     }
 
-    LicenseResult result = ParseResult(responseBody);
+    const LicenseResult result = ParseResult(responseBody);
     if (status >= 500 && result.message.empty()) {
         throw LicenseException("The NEXUS license server is temporarily unavailable.");
     }
-    return result;
+    return responseBody;
 }
 
 } // namespace nexus::license

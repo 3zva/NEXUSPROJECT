@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QPainter>
 #include <QPainterPath>
+#include <QSignalBlocker>
 #include <QSize>
 #include <QSizePolicy>
 #include <QStyle>
@@ -145,11 +146,12 @@ NumericStepperRow::NumericStepperRow(
     auto* resetButton = createSmallButton(QStringLiteral("↺"), QStringLiteral("Reset this value"));
 
     m_valueBox = new QLineEdit(this);
-    m_valueBox->setReadOnly(true);
+    m_valueBox->setReadOnly(false);
     m_valueBox->setAlignment(Qt::AlignCenter);
     m_valueBox->setMinimumWidth(100);
     m_valueBox->setMaximumWidth(150);
     m_valueBox->setProperty("valueBox", true);
+    m_valueBox->setToolTip(QStringLiteral("Type a value, then press Enter or click away."));
 
     layout->addWidget(label, 1);
     layout->addWidget(minusButton);
@@ -160,6 +162,8 @@ NumericStepperRow::NumericStepperRow(
     connect(minusButton, &QPushButton::clicked, this, [this]() { changeBy(-m_step); });
     connect(plusButton, &QPushButton::clicked, this, [this]() { changeBy(m_step); });
     connect(resetButton, &QPushButton::clicked, this, &NumericStepperRow::resetValue);
+    connect(m_valueBox, &QLineEdit::editingFinished, this, &NumericStepperRow::commitText);
+    connect(m_valueBox, &QLineEdit::returnPressed, this, &NumericStepperRow::commitText);
     updateDisplay();
 }
 
@@ -184,6 +188,13 @@ void NumericStepperRow::setValue(double value, bool emitSignal) {
     }
 }
 
+void NumericStepperRow::setDefaultValue(double defaultValue, bool updateCurrent) {
+    m_defaultValue = bounded(defaultValue);
+    if (updateCurrent) {
+        setValue(m_defaultValue, false);
+    }
+}
+
 void NumericStepperRow::resetValue() {
     setValue(m_defaultValue, true);
 }
@@ -192,11 +203,28 @@ void NumericStepperRow::changeBy(double delta) {
     setValue(m_value + delta, true);
 }
 
+void NumericStepperRow::commitText() {
+    QString text = m_valueBox->text().trimmed();
+    if (!m_suffix.isEmpty() && text.endsWith(m_suffix, Qt::CaseInsensitive)) {
+        text.chop(m_suffix.size());
+        text = text.trimmed();
+    }
+
+    bool ok = false;
+    const double typedValue = text.toDouble(&ok);
+    if (!ok) {
+        updateDisplay();
+        return;
+    }
+    setValue(typedValue, true);
+}
+
 void NumericStepperRow::updateDisplay() {
     QString text = QString::number(m_value, 'f', m_decimals);
     if (!m_suffix.isEmpty()) {
         text += QStringLiteral(" ") + m_suffix;
     }
+    const QSignalBlocker blocker(m_valueBox);
     m_valueBox->setText(text);
 }
 
@@ -213,11 +241,17 @@ OperatorVectorPreview::OperatorVectorPreview(QWidget* parent)
 void OperatorVectorPreview::setValues(
     double xAmount,
     double yAmount,
-    double timeDelay
+    double timeDelay,
+    double horizontalRamp,
+    double verticalRamp,
+    double rampStartSeconds
 ) {
     m_xAmount = xAmount;
     m_yAmount = yAmount;
     m_timeDelay = timeDelay;
+    m_horizontalRamp = horizontalRamp;
+    m_verticalRamp = verticalRamp;
+    m_rampStartSeconds = rampStartSeconds;
     update();
 }
 
@@ -238,18 +272,49 @@ void OperatorVectorPreview::paintEvent(QPaintEvent* event) {
     painter.drawLine(QPointF(center.x() - radius, center.y()), QPointF(center.x() + radius, center.y()));
     painter.drawLine(QPointF(center.x(), center.y() - radius), QPointF(center.x(), center.y() + radius));
 
-    const double normalizedX = qBound(-1.0, m_xAmount / 100.0, 1.0);
-    const double normalizedY = qBound(-1.0, m_yAmount / 100.0, 1.0);
-    const QPointF endpoint(
-        center.x() + normalizedX * radius,
-        center.y() - normalizedY * radius
+    const bool rampActive = qAbs(m_horizontalRamp) > 0.000001 || qAbs(m_verticalRamp) > 0.000001;
+    const double rampedX = qAbs(m_horizontalRamp) > 0.000001 ? m_horizontalRamp : m_xAmount;
+    const double rampedY = qAbs(m_verticalRamp) > 0.000001 ? m_verticalRamp : m_yAmount;
+    const double previewSeconds = qMax(3.0, m_rampStartSeconds + 1.0);
+    const double baseSeconds = rampActive
+        ? qBound(0.0, m_rampStartSeconds, previewSeconds)
+        : previewSeconds;
+    const double rampSeconds = rampActive ? qMax(0.0, previewSeconds - baseSeconds) : 0.0;
+
+    const QPointF baseDisplacement(m_xAmount * baseSeconds, -m_yAmount * baseSeconds);
+    const QPointF rampedDisplacement(
+        baseDisplacement.x() + (rampedX * rampSeconds),
+        baseDisplacement.y() - (rampedY * rampSeconds)
+    );
+    const double largestComponent = qMax(
+        10.0,
+        qMax(
+            qMax(qAbs(baseDisplacement.x()), qAbs(baseDisplacement.y())),
+            qMax(qAbs(rampedDisplacement.x()), qAbs(rampedDisplacement.y()))
+        )
+    );
+    const QPointF baseEndpoint(
+        center.x() + qBound(-1.0, baseDisplacement.x() / largestComponent, 1.0) * radius,
+        center.y() + qBound(-1.0, baseDisplacement.y() / largestComponent, 1.0) * radius
+    );
+    const QPointF rampedEndpoint(
+        center.x() + qBound(-1.0, rampedDisplacement.x() / largestComponent, 1.0) * radius,
+        center.y() + qBound(-1.0, rampedDisplacement.y() / largestComponent, 1.0) * radius
     );
 
     painter.setPen(QPen(QColor(QStringLiteral("#765BFF")), 3.0, Qt::SolidLine, Qt::RoundCap));
-    painter.drawLine(center, endpoint);
+    painter.drawLine(center, baseEndpoint);
+    if (rampActive) {
+        painter.setPen(QPen(QColor(QStringLiteral("#4ED49A")), 3.0, Qt::SolidLine, Qt::RoundCap));
+        painter.drawLine(baseEndpoint, rampedEndpoint);
+    }
     painter.setBrush(QColor(QStringLiteral("#A898FF")));
     painter.setPen(Qt::NoPen);
-    painter.drawEllipse(endpoint, 7.0, 7.0);
+    painter.drawEllipse(baseEndpoint, 6.0, 6.0);
+    if (rampActive) {
+        painter.setBrush(QColor(QStringLiteral("#4ED49A")));
+        painter.drawEllipse(rampedEndpoint, 7.0, 7.0);
+    }
     painter.setBrush(QColor(QStringLiteral("#4ED49A")));
     painter.drawEllipse(center, 5.0, 5.0);
 
@@ -258,10 +323,12 @@ void OperatorVectorPreview::paintEvent(QPaintEvent* event) {
     painter.drawText(
         QRectF(bounds.left(), bounds.bottom() - 24, bounds.width(), 22),
         Qt::AlignCenter,
-        QStringLiteral("X %1   Y %2   Δ %3 s")
+        QStringLiteral("X %1 Y %2  ->  X %3 Y %4   start %5 s")
             .arg(QString::number(m_xAmount, 'f', 0))
             .arg(QString::number(m_yAmount, 'f', 0))
-            .arg(QString::number(m_timeDelay, 'f', 3))
+            .arg(QString::number(rampedX, 'f', 2))
+            .arg(QString::number(rampedY, 'f', 2))
+            .arg(QString::number(m_rampStartSeconds, 'f', 2))
     );
 }
 
@@ -316,33 +383,22 @@ OperatorTile::OperatorTile(
 
     setText(name.toUpper());
     setIcon(operatorIcon);
+    setIconSize(QSize(58, 58));
     setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    setMinimumSize(96, 108);
     setCursor(Qt::PointingHandCursor);
     setToolTip(name);
     setAccessibleName(name + QStringLiteral(" operator"));
-    setDisplayMetrics(QSize(42, 42), QSize(72, 78), 8, 9, 5);
-}
-
-void OperatorTile::setDisplayMetrics(
-    const QSize& iconSize,
-    const QSize& minimumSize,
-    int fontSize,
-    int radius,
-    int verticalPadding
-) {
-    setIconSize(iconSize);
-    setMinimumSize(minimumSize);
-    setMaximumHeight(minimumSize.height() + 4);
     setStyleSheet(QStringLiteral(R"QSS(
         QToolButton {
             background: #0E1320;
             border: 1px solid #252D40;
-            border-radius: %1px;
+            border-radius: 14px;
             color: #F7F9FF;
-            font-size: %2px;
+            font-size: 9px;
             font-weight: 700;
-            padding: %3px 4px %3px 4px;
+            padding: 9px 6px 8px 6px;
         }
         QToolButton:hover,
         QToolButton:focus {
@@ -354,7 +410,7 @@ void OperatorTile::setDisplayMetrics(
             background: #28204D;
             border-color: #A898FF;
         }
-    )QSS").arg(radius).arg(fontSize).arg(verticalPadding));
+    )QSS"));
 }
 
 QString OperatorTile::operatorName() const {

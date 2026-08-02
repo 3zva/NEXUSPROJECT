@@ -535,7 +535,12 @@ void AuthFlowWidget::clearError() {
 
 void AuthFlowWidget::setDemoMode(bool enabled) {
     m_demoMode = enabled;
-    Q_UNUSED(enabled);
+    if (enabled) {
+        setStatusLabel(
+            m_signInStatus,
+            QStringLiteral("Demo mode: use demo@nexus.local with password demo.")
+        );
+    }
 }
 
 QString AuthFlowWidget::verificationEmail() const {

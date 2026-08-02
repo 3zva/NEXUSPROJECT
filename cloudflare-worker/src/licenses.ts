@@ -1,17 +1,38 @@
 import { decryptLicenseKey, encryptLicenseKey, generateLicenseKey, hashDevice, hashLicenseKey, normalizeEmail, signObject } from "./crypto";
 import { retrieveCheckoutSession } from "./stripe";
-import type { Env, LicenseRow, LicenseType, StripeCheckoutSession } from "./types";
+import type { Env, LicenseRow, LicenseType, StripeCheckoutSession, StripeMode } from "./types";
 
 function nowIso(): string { return new Date().toISOString(); }
+
+function stripeModeForSession(session: StripeCheckoutSession): StripeMode {
+  if (session.id.startsWith("cs_test_") || session.livemode === false) return "test";
+  if (session.id.startsWith("cs_live_") || session.livemode === true) return "live";
+  throw new Error("Unable to determine Stripe mode for Checkout Session.");
+}
+
+function priceIdsForMode(env: Env, mode: StripeMode): { day30: string; lifetime: string } {
+  const prices = mode === "test"
+    ? {
+      day30: env.STRIPE_TEST_PRICE_30_DAY || env.STRIPE_PRICE_30_DAY || "",
+      lifetime: env.STRIPE_TEST_PRICE_LIFETIME || env.STRIPE_PRICE_LIFETIME || ""
+    }
+    : {
+      day30: env.STRIPE_LIVE_PRICE_30_DAY || "",
+      lifetime: env.STRIPE_LIVE_PRICE_LIFETIME || ""
+    };
+  if (!prices.day30 || !prices.lifetime) throw new Error(`Stripe ${mode} Price IDs are not configured.`);
+  return prices;
+}
 
 function supportedPurchase(env: Env, session: StripeCheckoutSession): { type: LicenseType; priceId: string; email: string } {
   if (session.payment_status !== "paid") throw new Error("Checkout Session is not paid.");
   const items = session.line_items?.data ?? [];
   if (items.length !== 1 || (items[0]?.quantity ?? 1) !== 1) throw new Error("Checkout Session must contain exactly one supported license.");
   const priceId = items[0]?.price?.id ?? "";
+  const prices = priceIdsForMode(env, stripeModeForSession(session));
   let type: LicenseType;
-  if (priceId === env.STRIPE_PRICE_30_DAY) type = "30_day";
-  else if (priceId === env.STRIPE_PRICE_LIFETIME) type = "lifetime";
+  if (priceId === prices.day30) type = "30_day";
+  else if (priceId === prices.lifetime) type = "lifetime";
   else throw new Error("Checkout Session contains an unsupported Price ID.");
   if (session.metadata?.license_type !== type) throw new Error("Stripe metadata does not match the purchased Price ID.");
   const email = normalizeEmail(session.customer_details?.email ?? session.customer_email ?? "");

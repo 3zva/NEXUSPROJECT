@@ -139,29 +139,6 @@ inline QString globalStyleSheet() {
             border-color: #765BFF;
             color: #F7F9FF;
         }
-        QPushButton#moreOptionsButton {
-            min-height: 36px;
-            max-height: 36px;
-        }
-        QPushButton#moreOptionsButton[navActive="true"] {
-            background: #28204D;
-            border-color: #765BFF;
-            color: #F7F9FF;
-        }
-        QLabel[statusPill="true"] {
-            color: #A898FF;
-            background: #28204D;
-            border: 1px solid #765BFF;
-            border-radius: 10px;
-            padding: 5px 10px;
-            font-weight: 800;
-        }
-        QLabel[previewBox="true"] {
-            color: #68738B;
-            background: #090D17;
-            border: 1px solid #252D40;
-            border-radius: 12px;
-        }
         QLineEdit, QComboBox, QPlainTextEdit {
             min-height: 34px;
             padding: 0 10px;
@@ -212,7 +189,27 @@ inline QString globalStyleSheet() {
         }
         QScrollBar::handle:vertical:hover { background: #765BFF; }
         QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
-        QMessageBox { background: #0E1320; }
+        QMessageBox {
+            background: #0E1320;
+        }
+        QMessageBox QLabel {
+            color: #F7F9FF;
+            background: transparent;
+            font-size: 12px;
+        }
+        QMessageBox QPushButton {
+            min-width: 86px;
+            min-height: 34px;
+            background: #182136;
+            border: 1px solid #252D40;
+            border-radius: 9px;
+            color: #F7F9FF;
+            font-weight: 600;
+        }
+        QMessageBox QPushButton:hover {
+            background: #28204D;
+            border-color: #765BFF;
+        }
         QToolTip {
             background: #131A2A;
             color: #F7F9FF;

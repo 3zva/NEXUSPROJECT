@@ -15,5 +15,5 @@ namespace OperatorCatalog {
 [[nodiscard]] QList<OperatorRecord> forSide(const QString& side);
 [[nodiscard]] const OperatorRecord* findById(const QString& id);
 [[nodiscard]] const OperatorRecord* findByDisplayName(const QString& displayName);
-[[nodiscard]] QString resolveId(const QString& nameOrId);
+[[nodiscard]] QString resolveId(const QString& idOrDisplayName);
 }

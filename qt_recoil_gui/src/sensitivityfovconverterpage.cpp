@@ -287,7 +287,6 @@ SensitivityFovConverterPage::SensitivityFovConverterPage(QWidget* parent)
         QStringLiteral("3:2"),
         QStringLiteral("21:9")
     });
-    m_aspectRatio->setCurrentText(QStringLiteral("4:3"));
     m_aspectRatio->setAccessibleName(QStringLiteral("Rendered aspect ratio"));
     screenLayout->addWidget(m_aspectRatio);
 
@@ -482,7 +481,7 @@ void SensitivityFovConverterPage::resetInputs() {
     m_sensitivityInput->setText(QStringLiteral("48"));
     m_multiplierInput->setText(QStringLiteral("0.002"));
     m_verticalFovSlider->setValue(86);
-    m_aspectRatio->setCurrentText(QStringLiteral("4:3"));
+    m_aspectRatio->setCurrentText(QStringLiteral("16:9"));
     m_nativeMonitorRatio->setCurrentText(QStringLiteral("16:9"));
     m_ads1xSlider->setValue(58);
     m_ads25xSlider->setValue(100);

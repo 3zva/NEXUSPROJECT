@@ -5,11 +5,11 @@ import { signObject } from "./crypto";
 import { successPage } from "./success-page";
 import type { Env } from "./types";
 
-interface StripeEvent { id: string; type: string; data: { object: Record<string, unknown> }; }
+interface StripeEvent { id: string; type: string; livemode?: boolean; data: { object: Record<string, unknown> }; }
 
 async function handleWebhook(request: Request, env: Env): Promise<Response> {
   const raw = await request.text();
-  await verifyStripeWebhook(raw, request.headers.get("Stripe-Signature"), env.STRIPE_WEBHOOK_SECRET);
+  const webhookMode = await verifyStripeWebhook(raw, request.headers.get("Stripe-Signature"), env);
   const event = JSON.parse(raw) as StripeEvent;
   const claimed = await env.NEXUS_DB.prepare(`
     INSERT OR IGNORE INTO stripe_events (event_id, event_type, received_at)
@@ -27,7 +27,7 @@ async function handleWebhook(request: Request, env: Env): Promise<Response> {
     } else if (event.type === "charge.dispute.created") {
       const chargeId = typeof event.data.object.charge === "string" ? event.data.object.charge : "";
       if (chargeId) {
-        const paymentIntent = await retrieveChargePaymentIntent(env, chargeId);
+        const paymentIntent = await retrieveChargePaymentIntent(env, webhookMode, chargeId);
         if (paymentIntent) await revokeByPaymentIntent(env, paymentIntent, "disputed", event.type);
       }
     }

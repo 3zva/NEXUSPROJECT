@@ -3,6 +3,7 @@
 #include "authsession.h"
 
 #include <QHash>
+#include <QPixmap>
 #include <QRect>
 #include <QString>
 #include <QVariant>
@@ -37,9 +38,25 @@ public:
 
     // Compatibility wrapper for older integrations that still pass a display name.
     void showOperatorDetail(const QString& operatorName);
+
+    [[nodiscard]] QString installationPath() const;
+    [[nodiscard]] QVariantMap allOperatorSettings() const;
+    void setSuggestedInstallationPath(const QString& path);
+    void setLoadedInstallationPath(const QString& path);
+    void setOperatorSettings(
+        const QString& operatorId,
+        const QVariantMap& settings
+    );
+    [[nodiscard]] QVariantMap operatorSettingsFor(const QString& operatorId) const;
     void setScreenRegion(const QRect& region, const QString& displayId);
+    void setSelectedScreenRegion(
+        const QRect& region,
+        const QString& displayId,
+        const QPixmap& preview = QPixmap()
+    );
     void clearScreenRegion();
-    void setScreenRegionSaveResult(bool success, const QString& message);
+    void clearSelectedScreenRegion();
+    void setScreenRegionSaveResult(bool success, const QString& message = QString());
     void setOverlayAppSettings(
         bool monitoringEnabled,
         bool showSelectionBorder,
@@ -51,15 +68,6 @@ public:
     void setSensitivityScaleFactors(double horizontalScale, double verticalScale);
     void setSensitivityConversionError(const QString& message);
     [[nodiscard]] bool overlayMonitoringEnabled() const;
-
-    [[nodiscard]] QString installationPath() const;
-    void setSuggestedInstallationPath(const QString& path);
-    void setLoadedInstallationPath(const QString& path);
-    void setOperatorSettings(
-        const QString& operatorId,
-        const QVariantMap& settings
-    );
-    [[nodiscard]] QVariantMap operatorSettingsFor(const QString& operatorId) const;
 
 Q_SIGNALS:
     void logoutRequested();
@@ -75,7 +83,24 @@ Q_SIGNALS:
         const QVariant& value
     );
     void operatorSettingsResetRequested(const QString& operatorId);
-    void screenRegionPageRequested();
+    // Typed GUI-to-existing-backend signal. Value mapping is schema v2:
+    // 0 off, 1 Weapon 1, 2 Weapon 2, 3 both weapons.
+    void rapidFireSelectionChanged(
+        const QString& operatorId,
+        int rapidFireValue,
+        bool enabled
+    );
+    void operatorLoadoutSelectionChanged(
+        const QString& operatorId,
+        const QString& weaponSlot,
+        const QString& selectedWeapon,
+        const QVariantMap& attachments,
+        const QVariantMap& converterInputs
+    );
+    // Emitted after one global config imports and normalizes all 76 records.
+    void globalOperatorConfigurationImported(const QVariantMap& operators);
+    // UI integration surface for the separate overlay controller.
+    void screenRegionPageRequested(); // compatibility notification
     void regionSelectionRequested();
     void regionClearRequested();
     void regionSaveRequested(const QRect& region, const QString& displayId);
@@ -97,7 +122,6 @@ private:
     void setNavigationAvailable(bool available);
     void requestLogout();
     void handlePathLoad(const QString& path);
-    [[nodiscard]] QString currentPageKey() const;
     [[nodiscard]] QString defaultGlobalConfigPath() const;
     bool writeGlobalConfig(const QString& path, bool showFeedback);
     bool readGlobalConfig(const QString& path, bool showFeedback);
@@ -119,7 +143,8 @@ private:
     QLabel* m_versionLabel = nullptr;
     QPushButton* m_logoutButton = nullptr;
     QPushButton* m_moreButton = nullptr;
-    QString m_previousAuthenticatedPageKey = QStringLiteral("dashboard");
     QHash<QString, SidebarButton*> m_navButtons;
     QHash<QString, QWidget*> m_pages;
+    QString m_currentPageKey;
+    QString m_previousPageKey = QStringLiteral("dashboard");
 };

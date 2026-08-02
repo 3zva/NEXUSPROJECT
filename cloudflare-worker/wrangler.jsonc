@@ -11,21 +11,17 @@
 		{
 			"binding": "NEXUS_DB",
 			"database_name": "nexus-license-db",
-			"database_id": "REPLACE_WITH_D1_DATABASE_ID",
-			"migrations_dir": "migrations"
-		},
-		{
-			"binding": "nexus_license_db",
-			"database_name": "nexus-license-db",
 			"database_id": "ea1920d4-38b8-49d3-af21-91b3eaea6d2d",
-			"remote": true
+			"migrations_dir": "migrations"
 		}
 	],
 	"vars": {
 		"PRODUCT_NAME": "NEXUS",
-		"ALLOWED_ORIGIN": "https://YOUR-WORDPRESS-SITE.example",
-		"STRIPE_PRICE_30_DAY": "price_REPLACE_30_DAY",
-		"STRIPE_PRICE_LIFETIME": "price_REPLACE_LIFETIME",
+		"ALLOWED_ORIGIN": "https://highcloudnexus.com",
+		"STRIPE_TEST_PRICE_30_DAY": "price_1TvAJDP0C6hxVoRDSJlypSTW",
+		"STRIPE_TEST_PRICE_LIFETIME": "price_1TvANHP0C6hxVoRDWXzvd7Sb",
+		"STRIPE_LIVE_PRICE_30_DAY": "price_1TvmcS1P38omiwEhPcTbmOTs",
+		"STRIPE_LIVE_PRICE_LIFETIME": "price_1TvmcU1P38omiwEhnBQ1UMiy",
 		"LATEST_VERSION": "0.0.0",
 		"LATEST_PACKAGE_URL": "https://github.com/YOUR_ACCOUNT/YOUR_REPO/releases/download/v0.0.0/NEXUS-App.zip",
 		"LATEST_PACKAGE_SHA256": "REPLACE_SHA256",
@@ -35,8 +31,10 @@
 	},
 	"secrets": {
 		"required": [
-			"STRIPE_SECRET_KEY",
-			"STRIPE_WEBHOOK_SECRET",
+			"STRIPE_TEST_SECRET_KEY",
+			"STRIPE_LIVE_SECRET_KEY",
+			"STRIPE_TEST_WEBHOOK_SECRET",
+			"STRIPE_LIVE_WEBHOOK_SECRET",
 			"LICENSE_HASH_PEPPER",
 			"LICENSE_ENCRYPTION_KEY_B64",
 			"LICENSE_SIGNING_PRIVATE_JWK"

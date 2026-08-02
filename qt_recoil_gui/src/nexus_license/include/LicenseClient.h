@@ -16,9 +16,13 @@ public:
 
     [[nodiscard]] LicenseResult Activate(std::string_view licenseKey) const;
     [[nodiscard]] LicenseResult Validate(std::string_view licenseKey) const;
+    [[nodiscard]] std::string DebugActivateRaw(std::string_view licenseKey) const;
 
 private:
     [[nodiscard]] LicenseResult Request(
+        std::wstring_view endpoint,
+        std::string_view licenseKey) const;
+    [[nodiscard]] std::string RequestRaw(
         std::wstring_view endpoint,
         std::string_view licenseKey) const;
 
