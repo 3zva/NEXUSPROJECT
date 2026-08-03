@@ -13,6 +13,7 @@ class FirebaseAuthClient;
 class GameLaunchOverlayWindow;
 class LaunchReadinessController;
 class QLabel;
+class NexusProgressView;
 class QEvent;
 class QResizeEvent;
 class QSystemTrayIcon;
@@ -62,6 +63,12 @@ private:
     void finishClientUpdate(const QString& versionLabel);
     void failClientUpdate(const QString& message);
     void handleSensitivityConversion(const QVariantMap& inputs);
+    void beginLoadProgress();
+    void setLoadWaitingForGame();
+    void setLoadGameDetected(qint64 pid, const QString& executableName);
+    void setLoadClientReady();
+    void finishLoadProgress();
+    void failLoadProgress(const QString& message);
     void restoreSavedScreenRegion();
     void persistScreenRegion(const QRect& region, const QString& displayId);
     bool writeScreenRegionConfig(const QRect& region, const QString& displayId);
@@ -81,6 +88,7 @@ private:
     QStackedWidget* m_rootStack = nullptr;
     AuthFlowWidget* m_authFlow = nullptr;
     AuthenticatedRoot* m_authenticatedRoot = nullptr;
+    NexusProgressView* m_loadProgressView = nullptr;
     UpdateProgressPage* m_updateProgressPage = nullptr;
     GameLaunchOverlayWindow* m_gameLaunchOverlay = nullptr;
     LaunchReadinessController* m_launchReadiness = nullptr;

@@ -77,6 +77,7 @@ public:
 
 Q_SIGNALS:
     void logoutRequested();
+    void loadProgressStarted();
     void installationPathSelected(const QString& path);
     void operatorSelected(const QString& operatorId);
     void operatorSettingsSaveRequested(

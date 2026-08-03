@@ -6,6 +6,7 @@
 #include "gamelaunchoverlaywindow.h"
 #include "launchreadinesscontroller.h"
 #include "LicenseManager.h"
+#include "nexusprogressview.h"
 #include "operatorcatalog.h"
 #include "siegeprocesswatcher.h"
 #include "theme.h"
@@ -345,6 +346,7 @@ MainWindow::MainWindow(QWidget* parent)
     m_rootStack = new QStackedWidget(this);
     m_authFlow = new AuthFlowWidget(m_rootStack);
     m_authenticatedRoot = new AuthenticatedRoot(m_rootStack);
+    m_loadProgressView = new NexusProgressView(NexusProgressMode::GameLaunch, m_rootStack);
     m_updateProgressPage = new UpdateProgressPage(m_rootStack);
     m_gameLaunchOverlay = new GameLaunchOverlayWindow(this);
     m_launchReadiness = new LaunchReadinessController(m_gameLaunchOverlay, this);
@@ -365,6 +367,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     m_rootStack->addWidget(m_authFlow);
     m_rootStack->addWidget(m_authenticatedRoot);
+    m_rootStack->addWidget(m_loadProgressView);
     m_rootStack->addWidget(m_updateProgressPage);
     setCentralWidget(m_rootStack);
     setupTrayIcon();
@@ -727,45 +730,53 @@ void MainWindow::connectAuthentication() {
 void MainWindow::connectApplicationPages() {
     connect(m_authenticatedRoot, &AuthenticatedRoot::logoutRequested,
             this, &MainWindow::handleLogout);
+    connect(m_authenticatedRoot, &AuthenticatedRoot::loadProgressStarted,
+            this, &MainWindow::beginLoadProgress);
 
     connect(m_authenticatedRoot, &AuthenticatedRoot::installationPathSelected,
             this, [this](const QString& path) {
-        QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
-        settings.setValue(QStringLiteral("installationPath"), path);
-        m_launchReadiness->stop();
-        m_launchReadiness->setExecutableNames(settings.value(
-            QStringLiteral("game/processNames"),
-            SiegeProcessWatcher::defaultExecutableNames()
-        ).toStringList());
-        m_launchReadiness->setClientReady(false);
-        restoreSavedScreenRegion();
-        m_launchReadiness->beginWaitingForSiege();
-        launchRainbowSixSiege();
-        if (m_launchReadiness->siegeDetected()) {
-            m_authenticatedRoot->setLoadClientReady();
+        if (m_rootStack->currentWidget() != m_loadProgressView) {
+            beginLoadProgress();
         }
-        m_launchReadiness->setClientReady(true);
+        QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+        QTimer::singleShot(75, this, [this, path]() {
+            QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+            settings.setValue(QStringLiteral("installationPath"), path);
+            m_launchReadiness->stop();
+            m_launchReadiness->setExecutableNames(settings.value(
+                QStringLiteral("game/processNames"),
+                SiegeProcessWatcher::defaultExecutableNames()
+            ).toStringList());
+            m_launchReadiness->setClientReady(false);
+            restoreSavedScreenRegion();
+            m_launchReadiness->beginWaitingForSiege();
+            launchRainbowSixSiege();
+            if (m_launchReadiness->siegeDetected()) {
+                setLoadClientReady();
+            }
+            m_launchReadiness->setClientReady(true);
+        });
     });
 
     connect(m_launchReadiness, &LaunchReadinessController::waitingForSiege,
-            m_authenticatedRoot, &AuthenticatedRoot::setLoadWaitingForGame);
+            this, &MainWindow::setLoadWaitingForGame);
     connect(m_launchReadiness, &LaunchReadinessController::siegeProcessDetected,
             this, [this](qint64 pid, const QString& executableName) {
-        m_authenticatedRoot->setLoadGameDetected(pid, executableName);
+        setLoadGameDetected(pid, executableName);
         if (m_launchReadiness->clientReady()) {
-            m_authenticatedRoot->setLoadClientReady();
+            setLoadClientReady();
         }
     });
     connect(m_launchReadiness, &LaunchReadinessController::siegeProcessLost,
             this, [this](qint64) {
-        m_authenticatedRoot->setLoadWaitingForGame();
+        setLoadWaitingForGame();
     });
     connect(m_launchReadiness, &LaunchReadinessController::launchReady,
             this, [this](qint64) {
-        m_authenticatedRoot->finishLoadProgress();
+        finishLoadProgress();
     });
     connect(m_launchReadiness, &LaunchReadinessController::errorOccurred,
-            m_authenticatedRoot, &AuthenticatedRoot::failLoadProgress);
+            this, &MainWindow::failLoadProgress);
 
     // NEXUS.4: AuthenticatedRoot owns the one global operator configuration.
     // Do not add QSettings persistence or per-operator import/export here.
@@ -1145,6 +1156,74 @@ void MainWindow::failClientUpdate(const QString& message) {
     if (m_rootStack->currentWidget() == m_updateProgressPage) {
         m_updateProgressPage->failUpdate(message);
     }
+}
+
+void MainWindow::beginLoadProgress() {
+    m_loadProgressView->reset();
+    m_loadProgressView->setTitle(QStringLiteral("Loading NEXUS"));
+    m_loadProgressView->setSubtitle(QStringLiteral(
+        "Keep this window open while NEXUS prepares the client and waits for Rainbow Six Siege."
+    ));
+    m_loadProgressView->setStage(QStringLiteral("STARTING"));
+    m_loadProgressView->setStatus(QStringLiteral("Loading NEXUS client..."));
+    m_loadProgressView->setDetail(QStringLiteral("The application will open after readiness is complete."));
+    m_loadProgressView->setProgress(22, false);
+    m_loadProgressView->setActionVisible(false);
+    m_rootStack->setCurrentWidget(m_loadProgressView);
+    m_loadProgressView->raise();
+}
+
+void MainWindow::setLoadWaitingForGame() {
+    if (m_rootStack->currentWidget() != m_loadProgressView) {
+        m_rootStack->setCurrentWidget(m_loadProgressView);
+    }
+    m_loadProgressView->setStage(QStringLiteral("WAITING"));
+    m_loadProgressView->setStatus(QStringLiteral("Waiting for Rainbow Six Siege..."));
+    m_loadProgressView->setDetail(QStringLiteral("NEXUS is ready and watching for the game process."));
+    m_loadProgressView->setProgress(35, true);
+}
+
+void MainWindow::setLoadGameDetected(qint64 pid, const QString& executableName) {
+    if (m_rootStack->currentWidget() != m_loadProgressView) {
+        m_rootStack->setCurrentWidget(m_loadProgressView);
+    }
+    m_loadProgressView->setStage(QStringLiteral("GAME DETECTED"));
+    m_loadProgressView->setStatus(QStringLiteral("Rainbow Six Siege detected."));
+    m_loadProgressView->setDetail(QStringLiteral("%1 · PID %2").arg(executableName).arg(pid));
+    m_loadProgressView->setProgress(72, true);
+}
+
+void MainWindow::setLoadClientReady() {
+    if (m_rootStack->currentWidget() != m_loadProgressView) {
+        m_rootStack->setCurrentWidget(m_loadProgressView);
+    }
+    m_loadProgressView->setStage(QStringLiteral("FINALIZING"));
+    m_loadProgressView->setStatus(QStringLiteral("NEXUS client is ready. Finalizing launch..."));
+    m_loadProgressView->setDetail(QStringLiteral("Applying saved settings and runtime configuration."));
+    m_loadProgressView->setProgress(90, true);
+}
+
+void MainWindow::finishLoadProgress() {
+    if (m_rootStack->currentWidget() != m_loadProgressView) {
+        m_rootStack->setCurrentWidget(m_loadProgressView);
+    }
+    m_loadProgressView->setComplete(QStringLiteral("NEXUS and Rainbow Six Siege are ready."));
+    QTimer::singleShot(650, this, [this]() {
+        m_authenticatedRoot->showPage(QStringLiteral("dashboard"));
+        m_rootStack->setCurrentWidget(m_authenticatedRoot);
+    });
+}
+
+void MainWindow::failLoadProgress(const QString& message) {
+    if (m_rootStack->currentWidget() != m_loadProgressView) {
+        m_rootStack->setCurrentWidget(m_loadProgressView);
+    }
+    m_loadProgressView->setStage(QStringLiteral("LOAD FAILED"));
+    m_loadProgressView->setError(message.isEmpty()
+        ? QStringLiteral("NEXUS could not complete the load process.")
+        : message);
+    m_loadProgressView->setDetail(QStringLiteral("Restart NEXUS and try again."));
+    m_loadProgressView->setActionVisible(false);
 }
 
 void MainWindow::setupTrayIcon() {
