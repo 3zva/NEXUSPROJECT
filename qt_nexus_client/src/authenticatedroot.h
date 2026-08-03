@@ -67,6 +67,12 @@ public:
     void setGeneralAppSettings(const QVariantMap& settings);
     void setSensitivityScaleFactors(double horizontalScale, double verticalScale);
     void setSensitivityConversionError(const QString& message);
+    void beginLoadProgress();
+    void setLoadWaitingForGame();
+    void setLoadGameDetected(qint64 pid, const QString& executableName);
+    void setLoadClientReady();
+    void finishLoadProgress();
+    void failLoadProgress(const QString& message);
     [[nodiscard]] bool runtimeHelperMonitoringEnabled() const;
 
 Q_SIGNALS:

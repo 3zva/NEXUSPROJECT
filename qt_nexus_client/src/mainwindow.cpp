@@ -741,8 +741,31 @@ void MainWindow::connectApplicationPages() {
         restoreSavedScreenRegion();
         m_launchReadiness->beginWaitingForSiege();
         launchRainbowSixSiege();
+        if (m_launchReadiness->siegeDetected()) {
+            m_authenticatedRoot->setLoadClientReady();
+        }
         m_launchReadiness->setClientReady(true);
     });
+
+    connect(m_launchReadiness, &LaunchReadinessController::waitingForSiege,
+            m_authenticatedRoot, &AuthenticatedRoot::setLoadWaitingForGame);
+    connect(m_launchReadiness, &LaunchReadinessController::siegeProcessDetected,
+            this, [this](qint64 pid, const QString& executableName) {
+        m_authenticatedRoot->setLoadGameDetected(pid, executableName);
+        if (m_launchReadiness->clientReady()) {
+            m_authenticatedRoot->setLoadClientReady();
+        }
+    });
+    connect(m_launchReadiness, &LaunchReadinessController::siegeProcessLost,
+            this, [this](qint64) {
+        m_authenticatedRoot->setLoadWaitingForGame();
+    });
+    connect(m_launchReadiness, &LaunchReadinessController::launchReady,
+            this, [this](qint64) {
+        m_authenticatedRoot->finishLoadProgress();
+    });
+    connect(m_launchReadiness, &LaunchReadinessController::errorOccurred,
+            m_authenticatedRoot, &AuthenticatedRoot::failLoadProgress);
 
     // NEXUS.4: AuthenticatedRoot owns the one global operator configuration.
     // Do not add QSettings persistence or per-operator import/export here.

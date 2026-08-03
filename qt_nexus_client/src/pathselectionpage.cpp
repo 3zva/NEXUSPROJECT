@@ -1,4 +1,5 @@
 #include "pathselectionpage.h"
+#include "nexusprogressview.h"
 #include "nexuswidgets.h"
 #include "theme.h"
 
@@ -8,11 +9,16 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QStackedLayout>
 #include <QVBoxLayout>
 
 PathSelectionPage::PathSelectionPage(QWidget* parent)
     : QWidget(parent) {
-    auto* root = new QVBoxLayout(this);
+    m_stack = new QStackedLayout(this);
+    m_stack->setContentsMargins(0, 0, 0, 0);
+
+    auto* content = new QWidget(this);
+    auto* root = new QVBoxLayout(content);
     root->setContentsMargins(NexusTheme::ContentPadding, NexusTheme::ContentPadding,
                             NexusTheme::ContentPadding, NexusTheme::ContentPadding);
     root->setSpacing(18);
@@ -69,6 +75,12 @@ PathSelectionPage::PathSelectionPage(QWidget* parent)
     root->addWidget(card, 0, Qt::AlignHCenter);
     root->addStretch();
 
+    m_loadingView = new NexusProgressView(NexusProgressMode::GameLaunch, this);
+    m_loadingView->setActionVisible(false);
+    m_stack->addWidget(content);
+    m_stack->addWidget(m_loadingView);
+    m_stack->setCurrentWidget(content);
+
     connect(browse, &QPushButton::clicked, this, [this]() {
         const auto initial = m_pathEdit->text().isEmpty()
             ? QDir::homePath()
@@ -112,4 +124,61 @@ void PathSelectionPage::showStatus(const QString& message, bool error) {
     m_status->setStyleSheet(error
         ? QStringLiteral("color: #FF6B82;")
         : QStringLiteral("color: #98A2B7;"));
+}
+
+void PathSelectionPage::beginLoading() {
+    m_pathEdit->setEnabled(false);
+    m_loadButton->setEnabled(false);
+    m_loadingView->reset();
+    m_loadingView->setTitle(QStringLiteral("Loading NEXUS"));
+    m_loadingView->setSubtitle(QStringLiteral("Keep this window open while NEXUS prepares the client and waits for Rainbow Six Siege."));
+    m_loadingView->setStage(QStringLiteral("STARTING"));
+    m_loadingView->setStatus(QStringLiteral("Preparing client services..."));
+    m_loadingView->setDetail(QStringLiteral("The application will open after readiness is complete."));
+    m_loadingView->setProgress(12, false);
+    m_loadingView->setActionVisible(false);
+    m_stack->setCurrentWidget(m_loadingView);
+}
+
+void PathSelectionPage::setLoadingWaiting() {
+    m_loadingView->setStage(QStringLiteral("WAITING"));
+    m_loadingView->setStatus(QStringLiteral("Waiting for Rainbow Six Siege..."));
+    m_loadingView->setDetail(QStringLiteral("NEXUS is ready and watching for the game process."));
+    m_loadingView->setProgress(35, true);
+}
+
+void PathSelectionPage::setLoadingGameDetected(qint64 pid, const QString& executableName) {
+    m_loadingView->setStage(QStringLiteral("GAME DETECTED"));
+    m_loadingView->setStatus(QStringLiteral("Rainbow Six Siege detected."));
+    m_loadingView->setDetail(QStringLiteral("%1 · PID %2").arg(executableName).arg(pid));
+    m_loadingView->setProgress(72, true);
+}
+
+void PathSelectionPage::setLoadingClientReady() {
+    m_loadingView->setStage(QStringLiteral("FINALIZING"));
+    m_loadingView->setStatus(QStringLiteral("NEXUS client is ready. Finalizing launch..."));
+    m_loadingView->setDetail(QStringLiteral("Applying saved settings and runtime configuration."));
+    m_loadingView->setProgress(90, true);
+}
+
+void PathSelectionPage::finishLoading() {
+    m_loadingView->setComplete(QStringLiteral("NEXUS and Rainbow Six Siege are ready."));
+}
+
+void PathSelectionPage::failLoading(const QString& message) {
+    m_pathEdit->setEnabled(true);
+    m_loadButton->setEnabled(!selectedPath().isEmpty());
+    m_loadingView->setStage(QStringLiteral("LOAD FAILED"));
+    m_loadingView->setError(message.isEmpty()
+        ? QStringLiteral("NEXUS could not complete the load process.")
+        : message);
+    m_loadingView->setDetail(QStringLiteral("Return to the load page and try again."));
+    m_loadingView->setActionVisible(false);
+}
+
+void PathSelectionPage::resetLoading() {
+    m_pathEdit->setEnabled(true);
+    m_loadButton->setEnabled(!selectedPath().isEmpty());
+    m_loadingView->reset();
+    m_stack->setCurrentIndex(0);
 }

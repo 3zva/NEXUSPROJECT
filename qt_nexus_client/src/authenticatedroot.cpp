@@ -25,6 +25,7 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QStyle>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <utility>
 
@@ -358,6 +359,7 @@ void AuthenticatedRoot::resetToPathSelection() {
     m_installationPath.clear();
     m_currentPageKey.clear();
     m_previousPageKey = QStringLiteral("dashboard");
+    m_pathPage->resetLoading();
     setNavigationAvailable(false);
     for (auto* button : std::as_const(m_navButtons)) {
         button->setActive(false);
@@ -502,6 +504,34 @@ void AuthenticatedRoot::setLoadedInstallationPath(const QString& path) {
     }
 }
 
+void AuthenticatedRoot::beginLoadProgress() {
+    m_pathPage->beginLoading();
+    m_stack->setCurrentWidget(m_pathPage);
+}
+
+void AuthenticatedRoot::setLoadWaitingForGame() {
+    m_pathPage->setLoadingWaiting();
+}
+
+void AuthenticatedRoot::setLoadGameDetected(qint64 pid, const QString& executableName) {
+    m_pathPage->setLoadingGameDetected(pid, executableName);
+}
+
+void AuthenticatedRoot::setLoadClientReady() {
+    m_pathPage->setLoadingClientReady();
+}
+
+void AuthenticatedRoot::finishLoadProgress() {
+    m_pathPage->finishLoading();
+    QTimer::singleShot(650, this, [this]() {
+        showPage(QStringLiteral("dashboard"));
+    });
+}
+
+void AuthenticatedRoot::failLoadProgress(const QString& message) {
+    m_pathPage->failLoading(message);
+}
+
 void AuthenticatedRoot::setRuntimeHelperAppSettings(
     bool monitoringEnabled,
     bool showSelectionBorder,
@@ -554,9 +584,8 @@ void AuthenticatedRoot::requestLogout() {
 
 void AuthenticatedRoot::handlePathLoad(const QString& path) {
     m_installationPath = path;
-    m_pathPage->showStatus(QStringLiteral("Path selected. Loading NEXUS client..."));
+    beginLoadProgress();
     Q_EMIT installationPathSelected(path);
-    showPage(QStringLiteral("dashboard"));
 }
 
 
