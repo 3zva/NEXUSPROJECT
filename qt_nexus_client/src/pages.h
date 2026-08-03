@@ -67,10 +67,13 @@ class SettingsPage final : public QWidget {
     Q_OBJECT
 public:
     explicit SettingsPage(QWidget* parent = nullptr);
+    void setSettings(const QVariantMap& settings);
 Q_SIGNALS:
     void settingChanged(const QString& key, const QVariant& value);
     void keybindChanged(const QString& key, const QString& value);
     void resetOperatorsRequested();
+private:
+    ToggleRow* m_autoUpdates = nullptr;
 };
 
 /**

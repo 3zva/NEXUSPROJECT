@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(NexusClient VERSION 1.6.6 LANGUAGES CXX)
+project(NexusClient VERSION 1.6.7 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,12 +20,22 @@ qt_add_executable(NexusClient WIN32
     src/operatorbackendinterface.h
     src/firebaseauthclient.h
     src/firebaseauthclient.cpp
+    src/autoupdater.h
+    src/autoupdater.cpp
     src/operatorcatalog.h
     src/operatorcatalog.cpp
     src/operatorloadoutcatalog.h
     src/operatorloadoutcatalog.cpp
     src/nexuswidgets.h
     src/nexuswidgets.cpp
+    src/nexusprogressview.h
+    src/nexusprogressview.cpp
+    src/gamelaunchoverlaywindow.h
+    src/gamelaunchoverlaywindow.cpp
+    src/siegeprocesswatcher.h
+    src/siegeprocesswatcher.cpp
+    src/launchreadinesscontroller.h
+    src/launchreadinesscontroller.cpp
     src/authpages.h
     src/authpages.cpp
     src/pathselectionpage.h
@@ -36,6 +46,8 @@ qt_add_executable(NexusClient WIN32
     src/moreoptionspage.cpp
     src/sensitivityfovconverterpage.h
     src/sensitivityfovconverterpage.cpp
+    src/updateprogresspage.h
+    src/updateprogresspage.cpp
     src/authenticatedroot.h
     src/authenticatedroot.cpp
     src/nexus_license/include/DeviceId.h

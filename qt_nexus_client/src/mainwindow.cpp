@@ -1,10 +1,15 @@
 #include "mainwindow.h"
 #include "authenticatedroot.h"
+#include "autoupdater.h"
 #include "authpages.h"
 #include "firebaseauthclient.h"
+#include "gamelaunchoverlaywindow.h"
+#include "launchreadinesscontroller.h"
 #include "LicenseManager.h"
 #include "operatorcatalog.h"
+#include "siegeprocesswatcher.h"
 #include "theme.h"
+#include "updateprogresspage.h"
 
 #include <QApplication>
 #include <QAction>
@@ -333,7 +338,11 @@ MainWindow::MainWindow(QWidget* parent)
     m_rootStack = new QStackedWidget(this);
     m_authFlow = new AuthFlowWidget(m_rootStack);
     m_authenticatedRoot = new AuthenticatedRoot(m_rootStack);
+    m_updateProgressPage = new UpdateProgressPage(m_rootStack);
+    m_gameLaunchOverlay = new GameLaunchOverlayWindow(this);
+    m_launchReadiness = new LaunchReadinessController(m_gameLaunchOverlay, this);
     m_firebase = new FirebaseAuthClient(this);
+    m_autoUpdater = new AutoUpdater(this);
     m_runtimeNetwork = new QNetworkAccessManager(this);
     m_detectionServer = new QTcpServer(this);
     m_fpsLabel = new QLabel(this);
@@ -348,17 +357,29 @@ MainWindow::MainWindow(QWidget* parent)
 
     m_rootStack->addWidget(m_authFlow);
     m_rootStack->addWidget(m_authenticatedRoot);
+    m_rootStack->addWidget(m_updateProgressPage);
     setCentralWidget(m_rootStack);
     setupTrayIcon();
 
     connectAuthentication();
     connectApplicationPages();
+    connectUpdater();
     connect(qApp, &QCoreApplication::aboutToQuit, this, [this]() {
         stopRuntimeHelper();
     });
     startOperatorDetectionServer();
     readStartupArguments();
     loadFirebaseConfiguration();
+    if (const auto apiBase = licenseApiBaseUrl()) {
+        m_autoUpdater->setApiBaseUrl(QUrl(*apiBase));
+    }
+    {
+        QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+        m_launchReadiness->setExecutableNames(settings.value(
+            QStringLiteral("game/processNames"),
+            SiegeProcessWatcher::defaultExecutableNames()
+        ).toStringList());
+    }
     if (!ensureLicense()) {
         QTimer::singleShot(0, qApp, &QCoreApplication::quit);
         return;
@@ -656,8 +677,16 @@ void MainWindow::connectApplicationPages() {
             this, [this](const QString& path) {
         QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
         settings.setValue(QStringLiteral("installationPath"), path);
+        m_launchReadiness->stop();
+        m_launchReadiness->setExecutableNames(settings.value(
+            QStringLiteral("game/processNames"),
+            SiegeProcessWatcher::defaultExecutableNames()
+        ).toStringList());
+        m_launchReadiness->setClientReady(false);
         restoreSavedScreenRegion();
+        m_launchReadiness->beginWaitingForSiege();
         launchRainbowSixSiege();
+        m_launchReadiness->setClientReady(true);
     });
 
     // NEXUS.4: AuthenticatedRoot owns the one global operator configuration.
@@ -846,6 +875,33 @@ void MainWindow::connectApplicationPages() {
             this, &MainWindow::exitClient);
 }
 
+void MainWindow::connectUpdater() {
+    connect(m_autoUpdater, &AutoUpdater::checking,
+            m_updateProgressPage, &UpdateProgressPage::setCheckingStatus);
+    connect(m_autoUpdater, &AutoUpdater::updateStarted,
+            this, &MainWindow::beginClientUpdate);
+    connect(m_autoUpdater, &AutoUpdater::downloadProgress,
+            m_updateProgressPage, &UpdateProgressPage::setDownloadProgress);
+    connect(m_autoUpdater, &AutoUpdater::verificationProgress,
+            m_updateProgressPage, &UpdateProgressPage::setVerificationProgress);
+    connect(m_autoUpdater, &AutoUpdater::installationProgress,
+            m_updateProgressPage, &UpdateProgressPage::setInstallationProgress);
+    connect(m_autoUpdater, &AutoUpdater::restartingWithUpdate,
+            this, &MainWindow::finishClientUpdate);
+    connect(m_autoUpdater, &AutoUpdater::failed,
+            this, &MainWindow::failClientUpdate);
+    connect(m_autoUpdater, &AutoUpdater::canceled, this, [this]() {
+        m_updateProgressPage->reset();
+        m_rootStack->setCurrentWidget(m_authenticatedRoot);
+    });
+    connect(m_updateProgressPage, &UpdateProgressPage::cancelUpdateRequested,
+            m_autoUpdater, &AutoUpdater::cancel);
+    connect(m_updateProgressPage, &UpdateProgressPage::retryUpdateRequested,
+            m_autoUpdater, &AutoUpdater::retry);
+    connect(m_updateProgressPage, &UpdateProgressPage::restartRequested,
+            qApp, &QCoreApplication::quit);
+}
+
 void MainWindow::startOperatorDetectionServer() {
     connect(m_detectionServer, &QTcpServer::newConnection,
             this, &MainWindow::handleOperatorDetectionConnection);
@@ -929,6 +985,7 @@ void MainWindow::restoreSavedClientSettings() {
         {QStringLiteral("refresh_rate"), settings.value(QStringLiteral("settings/refresh_rate"), 60)},
         {QStringLiteral("tts_enabled"), settings.value(QStringLiteral("settings/tts_enabled"), true)},
         {QStringLiteral("tts_volume"), settings.value(QStringLiteral("settings/tts_volume"), 80)},
+        {QStringLiteral("auto_updates"), settings.value(QStringLiteral("settings/auto_updates"), true)},
         {QStringLiteral("theme"), settings.value(QStringLiteral("settings/theme"), QStringLiteral("NEXUS Purple"))},
         {QStringLiteral("accent"), settings.value(QStringLiteral("settings/accent"), QStringLiteral("Purple"))},
         {QStringLiteral("ui_scale"), settings.value(QStringLiteral("settings/ui_scale"), QStringLiteral("100%"))},
@@ -962,8 +1019,53 @@ void MainWindow::applyClientSetting(const QString& key, const QVariant& value) {
         // Stored setting. The current client has no sound playback path to mute.
     } else if (key == QStringLiteral("tts_enabled") || key == QStringLiteral("tts_volume")) {
         // Stored setting. Runtime audio feedback is handled by the native backend.
+    } else if (key == QStringLiteral("auto_updates")) {
+        if (value.toBool()) {
+            if (m_rootStack->currentWidget() == m_authenticatedRoot) {
+                m_updateCheckStarted = false;
+            }
+            checkForClientUpdatesIfEnabled();
+        }
     } else if (key == QStringLiteral("outline_crosshairs")) {
         // Stored setting. Crosshair drawing is not part of the current Qt client surface.
+    }
+}
+
+void MainWindow::checkForClientUpdatesIfEnabled() {
+    if (m_updateCheckStarted || m_autoUpdater->isBusy()) {
+        return;
+    }
+    if (m_rootStack->currentWidget() != m_authenticatedRoot) {
+        return;
+    }
+
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    if (!settings.value(QStringLiteral("settings/auto_updates"), true).toBool()) {
+        return;
+    }
+
+    if (const auto apiBase = licenseApiBaseUrl()) {
+        m_autoUpdater->setApiBaseUrl(QUrl(*apiBase));
+    }
+
+    m_updateCheckStarted = true;
+    QTimer::singleShot(250, m_autoUpdater, &AutoUpdater::checkAndInstall);
+}
+
+void MainWindow::beginClientUpdate(const QString& versionLabel) {
+    m_updateProgressPage->beginUpdate(versionLabel);
+    m_rootStack->setCurrentWidget(m_updateProgressPage);
+}
+
+void MainWindow::finishClientUpdate(const QString& versionLabel) {
+    m_updateProgressPage->finishUpdate(versionLabel);
+    m_rootStack->setCurrentWidget(m_updateProgressPage);
+    QTimer::singleShot(900, qApp, &QCoreApplication::quit);
+}
+
+void MainWindow::failClientUpdate(const QString& message) {
+    if (m_rootStack->currentWidget() == m_updateProgressPage) {
+        m_updateProgressPage->failUpdate(message);
     }
 }
 
@@ -1110,6 +1212,9 @@ void MainWindow::updateFpsLabel() {
 
 void MainWindow::exitClient() {
     m_forceExit = true;
+    if (m_launchReadiness != nullptr) {
+        m_launchReadiness->stop();
+    }
     stopRuntimeHelper();
     if (m_trayIcon != nullptr) {
         m_trayIcon->hide();
@@ -1430,10 +1535,15 @@ void MainWindow::enterAuthenticatedArea(const AuthSession& session) {
     }
 
     m_rootStack->setCurrentWidget(m_authenticatedRoot);
+    checkForClientUpdatesIfEnabled();
 }
 
 void MainWindow::handleLogout() {
     m_pendingSession.clear();
+    m_updateCheckStarted = false;
+    if (m_launchReadiness != nullptr) {
+        m_launchReadiness->stop();
+    }
     m_authenticatedRoot->resetToPathSelection();
     m_authFlow->showSignIn();
     m_authFlow->setDemoMode(false);

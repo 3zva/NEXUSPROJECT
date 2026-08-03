@@ -681,15 +681,15 @@ SettingsPage::SettingsPage(QWidget* parent)
     languageRow->addWidget(language);
     otherLayout->addLayout(languageRow);
 
-    auto* updates = new ToggleRow(QStringLiteral("Auto check for updates?"), QString(), true, other);
+    m_autoUpdates = new ToggleRow(QStringLiteral("Auto check for updates?"), QString(), true, other);
     auto* anonymous = new ToggleRow(QStringLiteral("Send anonymous data?"), QString(), false, other);
-    connect(updates, &ToggleRow::toggled, this, [this](bool value) {
+    connect(m_autoUpdates, &ToggleRow::toggled, this, [this](bool value) {
         Q_EMIT settingChanged(QStringLiteral("auto_updates"), value);
     });
     connect(anonymous, &ToggleRow::toggled, this, [this](bool value) {
         Q_EMIT settingChanged(QStringLiteral("anonymous_data"), value);
     });
-    otherLayout->addWidget(updates);
+    otherLayout->addWidget(m_autoUpdates);
     otherLayout->addWidget(anonymous);
     rightLayout->addWidget(other);
     rightLayout->addStretch();
@@ -698,6 +698,12 @@ SettingsPage::SettingsPage(QWidget* parent)
     columns->addWidget(right, 2);
     bodyLayout->addLayout(columns);
     bodyLayout->addStretch();
+}
+
+void SettingsPage::setSettings(const QVariantMap& settings) {
+    if (m_autoUpdates != nullptr) {
+        m_autoUpdates->setChecked(settings.value(QStringLiteral("auto_updates"), true).toBool());
+    }
 }
 
 OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)

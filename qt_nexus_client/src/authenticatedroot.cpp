@@ -520,7 +520,7 @@ void AuthenticatedRoot::setClientAppSettings(const QVariantMap& settings) {
 }
 
 void AuthenticatedRoot::setGeneralAppSettings(const QVariantMap& settings) {
-    Q_UNUSED(settings);
+    m_settings->setSettings(settings);
 }
 
 bool AuthenticatedRoot::runtimeHelperMonitoringEnabled() const {

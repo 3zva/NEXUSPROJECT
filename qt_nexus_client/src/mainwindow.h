@@ -8,7 +8,10 @@
 
 class AuthFlowWidget;
 class AuthenticatedRoot;
+class AutoUpdater;
 class FirebaseAuthClient;
+class GameLaunchOverlayWindow;
+class LaunchReadinessController;
 class QLabel;
 class QEvent;
 class QResizeEvent;
@@ -17,6 +20,7 @@ class QNetworkAccessManager;
 class QTcpServer;
 class QTimer;
 class QStackedWidget;
+class UpdateProgressPage;
 
 class MainWindow final : public QMainWindow {
     Q_OBJECT
@@ -32,6 +36,7 @@ protected:
 private:
     void connectAuthentication();
     void connectApplicationPages();
+    void connectUpdater();
     void enterAuthenticatedArea(const AuthSession& session);
     void handleLogout();
     void loadFirebaseConfiguration();
@@ -51,6 +56,10 @@ private:
     void setAuthWindowMode(bool enabled);
     void updateFpsLabel();
     void exitClient();
+    void checkForClientUpdatesIfEnabled();
+    void beginClientUpdate(const QString& versionLabel);
+    void finishClientUpdate(const QString& versionLabel);
+    void failClientUpdate(const QString& message);
     void handleSensitivityConversion(const QVariantMap& inputs);
     void restoreSavedScreenRegion();
     void persistScreenRegion(const QRect& region, const QString& displayId);
@@ -70,7 +79,11 @@ private:
     QStackedWidget* m_rootStack = nullptr;
     AuthFlowWidget* m_authFlow = nullptr;
     AuthenticatedRoot* m_authenticatedRoot = nullptr;
+    UpdateProgressPage* m_updateProgressPage = nullptr;
+    GameLaunchOverlayWindow* m_gameLaunchOverlay = nullptr;
+    LaunchReadinessController* m_launchReadiness = nullptr;
     FirebaseAuthClient* m_firebase = nullptr;
+    AutoUpdater* m_autoUpdater = nullptr;
     QNetworkAccessManager* m_runtimeNetwork = nullptr;
     QTcpServer* m_detectionServer = nullptr;
     QSystemTrayIcon* m_trayIcon = nullptr;
@@ -92,4 +105,5 @@ private:
     bool m_autoEnterAuthenticatedArea = false;
     bool m_reloadAfterSignIn = false;
     bool m_authWindowMode = false;
+    bool m_updateCheckStarted = false;
 };
