@@ -155,6 +155,99 @@ footer { position: absolute; bottom: 25px; left: 0; width: 100%; text-align: cen
 .load-arrow { width: 17px; height: 17px; }
 .installer-note { margin: 17px auto 0; text-align: center; color: #596275; font-size: 10px; line-height: 1.55; }
 
+.load-progress-shell {
+  grid-template-columns: 1fr;
+}
+
+.load-progress-panel {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  padding: 56px 72px 52px;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 82% 0, rgba(128, 104, 255, .16), transparent 36%), #0a0f1c;
+  border: 1px solid #765bff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.load-progress-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 10px 0 68px;
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: .22em;
+}
+
+.load-progress-brand img {
+  width: 46px;
+  height: 46px;
+}
+
+.load-progress-wrap {
+  width: min(560px, 100%);
+  margin: auto;
+}
+
+.load-progress-wrap h2 {
+  margin: 12px 0 12px;
+  font-size: 38px;
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+
+.load-progress-wrap p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.load-progress-track {
+  width: 100%;
+  height: 18px;
+  margin: 32px 0 12px;
+  border: 1px solid #252d40;
+  border-radius: 999px;
+  background: #0e1320;
+  overflow: hidden;
+}
+
+.load-progress-track span {
+  display: block;
+  width: 22%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #765bff, #9b89ff);
+  transition: width .32s ease;
+}
+
+.load-progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  color: var(--accent-bright);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .16em;
+}
+
+.load-progress-meta strong {
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.load-progress-detail {
+  margin-top: 18px !important;
+  color: #667084 !important;
+  font-size: 11px !important;
+}
+
 @media (max-width: 1050px) {
   .shell { grid-template-columns: minmax(340px, .9fr) minmax(430px, 1.1fr); }
   .brand-panel { padding-left: 45px; padding-right: 45px; }

@@ -84,6 +84,12 @@
     elements.installStatus = byId("install-status");
     elements.destinationPreview = byId("destination-preview");
     elements.authenticatedUser = byId("authenticated-user");
+    elements.loadProgressShell = byId("load-progress-shell");
+    elements.loadProgressStatus = byId("load-progress-status");
+    elements.loadProgressStage = byId("load-progress-stage");
+    elements.loadProgressPercent = byId("load-progress-percent");
+    elements.loadProgressBar = byId("load-progress-bar");
+    elements.loadProgressDetail = byId("load-progress-detail");
 
     elements.loginForm.addEventListener("submit", handleLoginSubmit);
     elements.togglePassword.addEventListener("click", () => toggleInputVisibility(elements.password, elements.togglePassword));
@@ -410,19 +416,22 @@
       return;
     }
 
-    setLoadBusy(true);
+    showLoadProgress("STARTING", "Loading NEXUS client...", 22, "The application will open after readiness is complete.");
     setStatus(elements.installStatus, "", "");
     const payload = { installPath: state.selectedPath };
     try {
+      updateLoadProgress("PREPARING", "Preparing files and runtime services...", 45, "Applying the selected installation path.");
       const result = await state.loadHandler(payload);
       assertSuccessfulResult(result, "Unable to continue installation.");
-      setStatus(elements.installStatus, "success", objectMessage(result) || "Installation started.");
+      updateLoadProgress("FINALIZING", "NEXUS is almost ready...", 82, objectMessage(result) || "Finishing the client handoff.");
       document.dispatchEvent(new CustomEvent("installer:load", { detail: { result, installPath: state.selectedPath } }));
+      updateLoadProgress("READY", "NEXUS is ready.", 100, "Opening the application.");
     } catch (error) {
       const normalized = normalizeError(error, "Unable to continue installation.");
+      updateLoadProgress("LOAD FAILED", normalized.message, 100, "Return to the load page and try again.");
+      window.setTimeout(() => showInstallPage({ username: state.pendingAccount.username || "" }), 1200);
       setStatus(elements.installStatus, "error", normalized.message);
       document.dispatchEvent(new CustomEvent("installer:error", { detail: { error: normalized, installPath: state.selectedPath } }));
-    } finally {
       setLoadBusy(false);
     }
   }
@@ -591,8 +600,23 @@
     state.loadingInstaller = busy;
     elements.selectPath.disabled = busy;
     elements.load.disabled = busy || !state.selectedPath;
-    elements.load.classList.toggle("loading", busy);
-    elements.load.querySelector(".button-label").textContent = busy ? "LOADING" : "LOAD";
+    elements.load.classList.remove("loading");
+    elements.load.querySelector(".button-label").textContent = "LOAD";
+  }
+
+  function showLoadProgress(stage, status, percent, detail) {
+    setLoadBusy(true);
+    updateLoadProgress(stage, status, percent, detail);
+    showPage("load-progress");
+  }
+
+  function updateLoadProgress(stage, status, percent, detail) {
+    const bounded = Math.max(0, Math.min(100, Number(percent) || 0));
+    elements.loadProgressStage.textContent = stage || "LOADING";
+    elements.loadProgressStatus.textContent = status || "Loading NEXUS client...";
+    elements.loadProgressPercent.textContent = `${Math.round(bounded)}%`;
+    elements.loadProgressBar.style.width = `${bounded}%`;
+    elements.loadProgressDetail.textContent = detail || "";
   }
 
   function normalizePathResult(result) {
