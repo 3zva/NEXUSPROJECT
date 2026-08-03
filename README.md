@@ -4,7 +4,7 @@ NEXUS is a desktop configuration hub built for Rainbow Six Siege players who wan
 
 The official website is:
 
-highcloudnexus.com
+https://highcloudnexus.com
 
 For downloads, license purchases, updates, and support, use the official website rather than downloading random builds or mirrors.
 
