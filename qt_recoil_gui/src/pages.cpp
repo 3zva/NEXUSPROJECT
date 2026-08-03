@@ -597,7 +597,6 @@ SettingsPage::SettingsPage(QWidget* parent)
         {QStringLiteral("Primary Weapon"), QStringLiteral("1"), QStringLiteral("primary_weapon")},
         {QStringLiteral("Secondary Weapon"), QStringLiteral("2"), QStringLiteral("secondary_weapon")},
         {QStringLiteral("Pause Input Control"), QStringLiteral("N"), QStringLiteral("pause_input")},
-        {QStringLiteral("Crouchspam"), QStringLiteral("K"), QStringLiteral("crouchspam")},
     };
     int row = 1;
     for (const auto& definition : keys) {
@@ -619,7 +618,7 @@ SettingsPage::SettingsPage(QWidget* parent)
     auto* noteLayout = new QVBoxLayout(note);
     noteLayout->setContentsMargins(14, 12, 14, 12);
     noteLayout->addWidget(bodyText(
-        QStringLiteral("Keybinds currently accept compact key names. Keep your in-game crouch key synchronized with the Crouchspam setting."),
+        QStringLiteral("Keybinds currently accept compact key names. Keep these values synchronized with your in-game controls."),
         note
     ));
     keyLayout->addWidget(note, row++, 0, 1, 2);

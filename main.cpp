@@ -111,7 +111,6 @@ std::chrono::steady_clock::time_point g_startupTime;
 char g_primaryHotkey = '1';
 char g_secondaryHotkey = '2';
 char g_pauseKey = 'p';
-char g_crouchHotkey = 'k';
 bool g_lastPrimary = false;
 bool g_lastSecondary = false;
 bool g_lastPause = false;
@@ -2097,10 +2096,6 @@ bool ApplyRuntimeKeybind(const std::string& key, const std::string& value) {
     }
     if (normalized == "secondary_weapon") {
         g_secondaryHotkey = FirstBindableChar(value, g_secondaryHotkey);
-        return true;
-    }
-    if (normalized == "crouchspam") {
-        g_crouchHotkey = FirstBindableChar(value, g_crouchHotkey);
         return true;
     }
     return false;
