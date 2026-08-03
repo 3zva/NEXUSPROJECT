@@ -47,8 +47,14 @@ void GameLaunchOverlayWindow::resetForWaiting() {
     m_pid = 0;
     m_executableName.clear();
     m_progressView->reset();
+    m_progressView->setStage(QStringLiteral("WAITING"));
+    m_progressView->setStatus(QStringLiteral("Waiting for Rainbow Six Siege..."));
+    m_progressView->setDetail(QStringLiteral("NEXUS is ready and watching for the game process."));
+    m_progressView->setProgress(18, false);
     m_progressView->setActionVisible(false);
-    hide();
+    centerOnScreen(nullptr);
+    show();
+    raise();
 }
 
 void GameLaunchOverlayWindow::showForDetectedProcess(
