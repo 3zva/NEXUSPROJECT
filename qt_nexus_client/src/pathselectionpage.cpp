@@ -133,9 +133,9 @@ void PathSelectionPage::beginLoading() {
     m_loadingView->setTitle(QStringLiteral("Loading NEXUS"));
     m_loadingView->setSubtitle(QStringLiteral("Keep this window open while NEXUS prepares the client and waits for Rainbow Six Siege."));
     m_loadingView->setStage(QStringLiteral("STARTING"));
-    m_loadingView->setStatus(QStringLiteral("Preparing client services..."));
+    m_loadingView->setStatus(QStringLiteral("Loading NEXUS client..."));
     m_loadingView->setDetail(QStringLiteral("The application will open after readiness is complete."));
-    m_loadingView->setProgress(12, false);
+    m_loadingView->setProgress(22, false);
     m_loadingView->setActionVisible(false);
     m_stack->setCurrentWidget(m_loadingView);
 }

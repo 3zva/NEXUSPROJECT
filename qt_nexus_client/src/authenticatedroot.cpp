@@ -585,7 +585,10 @@ void AuthenticatedRoot::requestLogout() {
 void AuthenticatedRoot::handlePathLoad(const QString& path) {
     m_installationPath = path;
     beginLoadProgress();
-    Q_EMIT installationPathSelected(path);
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+    QTimer::singleShot(50, this, [this, path]() {
+        Q_EMIT installationPathSelected(path);
+    });
 }
 
 
