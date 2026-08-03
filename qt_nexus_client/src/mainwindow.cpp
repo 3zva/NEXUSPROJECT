@@ -13,7 +13,11 @@
 
 #include <QApplication>
 #include <QAction>
+#include <QAbstractButton>
+#include <QAbstractSlider>
+#include <QAbstractSpinBox>
 #include <QCloseEvent>
+#include <QComboBox>
 #include <QCoreApplication>
 #include <QCursor>
 #include <QDialog>
@@ -33,6 +37,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPainter>
+#include <QPlainTextEdit>
 #include <QProcess>
 #include <QPushButton>
 #include <QJsonDocument>
@@ -48,10 +53,12 @@
 #include <QStandardPaths>
 #include <QSystemTrayIcon>
 #include <QStringList>
+#include <QTextEdit>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
 #include <QUrl>
+#include <QWindow>
 
 #include <cmath>
 #include <optional>
@@ -354,6 +361,7 @@ MainWindow::MainWindow(QWidget* parent)
     m_fpsLabel->hide();
     m_fpsTimer = new QTimer(this);
     connect(m_fpsTimer, &QTimer::timeout, this, &MainWindow::updateFpsLabel);
+    qApp->installEventFilter(this);
 
     m_rootStack->addWidget(m_authFlow);
     m_rootStack->addWidget(m_authenticatedRoot);
@@ -505,6 +513,53 @@ void MainWindow::changeEvent(QEvent* event) {
 void MainWindow::resizeEvent(QResizeEvent* event) {
     QMainWindow::resizeEvent(event);
     updateFpsLabel();
+}
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* event) {
+    if (shouldStartWindowDrag(watched, event)) {
+        return windowHandle() != nullptr && windowHandle()->startSystemMove();
+    }
+    return QMainWindow::eventFilter(watched, event);
+}
+
+bool MainWindow::shouldStartWindowDrag(QObject* watched, QEvent* event) const {
+    if (event->type() != QEvent::MouseButtonPress || isMaximized() || isFullScreen()) {
+        return false;
+    }
+
+    auto* mouseEvent = static_cast<QMouseEvent*>(event);
+    if (mouseEvent->button() != Qt::LeftButton) {
+        return false;
+    }
+
+    auto* target = qobject_cast<QWidget*>(watched);
+    if (target == nullptr || target->window() != this) {
+        return false;
+    }
+
+    const QPoint windowPosition = mapFromGlobal(mouseEvent->globalPosition().toPoint());
+    if (!rect().contains(windowPosition)) {
+        return false;
+    }
+
+    const bool inMainDragBand = windowPosition.y() <= 72;
+    if (!m_authWindowMode && !inMainDragBand) {
+        return false;
+    }
+
+    for (auto* widget = target; widget != nullptr && widget != this; widget = widget->parentWidget()) {
+        if (qobject_cast<QAbstractButton*>(widget) != nullptr
+            || qobject_cast<QLineEdit*>(widget) != nullptr
+            || qobject_cast<QComboBox*>(widget) != nullptr
+            || qobject_cast<QAbstractSpinBox*>(widget) != nullptr
+            || qobject_cast<QAbstractSlider*>(widget) != nullptr
+            || qobject_cast<QTextEdit*>(widget) != nullptr
+            || qobject_cast<QPlainTextEdit*>(widget) != nullptr) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void MainWindow::loadFirebaseConfiguration() {

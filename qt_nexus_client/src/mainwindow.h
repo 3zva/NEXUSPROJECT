@@ -32,6 +32,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
     void changeEvent(QEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
     void connectAuthentication();
@@ -68,6 +69,7 @@ private:
     void stopRuntimeHelper();
     void startRuntimeHelper();
     void launchRainbowSixSiege();
+    bool shouldStartWindowDrag(QObject* watched, QEvent* event) const;
     void publishOperatorProfile(const QString& operatorId);
     void publishOperatorSettings(const QVariantMap& settings);
     void publishRuntimeSetting(const QString& key, const QVariant& value);
