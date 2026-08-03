@@ -1,0 +1,1065 @@
+{
+  "format": "nexus-operator-loadouts",
+  "schema_version": 1,
+  "operator_count": 76,
+  "attacker_count": 38,
+  "defender_count": 38,
+  "attacker_first": "striker",
+  "defender_first": "sentry",
+  "notes": [
+    "The 74 supplied rows are preserved exactly.",
+    "Rauora and Denari were absent from the supplied tables and are documented supplements.",
+    "Recruit is excluded.",
+    "Attachment availability is intentionally data-driven and may be replaced by the existing backend."
+  ],
+  "operators": [
+    {
+      "operator_id": "striker",
+      "display_name": "Striker",
+      "side": "attacker",
+      "primary_weapons": [
+        "M4",
+        "M249"
+      ],
+      "secondary_weapons": [
+        "5.7 USG",
+        "ITA12S"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "sledge",
+      "display_name": "Sledge",
+      "side": "attacker",
+      "primary_weapons": [
+        "M590A1",
+        "L85A2"
+      ],
+      "secondary_weapons": [
+        "P226 MK 25"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "thatcher",
+      "display_name": "Thatcher",
+      "side": "attacker",
+      "primary_weapons": [
+        "AR33",
+        "L85A2",
+        "M590A1"
+      ],
+      "secondary_weapons": [
+        "P226 MK 25"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "ash",
+      "display_name": "Ash",
+      "side": "attacker",
+      "primary_weapons": [
+        "G36C",
+        "R4-C"
+      ],
+      "secondary_weapons": [
+        "M45 MEUSOC",
+        "5.7 USG"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "thermite",
+      "display_name": "Thermite",
+      "side": "attacker",
+      "primary_weapons": [
+        "M1014",
+        "556XI"
+      ],
+      "secondary_weapons": [
+        "M45 MEUSOC",
+        "5.7 USG"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "twitch",
+      "display_name": "Twitch",
+      "side": "attacker",
+      "primary_weapons": [
+        "F2",
+        "417",
+        "SG-CQB"
+      ],
+      "secondary_weapons": [
+        "P9",
+        "LFP586"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "montagne",
+      "display_name": "Montagne",
+      "side": "attacker",
+      "primary_weapons": [
+        "Shield"
+      ],
+      "secondary_weapons": [
+        "P9",
+        "LFP586"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "glaz",
+      "display_name": "Glaz",
+      "side": "attacker",
+      "primary_weapons": [
+        "OTs-03"
+      ],
+      "secondary_weapons": [
+        "PMM",
+        "GONNE-6",
+        "BEARING 9"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "fuze",
+      "display_name": "Fuze",
+      "side": "attacker",
+      "primary_weapons": [
+        "Shield",
+        "6P41",
+        "AK-12"
+      ],
+      "secondary_weapons": [
+        "PMM",
+        "GSH-18"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "blitz",
+      "display_name": "Blitz",
+      "side": "attacker",
+      "primary_weapons": [
+        "Shield"
+      ],
+      "secondary_weapons": [
+        "P12"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "iq",
+      "display_name": "IQ",
+      "side": "attacker",
+      "primary_weapons": [
+        "AUG A2",
+        "552 COMMANDO",
+        "G8A1"
+      ],
+      "secondary_weapons": [
+        "P12"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "buck",
+      "display_name": "Buck",
+      "side": "attacker",
+      "primary_weapons": [
+        "C8-SFW",
+        "CAMRS"
+      ],
+      "secondary_weapons": [
+        "MK1 9mm"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "blackbeard",
+      "display_name": "Blackbeard",
+      "side": "attacker",
+      "primary_weapons": [
+        "Shield"
+      ],
+      "secondary_weapons": [
+        "MK17 CQB",
+        "SR-25"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "capitao",
+      "display_name": "Capitão",
+      "side": "attacker",
+      "primary_weapons": [
+        "PARA-308",
+        "M249"
+      ],
+      "secondary_weapons": [
+        "PRB92",
+        "GONNE-6"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "hibana",
+      "display_name": "Hibana",
+      "side": "attacker",
+      "primary_weapons": [
+        "TYPE-89",
+        "SUPERNOVA"
+      ],
+      "secondary_weapons": [
+        "P229",
+        "BEARING 9"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "jackal",
+      "display_name": "Jackal",
+      "side": "attacker",
+      "primary_weapons": [
+        "C7E",
+        "PDW9",
+        "ITA12L"
+      ],
+      "secondary_weapons": [
+        "USP40",
+        "ITA12S"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "ying",
+      "display_name": "Ying",
+      "side": "attacker",
+      "primary_weapons": [
+        "T-95 LSW",
+        "SIX12"
+      ],
+      "secondary_weapons": [
+        "Q-929"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "zofia",
+      "display_name": "Zofia",
+      "side": "attacker",
+      "primary_weapons": [
+        "LMG-E",
+        "M762"
+      ],
+      "secondary_weapons": [
+        "RG15"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "dokkaebi",
+      "display_name": "Dokkaebi",
+      "side": "attacker",
+      "primary_weapons": [
+        "Mk 14 EBR",
+        "BOSG.12.2"
+      ],
+      "secondary_weapons": [
+        "SMG-12",
+        "C75 Auto",
+        "GONNE-6"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "lion",
+      "display_name": "Lion",
+      "side": "attacker",
+      "primary_weapons": [
+        "V308",
+        "417",
+        "SG-CQB"
+      ],
+      "secondary_weapons": [
+        "LFP586",
+        "P9"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "finka",
+      "display_name": "Finka",
+      "side": "attacker",
+      "primary_weapons": [
+        "SPEAR .308",
+        "6P41",
+        "SASG-12"
+      ],
+      "secondary_weapons": [
+        "PMM",
+        "GSH-18"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "maverick",
+      "display_name": "Maverick",
+      "side": "attacker",
+      "primary_weapons": [
+        "AR-15.50",
+        "M4"
+      ],
+      "secondary_weapons": [
+        "1911 TACOPS"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "nomad",
+      "display_name": "Nomad",
+      "side": "attacker",
+      "primary_weapons": [
+        "AK-74M",
+        "ARX200"
+      ],
+      "secondary_weapons": [
+        ".44 Mag Semi-Auto",
+        "PRB92"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "gridlock",
+      "display_name": "Gridlock",
+      "side": "attacker",
+      "primary_weapons": [
+        "F90",
+        "M249 SAW"
+      ],
+      "secondary_weapons": [
+        "SUPER SHORTY",
+        "SDP 9mm"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "nokk",
+      "display_name": "Nøkk",
+      "side": "attacker",
+      "primary_weapons": [
+        "FMG-9",
+        "SIX12 SD"
+      ],
+      "secondary_weapons": [
+        "5.7 USG",
+        "D-50"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "amaru",
+      "display_name": "Amaru",
+      "side": "attacker",
+      "primary_weapons": [
+        "G8A1",
+        "SUPERNOVA"
+      ],
+      "secondary_weapons": [
+        "SMG-11",
+        "ITA12S",
+        "GONNE-6"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "kali",
+      "display_name": "Kali",
+      "side": "attacker",
+      "primary_weapons": [
+        "CSRX 300"
+      ],
+      "secondary_weapons": [
+        "SPSMG9",
+        "C75 Auto",
+        "P226 MK 25"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "iana",
+      "display_name": "Iana",
+      "side": "attacker",
+      "primary_weapons": [
+        "ARX200",
+        "G36C"
+      ],
+      "secondary_weapons": [
+        "MK1 9mm",
+        "GONNE-6"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "ace",
+      "display_name": "Ace",
+      "side": "attacker",
+      "primary_weapons": [
+        "AK-12",
+        "M1014"
+      ],
+      "secondary_weapons": [
+        "P9"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "zero",
+      "display_name": "Zero",
+      "side": "attacker",
+      "primary_weapons": [
+        "SC3000K",
+        "MP7"
+      ],
+      "secondary_weapons": [
+        "5.7 USG",
+        "GONNE-6"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "flores",
+      "display_name": "Flores",
+      "side": "attacker",
+      "primary_weapons": [
+        "AR33",
+        "SR-25"
+      ],
+      "secondary_weapons": [
+        "GSH-18"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "osa",
+      "display_name": "Osa",
+      "side": "attacker",
+      "primary_weapons": [
+        "556XI",
+        "PDW9"
+      ],
+      "secondary_weapons": [
+        "PMM"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "sens",
+      "display_name": "Sens",
+      "side": "attacker",
+      "primary_weapons": [
+        "POF-9",
+        "417"
+      ],
+      "secondary_weapons": [
+        "SDP 9mm"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "grim",
+      "display_name": "Grim",
+      "side": "attacker",
+      "primary_weapons": [
+        "552 COMMANDO",
+        "SG-CQB"
+      ],
+      "secondary_weapons": [
+        "P229",
+        "Bailiff 410"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "brava",
+      "display_name": "Brava",
+      "side": "attacker",
+      "primary_weapons": [
+        "PARA-308",
+        "CAMRS"
+      ],
+      "secondary_weapons": [
+        "SUPER SHORTY",
+        "USP40"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "ram",
+      "display_name": "Ram",
+      "side": "attacker",
+      "primary_weapons": [
+        "R4-C",
+        "LMG-E"
+      ],
+      "secondary_weapons": [
+        "MK1 9mm",
+        "ITA12S"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "deimos",
+      "display_name": "Deimos",
+      "side": "attacker",
+      "primary_weapons": [
+        "AK-74M",
+        "M590A1"
+      ],
+      "secondary_weapons": [
+        ".44 Vendetta"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "rauora",
+      "display_name": "Rauora",
+      "side": "attacker",
+      "primary_weapons": [
+        "417",
+        "M249",
+        "XK23"
+      ],
+      "secondary_weapons": [
+        "Reaper MK2",
+        "GSh-18"
+      ],
+      "source": "official Ubisoft loadout supplement (Y11S2 XK23 included)"
+    },
+    {
+      "operator_id": "sentry",
+      "display_name": "Sentry",
+      "side": "defender",
+      "primary_weapons": [
+        "COMMANDO 9",
+        "M870"
+      ],
+      "secondary_weapons": [
+        "C75 Auto",
+        "SUPER SHORTY"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "smoke",
+      "display_name": "Smoke",
+      "side": "defender",
+      "primary_weapons": [
+        "FMG-9",
+        "M590A1"
+      ],
+      "secondary_weapons": [
+        "P226 MK 25",
+        "SMG-11"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "mute",
+      "display_name": "Mute",
+      "side": "defender",
+      "primary_weapons": [
+        "MP5K",
+        "M590A1"
+      ],
+      "secondary_weapons": [
+        "P226 MK 25",
+        "SMG-11"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "castle",
+      "display_name": "Castle",
+      "side": "defender",
+      "primary_weapons": [
+        "UMP45",
+        "M1014"
+      ],
+      "secondary_weapons": [
+        "5.7 USG",
+        "SUPER SHORTY",
+        "M45 MEUSOC"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "pulse",
+      "display_name": "Pulse",
+      "side": "defender",
+      "primary_weapons": [
+        "M1014",
+        "UMP45"
+      ],
+      "secondary_weapons": [
+        "M45 MEUSOC",
+        "5.7 USG"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "doc",
+      "display_name": "Doc",
+      "side": "defender",
+      "primary_weapons": [
+        "SG-CQB",
+        "MP5",
+        "P90"
+      ],
+      "secondary_weapons": [
+        "P9",
+        "LFP586",
+        "Bailiff 410"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "rook",
+      "display_name": "Rook",
+      "side": "defender",
+      "primary_weapons": [
+        "P90",
+        "MP5",
+        "SG-CQB"
+      ],
+      "secondary_weapons": [
+        "LFP586",
+        "P9"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "kapkan",
+      "display_name": "Kapkan",
+      "side": "defender",
+      "primary_weapons": [
+        "9x19VSN",
+        "SASG-12"
+      ],
+      "secondary_weapons": [
+        "PMM",
+        "GSH-18"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "tachanka",
+      "display_name": "Tachanka",
+      "side": "defender",
+      "primary_weapons": [
+        "DP27",
+        "9x19VSN"
+      ],
+      "secondary_weapons": [
+        "GSH-18",
+        "PMM",
+        "BEARING 9"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "jager",
+      "display_name": "Jäger",
+      "side": "defender",
+      "primary_weapons": [
+        "M870",
+        "416-C CARBINE"
+      ],
+      "secondary_weapons": [
+        "P12"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "bandit",
+      "display_name": "Bandit",
+      "side": "defender",
+      "primary_weapons": [
+        "MP7",
+        "M870"
+      ],
+      "secondary_weapons": [
+        "P12"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "frost",
+      "display_name": "Frost",
+      "side": "defender",
+      "primary_weapons": [
+        "SUPER 90",
+        "9mm C1"
+      ],
+      "secondary_weapons": [
+        "MK1 9mm",
+        "ITA12S"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "valkyrie",
+      "display_name": "Valkyrie",
+      "side": "defender",
+      "primary_weapons": [
+        "MPX",
+        "SPAS-12"
+      ],
+      "secondary_weapons": [
+        "D-50"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "caveira",
+      "display_name": "Caveira",
+      "side": "defender",
+      "primary_weapons": [
+        "M12",
+        "SPAS-15"
+      ],
+      "secondary_weapons": [
+        "LUISON"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "echo",
+      "display_name": "Echo",
+      "side": "defender",
+      "primary_weapons": [
+        "SUPERNOVA",
+        "MP5SD"
+      ],
+      "secondary_weapons": [
+        "P229",
+        "BEARING 9"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "mira",
+      "display_name": "Mira",
+      "side": "defender",
+      "primary_weapons": [
+        "VECTOR .45 ACP",
+        "ITA12L"
+      ],
+      "secondary_weapons": [
+        "USP40",
+        "ITA12S"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "lesion",
+      "display_name": "Lesion",
+      "side": "defender",
+      "primary_weapons": [
+        "SIX12 SD",
+        "T-5 SMG"
+      ],
+      "secondary_weapons": [
+        "Q-929"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "ela",
+      "display_name": "Ela",
+      "side": "defender",
+      "primary_weapons": [
+        "SCORPION EVO 3 A1",
+        "FO-12"
+      ],
+      "secondary_weapons": [
+        "RG15"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "vigil",
+      "display_name": "Vigil",
+      "side": "defender",
+      "primary_weapons": [
+        "K1A",
+        "BOSG.12.2"
+      ],
+      "secondary_weapons": [
+        "C75 Auto",
+        "SMG-12"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "maestro",
+      "display_name": "Maestro",
+      "side": "defender",
+      "primary_weapons": [
+        "ALDA 5.56",
+        "ACS12"
+      ],
+      "secondary_weapons": [
+        "Bailiff 410",
+        "KERATOS .357"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "alibi",
+      "display_name": "Alibi",
+      "side": "defender",
+      "primary_weapons": [
+        "Mx4 Storm",
+        "ACS12"
+      ],
+      "secondary_weapons": [
+        "KERATOS .357",
+        "Bailiff 410"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "clash",
+      "display_name": "Clash",
+      "side": "defender",
+      "primary_weapons": [],
+      "secondary_weapons": [
+        "SUPER SHORTY",
+        "SPSMG9",
+        "P-10C"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "kaid",
+      "display_name": "Kaid",
+      "side": "defender",
+      "primary_weapons": [
+        "AUG A3",
+        "TCSG12"
+      ],
+      "secondary_weapons": [
+        ".44 Mag Semi-Auto",
+        "LFP586"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "mozzie",
+      "display_name": "Mozzie",
+      "side": "defender",
+      "primary_weapons": [
+        "COMMANDO 9",
+        "P10 RONI"
+      ],
+      "secondary_weapons": [
+        "SDP 9mm"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "warden",
+      "display_name": "Warden",
+      "side": "defender",
+      "primary_weapons": [
+        "M590A1",
+        "MPX"
+      ],
+      "secondary_weapons": [
+        "P-10C",
+        "SMG-12"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "goyo",
+      "display_name": "Goyo",
+      "side": "defender",
+      "primary_weapons": [
+        "VECTOR .45 ACP",
+        "TCSG12"
+      ],
+      "secondary_weapons": [
+        "P229"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "wamai",
+      "display_name": "Wamai",
+      "side": "defender",
+      "primary_weapons": [
+        "AUG A2",
+        "MP5K"
+      ],
+      "secondary_weapons": [
+        "KERATOS .357",
+        "P12"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "oryx",
+      "display_name": "Oryx",
+      "side": "defender",
+      "primary_weapons": [
+        "T-5 SMG",
+        "SPAS-12"
+      ],
+      "secondary_weapons": [
+        "Bailiff 410",
+        "USP40"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "melusi",
+      "display_name": "Melusi",
+      "side": "defender",
+      "primary_weapons": [
+        "MP5",
+        "SUPER 90"
+      ],
+      "secondary_weapons": [
+        "RG15",
+        "ITA12S"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "aruni",
+      "display_name": "Aruni",
+      "side": "defender",
+      "primary_weapons": [
+        "P10 RONI",
+        "Mk 14 EBR"
+      ],
+      "secondary_weapons": [
+        "PRB92"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "thunderbird",
+      "display_name": "Thunderbird",
+      "side": "defender",
+      "primary_weapons": [
+        "SPEAR .308",
+        "SPAS-15"
+      ],
+      "secondary_weapons": [
+        "Q-929",
+        "BEARING 9",
+        "ITA12S"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "thorn",
+      "display_name": "Thorn",
+      "side": "defender",
+      "primary_weapons": [
+        "UZK50GI",
+        "M870"
+      ],
+      "secondary_weapons": [
+        "1911 TACOPS",
+        "C75 Auto"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "azami",
+      "display_name": "Azami",
+      "side": "defender",
+      "primary_weapons": [
+        "9x19VSN",
+        "ACS12"
+      ],
+      "secondary_weapons": [
+        "D-50"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "solis",
+      "display_name": "Solis",
+      "side": "defender",
+      "primary_weapons": [
+        "P90",
+        "ITA12L"
+      ],
+      "secondary_weapons": [
+        "SMG-11"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "fenrir",
+      "display_name": "Fenrir",
+      "side": "defender",
+      "primary_weapons": [
+        "MP7",
+        "SASG-12"
+      ],
+      "secondary_weapons": [
+        "Bailiff 410",
+        "5.7 USG"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "tubarao",
+      "display_name": "Tubarão",
+      "side": "defender",
+      "primary_weapons": [
+        "MPX",
+        "AR-15.50"
+      ],
+      "secondary_weapons": [
+        "P226 MK 25"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "skopos",
+      "display_name": "Skopós",
+      "side": "defender",
+      "primary_weapons": [
+        "PCX-33"
+      ],
+      "secondary_weapons": [
+        "P229"
+      ],
+      "source": "user-supplied table"
+    },
+    {
+      "operator_id": "denari",
+      "display_name": "Denari",
+      "side": "defender",
+      "primary_weapons": [
+        "SCORPION EVO 3 A1",
+        "FMG-9"
+      ],
+      "secondary_weapons": [
+        "Glaive-12",
+        "P226 MK 25"
+      ],
+      "source": "official Ubisoft loadout supplement"
+    }
+  ]
+}

@@ -57,19 +57,19 @@ using Microsoft::WRL::ComPtr;
 
 namespace fs = std::filesystem;
 
-constexpr wchar_t APP_TITLE[] = L"Combined RecoilMaster";
-constexpr char CONFIG_PREFIX[] = "^^^V5";
-constexpr char LOCAL_CONFIG_FILENAME[] = "my_V5config.txt";
+constexpr wchar_t APP_TITLE[] = L"NEXUS";
+constexpr char CONFIG_PREFIX[] = "NEXUS_CONFIG_V1";
+constexpr char LOCAL_CONFIG_FILENAME[] = "nexus_runtime_config.txt";
 constexpr char LOCAL_HTTP_HOST[] = "127.0.0.1";
 constexpr int LOCAL_HTTP_PORT = 20112;
 constexpr int LOADER_HTTP_PORT = 20110;
 constexpr int WS_PORTS[] = {20111, 8765, 6741};
-constexpr wchar_t OVERLAY_WORD_LIST_FILENAME[] = L"List A and B for Overlay window.txt";
-constexpr wchar_t VISION_TOOL_FILENAME[] = L"VisionAutomationTool.exe";
-constexpr wchar_t VISION_CONFIG_FILENAME[] = L"vision_overlay_config.txt";
+constexpr wchar_t RUNTIME_HELPER_WORD_LIST_FILENAME[] = L"nexus_runtime_helper_words.txt";
+constexpr wchar_t RUNTIME_HELPER_EXE_FILENAME[] = L"NEXUS Runtime Helper.exe";
+constexpr wchar_t RUNTIME_HELPER_CONFIG_FILENAME[] = L"nexus_runtime_helper_config.txt";
 constexpr wchar_t RUNTIME_SUPPORT_DIR[] = L"runtime";
-constexpr wchar_t QT_RECOIL_UI_DIR[] = L"recoil-ui";
-constexpr wchar_t QT_RECOIL_UI_EXE[] = L"Nexus Recoil.exe";
+constexpr wchar_t QT_CLIENT_UI_DIR[] = L"nexus-client";
+constexpr wchar_t QT_CLIENT_UI_EXE[] = L"Nexus Client.exe";
 
 HWND g_hwnd = nullptr;
 HWND g_status = nullptr;
@@ -104,7 +104,7 @@ bool g_profileActive = false;
 bool g_leftHeld = false;
 bool g_rightHeld = false;
 bool g_holding = false;
-std::chrono::steady_clock::time_point g_rapidRecoilUntil;
+std::chrono::steady_clock::time_point g_rapidActionUntil;
 std::chrono::steady_clock::time_point g_syntheticClicksUntil;
 std::chrono::steady_clock::time_point g_startupTime;
 
@@ -148,7 +148,7 @@ bool g_passwordVisible = false;
 bool g_registerPasswordVisible = false;
 bool g_registerConfirmVisible = false;
 bool g_termsAccepted = false;
-bool g_recoilOnlyMode = false;
+bool g_clientOnlyMode = false;
 bool g_backendOnlyMode = false;
 std::wstring g_displayName = L"";
 
@@ -215,7 +215,7 @@ void OpenHtmlUi();
 void LoaderHttpServerThread();
 void HandleLogout();
 void NavigateEmbedded(const std::wstring& url);
-std::wstring RecoilHtmlUrl();
+std::wstring ClientCoreHtmlUrl();
 
 std::wstring Utf8ToWide(const std::string& value) {
     if (value.empty()) return L"";
@@ -407,7 +407,7 @@ fs::path CurrentExePath() {
 
 std::wstring CurrentExeDisplayName() {
     std::wstring stem = CurrentExePath().stem().wstring();
-    return stem.empty() ? L"RecoilMaster" : stem;
+    return stem.empty() ? L"NEXUS" : stem;
 }
 
 fs::path NexusDataDir() {
@@ -492,7 +492,7 @@ std::wstring ChooseVisibleExeName() {
     return std::wstring(MAIN_LIST_A[left(rng)]) + MAIN_LIST_B[right(rng)] + L".exe";
 }
 
-std::vector<std::wstring> ParseOverlayWords(const std::string& text, const std::string& beginMarker, const std::string& endMarker) {
+std::vector<std::wstring> ParseRuntimeHelperWords(const std::string& text, const std::string& beginMarker, const std::string& endMarker) {
     std::vector<std::wstring> words;
     size_t begin = text.find(beginMarker);
     if (begin == std::string::npos) return words;
@@ -515,12 +515,12 @@ std::vector<std::wstring> ParseOverlayWords(const std::string& text, const std::
     return words;
 }
 
-std::wstring ChooseOverlayExeName() {
-    const fs::path wordList = RuntimeFile(OVERLAY_WORD_LIST_FILENAME);
-    std::vector<std::wstring> listA = ParseOverlayWords(ReadFileUtf8(wordList), "List A", "List B");
-    std::vector<std::wstring> listB = ParseOverlayWords(ReadFileUtf8(wordList), "List B", "");
+std::wstring ChooseRuntimeHelperExeName() {
+    const fs::path wordList = RuntimeFile(RUNTIME_HELPER_WORD_LIST_FILENAME);
+    std::vector<std::wstring> listA = ParseRuntimeHelperWords(ReadFileUtf8(wordList), "List A", "List B");
+    std::vector<std::wstring> listB = ParseRuntimeHelperWords(ReadFileUtf8(wordList), "List B", "");
     if (listA.empty() || listB.empty()) {
-        throw std::runtime_error("Overlay word list is missing or invalid.");
+        throw std::runtime_error("NEXUS runtime helper word list is missing or invalid.");
     }
 
     static std::mt19937 rng((unsigned)GetTickCount() ^ (unsigned)std::chrono::steady_clock::now().time_since_epoch().count() ^ 0x5A17C0DEu);
@@ -613,9 +613,9 @@ void CleanupPreviousInstall(const fs::path& installDir) {
         RemoveCopiedExecutable(previousBackend, installDir);
     }
 
-    const fs::path recoilUiDir = installDir / QT_RECOIL_UI_DIR;
+    const fs::path nexusUiDir = installDir / QT_CLIENT_UI_DIR;
     for (const std::wstring& visibleName : GeneratedVisibleExeNames()) {
-        const fs::path visibleCopy = recoilUiDir / visibleName;
+        const fs::path visibleCopy = nexusUiDir / visibleName;
         const fs::path backendCopy = installDir / (fs::path(visibleName).stem().wstring() + L" Runtime.exe");
         RemoveCopiedExecutable(visibleCopy, installDir);
         RemoveCopiedExecutable(backendCopy, installDir);
@@ -657,18 +657,18 @@ std::wstring PowerShellSingleQuoted(const std::wstring& value) {
     return escaped;
 }
 
-void StopVisionOverlayProcesses(const fs::path& installDir = fs::path()) {
+void StopNexusRuntimeHelperProcesses(const fs::path& installDir = fs::path()) {
     std::wstring executablePathClause;
     if (!installDir.empty()) {
         fs::path runtimeDir = RuntimeDirFor(installDir);
-        for (const fs::path& pidMarker : {runtimeDir / L"current_overlay_pid.txt", installDir / L"current_overlay_pid.txt"}) {
+        for (const fs::path& pidMarker : {runtimeDir / L"current_runtime_helper_pid.txt", installDir / L"current_runtime_helper_pid.txt"}) {
             std::string pidText = Trim(ReadFileUtf8(pidMarker));
             if (!pidText.empty()) {
                 LaunchHiddenUtility(L"taskkill.exe /PID " + Utf8ToWide(pidText) + L" /F /T");
             }
         }
 
-        for (const fs::path& marker : {runtimeDir / L"current_overlay.txt", installDir / L"current_overlay.txt"}) {
+        for (const fs::path& marker : {runtimeDir / L"current_runtime_helper.txt", installDir / L"current_runtime_helper.txt"}) {
             std::wstring previous = Utf8ToWide(Trim(ReadFileUtf8(marker)));
             if (!previous.empty()) {
                 fs::path previousPath(previous);
@@ -685,18 +685,18 @@ void StopVisionOverlayProcesses(const fs::path& installDir = fs::path()) {
         L"powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
         L"\"$self=$PID; Get-CimInstance Win32_Process | Where-Object { "
         L"($_.ProcessId -ne $self) -and ("
-        L"($_.ExecutablePath -like '*VisionAutomationTool.exe') -or "
-        L"($_.CommandLine -like '*vision_overlay_config.txt*')";
+        L"($_.ExecutablePath -like '*NEXUS Runtime Helper.exe') -or "
+        L"($_.CommandLine -like '*nexus_runtime_helper_config.txt*')";
     command += executablePathClause;
     command += L") } | ForEach-Object { Invoke-CimMethod -InputObject $_ -MethodName Terminate | Out-Null }\"";
 
     LaunchHiddenUtility(command);
 }
 
-void CleanupPreviousOverlay(const fs::path& installDir) {
-    StopVisionOverlayProcesses(installDir);
+void CleanupPreviousRuntimeHelper(const fs::path& installDir) {
+    StopNexusRuntimeHelperProcesses(installDir);
     fs::path runtimeDir = RuntimeDirFor(installDir);
-    fs::path marker = runtimeDir / L"current_overlay.txt";
+    fs::path marker = runtimeDir / L"current_runtime_helper.txt";
     std::wstring previous = Utf8ToWide(Trim(ReadFileUtf8(marker)));
     std::error_code ec;
     if (!previous.empty()) {
@@ -706,19 +706,19 @@ void CleanupPreviousOverlay(const fs::path& installDir) {
         }
     }
     fs::remove(marker, ec);
-    fs::remove(runtimeDir / L"current_overlay_pid.txt", ec);
-    fs::remove(installDir / L"current_overlay.txt", ec);
-    fs::remove(installDir / L"current_overlay_pid.txt", ec);
+    fs::remove(runtimeDir / L"current_runtime_helper_pid.txt", ec);
+    fs::remove(installDir / L"current_runtime_helper.txt", ec);
+    fs::remove(installDir / L"current_runtime_helper_pid.txt", ec);
 }
 
 void CopyRuntimeResources(const fs::path& installDir) {
     std::error_code ec;
     fs::path runtimeDir = RuntimeDirFor(installDir);
     fs::create_directories(runtimeDir, ec);
-    fs::create_directories(installDir / L"recoilmaster-main", ec);
+    fs::create_directories(installDir / L"nexus-runtime-core", ec);
     fs::create_directories(installDir / L"configs", ec);
     fs::create_directories(installDir / L"nexus-ui", ec);
-    fs::create_directories(installDir / QT_RECOIL_UI_DIR, ec);
+    fs::create_directories(installDir / QT_CLIENT_UI_DIR, ec);
 
     if (fs::exists(RuntimeFile(L"WebView2Loader.dll"))) {
         fs::copy_file(RuntimeFile(L"WebView2Loader.dll"), runtimeDir / L"WebView2Loader.dll", fs::copy_options::overwrite_existing, ec);
@@ -732,29 +732,29 @@ void CopyRuntimeResources(const fs::path& installDir) {
     if (fs::exists(ExeDir() / L"nexus-ui")) {
         fs::copy(ExeDir() / L"nexus-ui", installDir / L"nexus-ui", fs::copy_options::recursive | fs::copy_options::overwrite_existing, ec);
     }
-    if (fs::exists(ExeDir() / QT_RECOIL_UI_DIR)) {
-        fs::copy(ExeDir() / QT_RECOIL_UI_DIR, installDir / QT_RECOIL_UI_DIR, fs::copy_options::recursive | fs::copy_options::overwrite_existing, ec);
+    if (fs::exists(ExeDir() / QT_CLIENT_UI_DIR)) {
+        fs::copy(ExeDir() / QT_CLIENT_UI_DIR, installDir / QT_CLIENT_UI_DIR, fs::copy_options::recursive | fs::copy_options::overwrite_existing, ec);
     }
-    if (fs::exists(ResourceRoot() / L"PeripheralCoreManager.html")) {
-        fs::copy_file(ResourceRoot() / L"PeripheralCoreManager.html", installDir / L"recoilmaster-main" / L"PeripheralCoreManager.html", fs::copy_options::overwrite_existing, ec);
+    if (fs::exists(ResourceRoot() / L"NexusRuntimeCore.html")) {
+        fs::copy_file(ResourceRoot() / L"NexusRuntimeCore.html", installDir / L"nexus-runtime-core" / L"NexusRuntimeCore.html", fs::copy_options::overwrite_existing, ec);
     }
     if (fs::exists(ResourceRoot() / L"associated_icon.png")) {
-        fs::copy_file(ResourceRoot() / L"associated_icon.png", installDir / L"recoilmaster-main" / L"associated_icon.png", fs::copy_options::overwrite_existing, ec);
+        fs::copy_file(ResourceRoot() / L"associated_icon.png", installDir / L"nexus-runtime-core" / L"associated_icon.png", fs::copy_options::overwrite_existing, ec);
     }
     if (fs::exists(ResourceRoot() / L"assets")) {
-        fs::copy(ResourceRoot() / L"assets", installDir / L"recoilmaster-main" / L"assets", fs::copy_options::recursive | fs::copy_options::overwrite_existing, ec);
+        fs::copy(ResourceRoot() / L"assets", installDir / L"nexus-runtime-core" / L"assets", fs::copy_options::recursive | fs::copy_options::overwrite_existing, ec);
     }
     if (fs::exists(ConfigPath())) {
         fs::copy_file(ConfigPath(), installDir / L"configs" / LOCAL_CONFIG_FILENAME, fs::copy_options::overwrite_existing, ec);
     }
-    if (fs::exists(RuntimeFile(VISION_TOOL_FILENAME))) {
-        fs::copy_file(RuntimeFile(VISION_TOOL_FILENAME), runtimeDir / VISION_TOOL_FILENAME, fs::copy_options::overwrite_existing, ec);
+    if (fs::exists(RuntimeFile(RUNTIME_HELPER_EXE_FILENAME))) {
+        fs::copy_file(RuntimeFile(RUNTIME_HELPER_EXE_FILENAME), runtimeDir / RUNTIME_HELPER_EXE_FILENAME, fs::copy_options::overwrite_existing, ec);
     }
-    if (fs::exists(RuntimeFile(OVERLAY_WORD_LIST_FILENAME))) {
-        fs::copy_file(RuntimeFile(OVERLAY_WORD_LIST_FILENAME), runtimeDir / OVERLAY_WORD_LIST_FILENAME, fs::copy_options::overwrite_existing, ec);
+    if (fs::exists(RuntimeFile(RUNTIME_HELPER_WORD_LIST_FILENAME))) {
+        fs::copy_file(RuntimeFile(RUNTIME_HELPER_WORD_LIST_FILENAME), runtimeDir / RUNTIME_HELPER_WORD_LIST_FILENAME, fs::copy_options::overwrite_existing, ec);
     }
-    if (fs::exists(RuntimeFile(VISION_CONFIG_FILENAME)) && !fs::exists(runtimeDir / VISION_CONFIG_FILENAME, ec)) {
-        fs::copy_file(RuntimeFile(VISION_CONFIG_FILENAME), runtimeDir / VISION_CONFIG_FILENAME, fs::copy_options::overwrite_existing, ec);
+    if (fs::exists(RuntimeFile(RUNTIME_HELPER_CONFIG_FILENAME)) && !fs::exists(runtimeDir / RUNTIME_HELPER_CONFIG_FILENAME, ec)) {
+        fs::copy_file(RuntimeFile(RUNTIME_HELPER_CONFIG_FILENAME), runtimeDir / RUNTIME_HELPER_CONFIG_FILENAME, fs::copy_options::overwrite_existing, ec);
     }
 }
 
@@ -818,39 +818,39 @@ DWORD LaunchProcess(const fs::path& exePath, const std::wstring& arguments, cons
     return processId;
 }
 
-std::wstring OverlayLaunchArguments(const fs::path& installDir) {
-    return L"--config " + QuoteArg((RuntimeDirFor(installDir) / VISION_CONFIG_FILENAME).wstring());
+std::wstring RuntimeHelperLaunchArguments(const fs::path& installDir) {
+    return L"--config " + QuoteArg((RuntimeDirFor(installDir) / RUNTIME_HELPER_CONFIG_FILENAME).wstring());
 }
 
-fs::path InstallAndLaunchOverlayCopy(const fs::path& installDir) {
+fs::path InstallAndLaunchRuntimeHelperCopy(const fs::path& installDir) {
     fs::path runtimeDir = RuntimeDirFor(installDir);
-    fs::path sourceOverlay = RuntimeFileFor(installDir, VISION_TOOL_FILENAME);
+    fs::path sourceRuntimeHelper = RuntimeFileFor(installDir, RUNTIME_HELPER_EXE_FILENAME);
     std::error_code ec;
-    if (!fs::exists(sourceOverlay, ec)) {
-        throw std::runtime_error("Vision automation tool is missing from the build output.");
+    if (!fs::exists(sourceRuntimeHelper, ec)) {
+        throw std::runtime_error("NEXUS runtime helper is missing from the build output.");
     }
 
-    CleanupPreviousOverlay(installDir);
+    CleanupPreviousRuntimeHelper(installDir);
     fs::create_directories(runtimeDir, ec);
-    fs::path overlayExe = runtimeDir / ChooseOverlayExeName();
-    fs::copy_file(sourceOverlay, overlayExe, fs::copy_options::overwrite_existing, ec);
-    if (ec) throw std::runtime_error("Unable to create the overlay executable copy.");
+    fs::path runtimeHelperExe = runtimeDir / ChooseRuntimeHelperExeName();
+    fs::copy_file(sourceRuntimeHelper, runtimeHelperExe, fs::copy_options::overwrite_existing, ec);
+    if (ec) throw std::runtime_error("Unable to create the runtime helper executable copy.");
 
-    std::ofstream(runtimeDir / L"current_overlay.txt", std::ios::trunc) << overlayExe.string();
-    std::ofstream(installDir / L"install.log", std::ios::app) << "Installed and launched overlay " << overlayExe.string() << "\n";
-    DWORD overlayPid = LaunchProcess(overlayExe, OverlayLaunchArguments(installDir), runtimeDir, L"C:\\msys64\\mingw64\\bin");
-    std::ofstream(runtimeDir / L"current_overlay_pid.txt", std::ios::trunc) << overlayPid;
-    return overlayExe;
+    std::ofstream(runtimeDir / L"current_runtime_helper.txt", std::ios::trunc) << runtimeHelperExe.string();
+    std::ofstream(installDir / L"install.log", std::ios::app) << "Installed and launched runtime helper " << runtimeHelperExe.string() << "\n";
+    DWORD runtimeHelperPid = LaunchProcess(runtimeHelperExe, RuntimeHelperLaunchArguments(installDir), runtimeDir, L"C:\\msys64\\mingw64\\bin");
+    std::ofstream(runtimeDir / L"current_runtime_helper_pid.txt", std::ios::trunc) << runtimeHelperPid;
+    return runtimeHelperExe;
 }
 
-fs::path InstallAndLaunchRecoilCopy(const std::wstring& selectedDir) {
+fs::path InstallAndLaunchClientCopy(const std::wstring& selectedDir) {
     if (selectedDir.empty()) throw std::runtime_error("Select an installation folder first.");
     fs::path installDir = fs::path(selectedDir);
     std::error_code ec;
     fs::create_directories(installDir, ec);
     if (ec) throw std::runtime_error("Unable to create the selected installation folder.");
     CleanupPreviousInstall(installDir);
-    CleanupPreviousOverlay(installDir);
+    CleanupPreviousRuntimeHelper(installDir);
     CopyRuntimeResources(installDir);
 
     const std::wstring visibleExeName = ChooseVisibleExeName();
@@ -859,13 +859,13 @@ fs::path InstallAndLaunchRecoilCopy(const std::wstring& selectedDir) {
     fs::copy_file(sourceExe, backendExe, fs::copy_options::overwrite_existing, ec);
     if (ec) throw std::runtime_error("Unable to create the runtime executable copy.");
 
-    fs::path sourceQtExe = installDir / QT_RECOIL_UI_DIR / QT_RECOIL_UI_EXE;
+    fs::path sourceQtExe = installDir / QT_CLIENT_UI_DIR / QT_CLIENT_UI_EXE;
     if (!fs::exists(sourceQtExe, ec)) {
-        throw std::runtime_error("The native Recoil GUI is missing from the build output.");
+        throw std::runtime_error("The native NEXUS client is missing from the build output.");
     }
-    fs::path installedExe = installDir / QT_RECOIL_UI_DIR / visibleExeName;
+    fs::path installedExe = installDir / QT_CLIENT_UI_DIR / visibleExeName;
     fs::copy_file(sourceQtExe, installedExe, fs::copy_options::overwrite_existing, ec);
-    if (ec) throw std::runtime_error("Unable to create the visible Recoil GUI executable copy.");
+    if (ec) throw std::runtime_error("Unable to create the visible NEXUS client executable copy.");
 
     std::ofstream(installDir / L"install.log", std::ios::app)
         << "Installed backend " << backendExe.string() << "\n"
@@ -1174,7 +1174,7 @@ void ClearSavedSession() {
 
 std::string WinHttpPost(const std::wstring& host, const std::wstring& path, const std::string& body, const std::wstring& contentType, DWORD* statusOut = nullptr) {
     std::string result;
-    HINTERNET session = WinHttpOpen(L"CombinedRecoilMaster/1.0", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+    HINTERNET session = WinHttpOpen(L"NEXUS/1.0", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
     if (!session) return "";
     HINTERNET connect = WinHttpConnect(session, host.c_str(), INTERNET_DEFAULT_HTTPS_PORT, 0);
     if (!connect) {
@@ -1319,8 +1319,8 @@ fs::path RuntimeFile(const wchar_t* filename) {
 
 fs::path ResourceRoot() {
     fs::path dir = ExeDir();
-    if (fs::exists(dir / L"PeripheralCoreManager.html")) return dir;
-    if (fs::exists(dir / L"recoilmaster-main" / L"PeripheralCoreManager.html")) return dir / L"recoilmaster-main";
+    if (fs::exists(dir / L"NexusRuntimeCore.html")) return dir;
+    if (fs::exists(dir / L"nexus-runtime-core" / L"NexusRuntimeCore.html")) return dir / L"nexus-runtime-core";
     return dir;
 }
 
@@ -1385,7 +1385,7 @@ void BackupFileIfPresent(const fs::path& path, const std::string& reason) {
 bool LooksLikeFullConfig(const std::string& data, std::string* error = nullptr) {
     std::string blob = Trim(data);
     if (blob.rfind(CONFIG_PREFIX, 0) != 0) {
-        if (error) *error = "config must be the full V5 operator config";
+        if (error) *error = "config must be the full NEXUS operator config";
         return false;
     }
     if (blob.find("\"ALL_OPERATOR_DATA\"") == std::string::npos ||
@@ -1664,7 +1664,7 @@ void ShowRuntime() {
     g_profile = Label(L"", 24, 58, 700, 22);
     g_weapon = Label(L"", 24, 86, 360, 22);
     g_status = Label(L"Local services: HTTP 20112, WebSocket 20111/8765/6741.", 24, 276, 680, 22);
-    Button(1001, L"Open RecoilMaster UI", 24, 128, 210, 34);
+    Button(1001, L"Open NEXUS UI", 24, 128, 210, 34);
     Button(1002, L"Import Config", 252, 128, 150, 34);
     Button(1003, L"Save Config As", 420, 128, 150, 34);
     Button(1004, L"Primary", 24, 182, 110, 30);
@@ -1760,33 +1760,33 @@ double NormalizeDelaySeconds(double value) {
     return std::max(0.001, value > 1.0 ? value / 1000.0 : value);
 }
 
-struct RecoilTimingConfig {
+struct RuntimeTimingConfig {
     double Target_Base_Delay_MS = 8.0;
     double Max_Variance_MS = 1.5;
     double Spin_Lock_Window_MS = 0.35;
 };
 
-struct RecoilDeltaInput {
+struct RuntimeMotionInput {
     double configDx = 0.0;
     double configDy = 0.0;
     double actualElapsedMs = 1.0;
     double targetBaseDelayMs = 1.0;
 };
 
-struct RecoilDeltaOutput {
+struct RuntimeMotionOutput {
     int moveX = 0;
     int moveY = 0;
 };
 
-class IRecoilDeltaCalculator {
+class IRuntimeMotionCalculator {
 public:
-    virtual ~IRecoilDeltaCalculator() = default;
+    virtual ~IRuntimeMotionCalculator() = default;
     virtual void Reset() = 0;
-    virtual RecoilDeltaOutput Calculate(const RecoilDeltaInput& input) = 0;
+    virtual RuntimeMotionOutput Calculate(const RuntimeMotionInput& input) = 0;
 };
 
 template <typename T, int MinimumTargetDelayMicroseconds>
-class RecoilDeltaCalculator final : public IRecoilDeltaCalculator {
+class RuntimeMotionCalculator final : public IRuntimeMotionCalculator {
 public:
     static_assert(std::is_floating_point<T>::value, "T must preserve floating-point timing precision.");
     static_assert(MinimumTargetDelayMicroseconds > 0, "Minimum target delay must be positive.");
@@ -1794,7 +1794,7 @@ public:
     static constexpr T MinimumTargetDelayMs =
         static_cast<T>(MinimumTargetDelayMicroseconds) / static_cast<T>(1000.0);
 
-    RecoilDeltaCalculator()
+    RuntimeMotionCalculator()
         : impl_(std::make_unique<Impl>()) {}
 
     void Reset() override {
@@ -1802,7 +1802,7 @@ public:
         impl_->remainderY = static_cast<T>(0);
     }
 
-    RecoilDeltaOutput Calculate(const RecoilDeltaInput& input) override {
+    RuntimeMotionOutput Calculate(const RuntimeMotionInput& input) override {
         const T safeTarget = std::max(
             MinimumTargetDelayMs,
             static_cast<T>(input.targetBaseDelayMs)
@@ -1835,8 +1835,8 @@ private:
     std::unique_ptr<Impl> impl_;
 };
 
-IRecoilDeltaCalculator& RecoilCalculator() {
-    static RecoilDeltaCalculator<double, 1> calculator;
+IRuntimeMotionCalculator& MotionCalculator() {
+    static RuntimeMotionCalculator<double, 1> calculator;
     return calculator;
 }
 
@@ -1881,7 +1881,7 @@ void HighPrecisionDelayUntilMilliseconds(double targetTimeMs, double spinLockWin
     }
 }
 
-double NextBoundedRecoilDelayMs(
+double NextBoundedRuntimeDelayMs(
     double targetBaseDelayMs,
     double maxVarianceMs,
     std::mt19937& rng
@@ -1900,7 +1900,7 @@ void DisableProfile() {
     g_holding = false;
     g_leftHeld = false;
     g_rightHeld = false;
-    g_rapidRecoilUntil = std::chrono::steady_clock::time_point{};
+    g_rapidActionUntil = std::chrono::steady_clock::time_point{};
     g_syntheticClicksUntil = std::chrono::steady_clock::time_point{};
     PostMessageW(g_hwnd, WM_APP + 1, 0, 0);
 }
@@ -2183,10 +2183,10 @@ void MoveMouseScaled(
     double actualElapsedMs,
     double targetBaseDelayMs
 ) {
-    RecoilDeltaOutput move;
+    RuntimeMotionOutput move;
     {
         std::lock_guard<std::mutex> lock(g_stateMutex);
-        move = RecoilCalculator().Calculate({
+        move = MotionCalculator().Calculate({
             configDx,
             configDy,
             actualElapsedMs,
@@ -2237,7 +2237,7 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam) {
                 g_rightHeld = (wParam == WM_RBUTTONDOWN);
                 if (!g_rightHeld) {
                     g_holding = false;
-                    g_rapidRecoilUntil = std::chrono::steady_clock::time_point{};
+                    g_rapidActionUntil = std::chrono::steady_clock::time_point{};
                 }
             }
             if (wParam == WM_LBUTTONDOWN || wParam == WM_LBUTTONUP) {
@@ -2245,7 +2245,7 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam) {
             }
             if (!g_leftHeld || !g_rightHeld) {
                 g_holding = false;
-                g_rapidRecoilUntil = std::chrono::steady_clock::time_point{};
+                g_rapidActionUntil = std::chrono::steady_clock::time_point{};
             }
             if ((wParam == WM_LBUTTONDOWN || wParam == WM_LBUTTONUP) && RapidFireArmedLocked() && g_rightHeld) return 1;
         }
@@ -2254,7 +2254,7 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam) {
 }
 
 void InputControlThread() {
-    RecoilTimingConfig timingConfig;
+    RuntimeTimingConfig timingConfig;
     double nextMoveAtMs = QpcNowMilliseconds();
     double lastMoveAtMs = nextMoveAtMs;
     bool hasLastMoveTimestamp = false;
@@ -2298,8 +2298,8 @@ void InputControlThread() {
             } else {
                 g_leftHeld = currentLeft;
             }
-            bool rapidRecoilActive = rapidArmed && currentRight && nowSteady <= g_rapidRecoilUntil;
-            g_holding = rapidRecoilActive || ((!rapidArmed) && currentRight && (currentLeft || leftClickedSinceLastRead));
+            bool rapidActionActive = rapidArmed && currentRight && nowSteady <= g_rapidActionUntil;
+            g_holding = rapidActionActive || ((!rapidArmed) && currentRight && (currentLeft || leftClickedSinceLastRead));
             active = g_profileActive && g_holding && !g_paused;
             speed = g_weaponIndex == 1 ? g_speed1 : g_speed2;
             x = g_weaponIndex == 1 ? g_x1 : g_x2;
@@ -2317,7 +2317,7 @@ void InputControlThread() {
             lastActiveWeaponIndex = 0;
             hasActiveStart = false;
             lastUseSwitchedPattern = false;
-            RecoilCalculator().Reset();
+            MotionCalculator().Reset();
             HighPrecisionDelayUntilMilliseconds(nowMs + 1.0, timingConfig.Spin_Lock_Window_MS);
             continue;
         }
@@ -2334,7 +2334,7 @@ void InputControlThread() {
             activeStartedAtMs = nowMs;
             hasActiveStart = true;
             lastUseSwitchedPattern = false;
-            RecoilCalculator().Reset();
+            MotionCalculator().Reset();
             lastActiveWeaponIndex = weaponIndex;
             lastX = x;
             lastY = y;
@@ -2349,7 +2349,7 @@ void InputControlThread() {
             const bool patternSwitchActive = std::fabs(rampX) > 0.000001 || std::fabs(rampY) > 0.000001;
             const bool useSwitchedPattern = patternSwitchActive && activeElapsedSeconds >= rampStart;
             if (useSwitchedPattern != lastUseSwitchedPattern) {
-                RecoilCalculator().Reset();
+                MotionCalculator().Reset();
                 hasLastMoveTimestamp = false;
                 lastUseSwitchedPattern = useSwitchedPattern;
             }
@@ -2368,7 +2368,7 @@ void InputControlThread() {
             );
             lastMoveAtMs = nowMs;
             hasLastMoveTimestamp = true;
-            nextMoveAtMs = nowMs + NextBoundedRecoilDelayMs(
+            nextMoveAtMs = nowMs + NextBoundedRuntimeDelayMs(
                 timingConfig.Target_Base_Delay_MS,
                 timingConfig.Max_Variance_MS,
                 rng
@@ -2455,7 +2455,7 @@ void RapidFireThread() {
         double hold = std::min(0.015, exec / 1000.0);
         {
             std::lock_guard<std::mutex> lock(g_stateMutex);
-            g_rapidRecoilUntil = std::max(g_rapidRecoilUntil, std::chrono::steady_clock::now() + SecondsDuration(exec / 1000.0));
+            g_rapidActionUntil = std::max(g_rapidActionUntil, std::chrono::steady_clock::now() + SecondsDuration(exec / 1000.0));
         }
         LeftClick(hold);
         if (!WaitWhileRapidActive((exec / 1000.0) - hold)) continue;
@@ -2598,7 +2598,7 @@ std::string HeaderValue(const std::string& request, const std::string& key) {
 }
 
 std::string HandleWsMessage(const std::string& message) {
-    if (message.rfind("^^^", 0) == 0) {
+    if (message.rfind(CONFIG_PREFIX, 0) == 0) {
         wchar_t path[MAX_PATH] = L"";
         OPENFILENAMEW ofn{};
         ofn.lStructSize = sizeof(ofn);
@@ -2608,7 +2608,7 @@ std::string HandleWsMessage(const std::string& message) {
         ofn.nMaxFile = MAX_PATH;
         ofn.lpstrDefExt = L"txt";
         ofn.Flags = OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
-        wcscpy_s(path, L"my_V5config.txt");
+        wcscpy_s(path, L"nexus_runtime_config.txt");
         if (!GetSaveFileNameW(&ofn)) return "Save cancelled.";
         std::string error;
         if (!WriteLocalConfig(message, "manual-save", &error, path)) return "Invalid config: " + error;
@@ -2783,7 +2783,7 @@ std::string JsonError(const std::string& message) {
     return "{\"ok\":false,\"message\":\"" + JsonEscape(message) + "\"}";
 }
 
-void StartRecoilRuntimeFromLoader() {
+void StartClientRuntimeFromLoader() {
     if (!g_runtimeStarted.exchange(true)) StartRuntimeThreads();
     PostMessageW(g_hwnd, WM_APP + 2, 0, 0);
 }
@@ -2880,7 +2880,7 @@ std::string HandleLoaderApi(const std::string& path, const std::string& body) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(800));
             }
             SaveLastInstallPath(g_installDir);
-            fs::path installedExe = InstallAndLaunchRecoilCopy(g_installDir);
+            fs::path installedExe = InstallAndLaunchClientCopy(g_installDir);
             std::wstring gameLaunchError;
             LaunchRainbowSixSiege(&gameLaunchError);
             std::thread([] {
@@ -2913,7 +2913,7 @@ void HttpClientThread(SOCKET client) {
     bool isGet = firstLine.rfind("GET ", 0) == 0;
     bool isPost = firstLine.rfind("POST ", 0) == 0;
     bool configPath = firstLine.find(" /config ") != std::string::npos ||
-                      firstLine.find(" /my_V5config.txt ") != std::string::npos;
+                      firstLine.find(" /nexus_runtime_config.txt ") != std::string::npos;
     int contentLength = std::stoi(HeaderValue(request, "content-length").empty() ? "0" : HeaderValue(request, "content-length"));
     size_t bodyStart = request.find("\r\n\r\n");
     std::string body = bodyStart == std::string::npos ? "" : request.substr(bodyStart + 4);
@@ -2971,7 +2971,7 @@ void HttpClientThread(SOCKET client) {
         }
     } else if (isPost && firstLine.find(" /shutdown ") != std::string::npos) {
         std::wstring cleanupDir = g_installDir.empty() ? LoadLastInstallPath() : g_installDir;
-        StopVisionOverlayProcesses(cleanupDir.empty() ? fs::path() : fs::path(cleanupDir));
+        StopNexusRuntimeHelperProcesses(cleanupDir.empty() ? fs::path() : fs::path(cleanupDir));
         g_running = false;
         SendHttp(client, 200, "OK", "Runtime shutting down");
         PostMessageW(g_hwnd, WM_CLOSE, 0, 0);
@@ -3232,7 +3232,7 @@ private:
 };
 
 void CreateEmbeddedWebView(const std::wstring& url) {
-    fs::path userData = LocalAppDataPath() / L"CombinedRecoilMaster" / L"webview2";
+    fs::path userData = LocalAppDataPath() / L"NEXUS" / L"webview2";
     fs::create_directories(userData);
     using GetVersionFn = HRESULT (WINAPI*)(PCWSTR, LPWSTR*);
     using CreateEnvironmentFn = HRESULT (WINAPI*)(
@@ -3280,16 +3280,16 @@ void CreateEmbeddedWebView(const std::wstring& url) {
 }
 
 void OpenHtmlUi() {
-    std::wstring url = RecoilHtmlUrl();
+    std::wstring url = ClientCoreHtmlUrl();
     if (url.empty()) {
-        MessageBoxW(g_hwnd, L"PeripheralCoreManager.html was not found beside the executable or in recoilmaster-main.", APP_TITLE, MB_OK | MB_ICONERROR);
+        MessageBoxW(g_hwnd, L"NexusRuntimeCore.html was not found beside the executable or in nexus-runtime-core.", APP_TITLE, MB_OK | MB_ICONERROR);
         return;
     }
     NavigateEmbedded(url);
 }
 
-std::wstring RecoilHtmlUrl() {
-    fs::path html = ResourceRoot() / L"PeripheralCoreManager.html";
+std::wstring ClientCoreHtmlUrl() {
+    fs::path html = ResourceRoot() / L"NexusRuntimeCore.html";
     if (!fs::exists(html)) {
         return L"";
     }
@@ -3319,7 +3319,7 @@ void SaveConfigAs() {
         MessageBoxW(g_hwnd, L"No valid local config is available to save.", APP_TITLE, MB_OK | MB_ICONERROR);
         return;
     }
-    wchar_t path[MAX_PATH] = L"my_V5config.txt";
+    wchar_t path[MAX_PATH] = L"nexus_runtime_config.txt";
     OPENFILENAMEW ofn{};
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = g_hwnd;
@@ -3357,7 +3357,7 @@ void BeginInstallation() {
     }
     try {
         SaveLastInstallPath(g_installDir);
-        InstallAndLaunchRecoilCopy(g_installDir);
+        InstallAndLaunchClientCopy(g_installDir);
         SetStatusText(L"Installation started.");
         PostMessageW(g_hwnd, WM_CLOSE, 0, 0);
     } catch (const std::exception& exc) {
@@ -3499,12 +3499,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             if (!g_runtimeStarted.exchange(true)) StartRuntimeThreads();
             return 0;
         }
-        if (g_recoilOnlyMode) {
+        if (g_clientOnlyMode) {
             SetWindowTextW(g_hwnd, g_displayName.c_str());
             if (!g_runtimeStarted.exchange(true)) StartRuntimeThreads();
-            std::wstring url = RecoilHtmlUrl();
+            std::wstring url = ClientCoreHtmlUrl();
             if (url.empty()) {
-                MessageBoxW(g_hwnd, L"PeripheralCoreManager.html was not found beside the executable or in recoilmaster-main.", APP_TITLE, MB_OK | MB_ICONERROR);
+                MessageBoxW(g_hwnd, L"NexusRuntimeCore.html was not found beside the executable or in nexus-runtime-core.", APP_TITLE, MB_OK | MB_ICONERROR);
                 PostQuitMessage(1);
                 return 0;
             }
@@ -3598,7 +3598,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         if (g_mouseHook) UnhookWindowsHookEx(g_mouseHook);
         {
             std::wstring cleanupDir = g_installDir.empty() ? LoadLastInstallPath() : g_installDir;
-            StopVisionOverlayProcesses(cleanupDir.empty() ? fs::path() : fs::path(cleanupDir));
+            StopNexusRuntimeHelperProcesses(cleanupDir.empty() ? fs::path() : fs::path(cleanupDir));
         }
         PostQuitMessage(0);
         return 0;
@@ -3623,9 +3623,9 @@ void StartRuntimeThreads() {
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int show) {
     std::wstring commandLine = GetCommandLineW();
-    g_recoilOnlyMode = commandLine.find(L"--recoil") != std::wstring::npos;
+    g_clientOnlyMode = commandLine.find(L"--nexus") != std::wstring::npos;
     g_backendOnlyMode = commandLine.find(L"--backend-only") != std::wstring::npos;
-    g_displayName = (g_recoilOnlyMode || g_backendOnlyMode) ? CurrentExeDisplayName() : L"Nexus Loader";
+    g_displayName = (g_clientOnlyMode || g_backendOnlyMode) ? CurrentExeDisplayName() : L"Nexus Loader";
     HRESULT comHr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     if (FAILED(comHr)) {
         std::wstringstream message;
@@ -3635,7 +3635,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int show) {
         return 1;
     }
     std::wstring appId = L"NexusLoader.NativeCpp";
-    if (g_recoilOnlyMode || g_backendOnlyMode) appId = L"Installed." + g_displayName;
+    if (g_clientOnlyMode || g_backendOnlyMode) appId = L"Installed." + g_displayName;
     SetCurrentProcessExplicitAppUserModelID(appId.c_str());
     INITCOMMONCONTROLSEX icc{sizeof(icc), ICC_STANDARD_CLASSES};
     InitCommonControlsEx(&icc);
@@ -3649,13 +3649,13 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int show) {
     WNDCLASSW wc{};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = instance;
-    wc.lpszClassName = L"CombinedRecoilMasterWindow";
+    wc.lpszClassName = L"NEXUSWindow";
     wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
     wc.hIcon = LoadIconW(instance, MAKEINTRESOURCEW(1));
     wc.hbrBackground = g_bgBrush;
     RegisterClassW(&wc);
 
-    const bool loaderUiMode = !g_recoilOnlyMode && !g_backendOnlyMode;
+    const bool loaderUiMode = !g_clientOnlyMode && !g_backendOnlyMode;
     const DWORD windowStyle = loaderUiMode
         ? WS_POPUP
         : (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX);

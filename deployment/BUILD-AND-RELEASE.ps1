@@ -15,8 +15,8 @@ $required = @(
     'Nexus Loader.exe',
     'configs',
     'nexus-ui',
-    'recoil-ui',
-    'recoilmaster-main',
+    'nexus-client',
+    'nexus-runtime-core',
     'runtime'
 )
 

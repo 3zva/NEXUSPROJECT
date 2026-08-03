@@ -1,0 +1,6 @@
+build/
+build-mingw/
+.vs/
+CMakeUserPresets.json
+config/firebase_config.json
+*.user
