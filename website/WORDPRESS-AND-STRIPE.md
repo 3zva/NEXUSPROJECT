@@ -21,7 +21,7 @@ Point the website Download button to:
 
 `https://YOUR-WORKER-DOMAIN/download`
 
-The Worker redirects to the current public `NEXUS-VERSION.exe` from `https://github.com/3zva/NEXUSPROJECT/releases`, allowing releases to change without editing WordPress.
+The Worker redirects to `https://github.com/3zva/NEXUSPROJECT/releases/latest/download/NEXUS.exe`, allowing releases to change without editing WordPress.
 
 ## Never put on WordPress
 

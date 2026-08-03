@@ -79,7 +79,7 @@ $compileArgs += @(
 & $gxx @compileArgs
 if ($LASTEXITCODE -ne 0) { throw "Failed to compile the single EXE launcher." }
 
-$releaseExe = Join-Path $OutputDir "NEXUS-$Version.exe"
+$releaseExe = Join-Path $OutputDir "NEXUS.exe"
 if (Test-Path -LiteralPath $releaseExe) { Remove-Item -LiteralPath $releaseExe -Force }
 Copy-Item -LiteralPath $stubExe -Destination $releaseExe -Force
 
@@ -184,7 +184,7 @@ $size = (Get-Item -LiteralPath $releaseExe).Length
 $assetName = Split-Path -Leaf $releaseExe
 $githubDownloadUrl = ""
 if (![string]::IsNullOrWhiteSpace($GitHubOwner) -and ![string]::IsNullOrWhiteSpace($GitHubRepo)) {
-    $githubDownloadUrl = "https://github.com/$GitHubOwner/$GitHubRepo/releases/download/$ReleaseTag/$assetName"
+    $githubDownloadUrl = "https://github.com/$GitHubOwner/$GitHubRepo/releases/latest/download/$assetName"
 }
 $readmeDownloadUrl = $githubDownloadUrl
 if ([string]::IsNullOrWhiteSpace($readmeDownloadUrl)) {
