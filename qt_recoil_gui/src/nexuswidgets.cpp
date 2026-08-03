@@ -125,16 +125,16 @@ NumericStepperRow::NumericStepperRow(
     m_value(defaultValue),
     m_suffix(suffix) {
     auto* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(14, 10, 12, 10);
-    layout->setSpacing(8);
+    layout->setContentsMargins(12, 9, 10, 9);
+    layout->setSpacing(6);
 
     auto* label = new QLabel(title, this);
     label->setFont(NexusTheme::font(10, QFont::DemiBold));
-    label->setMinimumWidth(110);
+    label->setMinimumWidth(96);
 
     auto createSmallButton = [this](const QString& text, const QString& tooltip) {
         auto* button = new QPushButton(text, this);
-        button->setFixedSize(38, 34);
+        button->setFixedSize(34, 32);
         button->setCursor(Qt::PointingHandCursor);
         button->setToolTip(tooltip);
         button->setProperty("stepperButton", true);
@@ -148,8 +148,8 @@ NumericStepperRow::NumericStepperRow(
     m_valueBox = new QLineEdit(this);
     m_valueBox->setReadOnly(false);
     m_valueBox->setAlignment(Qt::AlignCenter);
-    m_valueBox->setMinimumWidth(100);
-    m_valueBox->setMaximumWidth(150);
+    m_valueBox->setMinimumWidth(84);
+    m_valueBox->setMaximumWidth(120);
     m_valueBox->setProperty("valueBox", true);
     m_valueBox->setToolTip(QStringLiteral("Type a value, then press Enter or click away."));
 

@@ -719,9 +719,9 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
     bodyLayout->addLayout(navigationRow);
 
     auto* hero = new CardFrame(this, true);
-    auto* heroLayout = new QHBoxLayout(hero);
+    auto* heroLayout = new QVBoxLayout(hero);
     heroLayout->setContentsMargins(22, 20, 22, 20);
-    heroLayout->setSpacing(20);
+    heroLayout->setSpacing(14);
 
     auto* iconCard = new CardFrame(hero, false);
     iconCard->setFixedSize(132, 132);
@@ -754,8 +754,8 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
     identity->addStretch();
 
     auto* notesCard = new CardFrame(hero, false);
-    notesCard->setMinimumWidth(260);
-    notesCard->setMaximumWidth(330);
+    notesCard->setMinimumWidth(0);
+    notesCard->setMaximumWidth(QWIDGETSIZE_MAX);
     auto* notesLayout = new QVBoxLayout(notesCard);
     notesLayout->setContentsMargins(14, 12, 14, 12);
     notesLayout->setSpacing(7);
@@ -765,8 +765,12 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
     m_notes->setMinimumHeight(88);
     notesLayout->addWidget(m_notes);
 
-    heroLayout->addWidget(iconCard);
-    heroLayout->addLayout(identity, 1);
+    auto* identityRow = new QHBoxLayout();
+    identityRow->setContentsMargins(0, 0, 0, 0);
+    identityRow->setSpacing(16);
+    identityRow->addWidget(iconCard);
+    identityRow->addLayout(identity, 1);
+    heroLayout->addLayout(identityRow);
     heroLayout->addWidget(notesCard);
     bodyLayout->addWidget(hero);
 
@@ -774,20 +778,16 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
     weaponTabs->setSpacing(8);
     m_primaryButton = createAccentButton(QStringLiteral("WEAPON 1"), this);
     m_secondaryButton = new QPushButton(QStringLiteral("WEAPON 2"), this);
-    m_primaryButton->setFixedWidth(150);
-    m_secondaryButton->setFixedWidth(150);
+    m_primaryButton->setMinimumWidth(118);
+    m_secondaryButton->setMinimumWidth(118);
     weaponTabs->addWidget(m_primaryButton);
     weaponTabs->addWidget(m_secondaryButton);
     weaponTabs->addStretch();
     bodyLayout->addLayout(weaponTabs);
 
-    auto* workspace = new QGridLayout();
+    auto* workspace = new QVBoxLayout();
     workspace->setContentsMargins(0, 0, 0, 0);
-    workspace->setHorizontalSpacing(12);
-    workspace->setVerticalSpacing(12);
-    workspace->setColumnStretch(0, 4);
-    workspace->setColumnStretch(1, 3);
-    workspace->setColumnStretch(2, 2);
+    workspace->setSpacing(12);
 
     auto* loadoutCard = new CardFrame(this, true);
     auto* loadoutLayout = new QGridLayout(loadoutCard);
@@ -1023,9 +1023,9 @@ OperatorSettingsPage::OperatorSettingsPage(QWidget* parent)
     statsLayout->addWidget(m_rapidFireStatusLabel);
     statsLayout->addStretch();
 
-    workspace->addWidget(leftColumn, 0, 0);
-    workspace->addWidget(visualizationCard, 0, 1);
-    workspace->addWidget(statsCard, 0, 2);
+    workspace->addWidget(leftColumn);
+    workspace->addWidget(visualizationCard);
+    workspace->addWidget(statsCard);
     bodyLayout->addLayout(workspace);
 
     auto* footerCard = new CardFrame(this, true);
