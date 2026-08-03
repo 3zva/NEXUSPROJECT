@@ -7,7 +7,9 @@ param(
     [Parameter(Mandatory=$false)][string]$GitHubRepo = "",
     [Parameter(Mandatory=$false)][string]$ReleaseTag = "",
     [Parameter(Mandatory=$false)][string]$DesktopReleaseDir = "$env:USERPROFILE\Desktop\NEXUS-GitHub-Release",
-    [Parameter(Mandatory=$false)][switch]$SkipWorkerConfigUpdate
+    [Parameter(Mandatory=$false)][switch]$SkipWorkerConfigUpdate,
+    [Parameter(Mandatory=$false)][switch]$CommitReleaseMetadata,
+    [Parameter(Mandatory=$false)][switch]$CreateGitHubRelease
 )
 
 $ErrorActionPreference = 'Stop'
@@ -206,13 +208,61 @@ if (!$SkipWorkerConfigUpdate) {
 
     $wranglerPath = Join-Path $repoRoot 'cloudflare-worker\wrangler.jsonc'
     if (!(Test-Path -LiteralPath $wranglerPath)) { throw "wrangler.jsonc not found: $wranglerPath" }
-    $wrangler = Get-Content -Raw -LiteralPath $wranglerPath | ConvertFrom-Json
-    $wrangler.vars.LATEST_VERSION = $Version
-    $wrangler.vars.LATEST_PACKAGE_URL = $githubDownloadUrl
-    $wrangler.vars.LATEST_PACKAGE_SHA256 = $hash
-    $wrangler.vars.LATEST_PACKAGE_SIZE = [string]$size
-    $wrangler.vars.SETUP_DOWNLOAD_URL = $githubDownloadUrl
-    $wrangler | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $wranglerPath
+    function Set-JsonStringValue([string]$Text, [string]$Key, [string]$Value) {
+        $pattern = '("' + [regex]::Escape($Key) + '"\s*:\s*")[^"]*(")'
+        $escapedValue = $Value.Replace('\', '\\').Replace('"', '\"')
+        return [regex]::Replace(
+            $Text,
+            $pattern,
+            { param($match) $match.Groups[1].Value + $escapedValue + $match.Groups[2].Value },
+            1
+        )
+    }
+    $wranglerText = Get-Content -Raw -LiteralPath $wranglerPath
+    $wranglerText = Set-JsonStringValue $wranglerText 'LATEST_VERSION' $Version
+    $wranglerText = Set-JsonStringValue $wranglerText 'LATEST_PACKAGE_URL' $githubDownloadUrl
+    $wranglerText = Set-JsonStringValue $wranglerText 'LATEST_PACKAGE_SHA256' $hash
+    $wranglerText = Set-JsonStringValue $wranglerText 'LATEST_PACKAGE_SIZE' ([string]$size)
+    $wranglerText = Set-JsonStringValue $wranglerText 'SETUP_DOWNLOAD_URL' $githubDownloadUrl
+    $wranglerText | ConvertFrom-Json | Out-Null
+    Set-Content -LiteralPath $wranglerPath -Value $wranglerText -NoNewline
+}
+
+if ($CreateGitHubRelease) {
+    if ([string]::IsNullOrWhiteSpace($githubDownloadUrl)) {
+        throw "GitHub owner/repo are required to create a GitHub Release."
+    }
+    $gh = Get-Command gh -ErrorAction SilentlyContinue
+    if (!$gh) {
+        throw "GitHub CLI was not found. Install GitHub CLI and run 'gh auth login', then re-run with -CreateGitHubRelease."
+    }
+    & $gh.Source auth status *> $null
+    if ($LASTEXITCODE -ne 0) {
+        throw "GitHub CLI is not authenticated. Run 'gh auth login', then re-run with -CreateGitHubRelease."
+    }
+
+    $repo = "$GitHubOwner/$GitHubRepo"
+    $releaseTitle = "NEXUS $Version"
+    $releaseNotes = @"
+NEXUS standalone release $Version
+
+Asset: $assetName
+SHA256: $hash
+Size: $size bytes
+"@
+    $releaseExists = $false
+    & $gh.Source release view $ReleaseTag --repo $repo *> $null
+    if ($LASTEXITCODE -eq 0) {
+        $releaseExists = $true
+    }
+    if ($releaseExists) {
+        & $gh.Source release upload $ReleaseTag $releaseExe --repo $repo --clobber
+    } else {
+        & $gh.Source release create $ReleaseTag $releaseExe --repo $repo --title $releaseTitle --notes $releaseNotes
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "GitHub Release publish failed."
+    }
 }
 
 if (![string]::IsNullOrWhiteSpace($DesktopReleaseDir)) {
@@ -248,3 +298,22 @@ Write-Host "Bundled files: $($files.Count)"
 if ($githubDownloadUrl) { Write-Host "GitHub URL: $githubDownloadUrl" }
 if (!$SkipWorkerConfigUpdate) { Write-Host "Updated: cloudflare-worker\wrangler.jsonc" }
 if ($DesktopReleaseDir) { Write-Host "Desktop release folder: $DesktopReleaseDir" }
+
+if ($CommitReleaseMetadata) {
+    Push-Location $repoRoot
+    try {
+        $trackedChanges = git status --porcelain -- cloudflare-worker/wrangler.jsonc
+        if ($trackedChanges) {
+            git add cloudflare-worker/wrangler.jsonc
+            git commit -m "Update release metadata for $ReleaseTag"
+            if ($LASTEXITCODE -ne 0) {
+                throw "Git commit failed."
+            }
+            Write-Host "Committed release metadata: $ReleaseTag"
+        } else {
+            Write-Host "No release metadata changes to commit."
+        }
+    } finally {
+        Pop-Location
+    }
+}

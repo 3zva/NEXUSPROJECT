@@ -32,6 +32,9 @@ script remembers them in
 deployment\release-settings.json, updates cloudflare-worker\wrangler.jsonc
 with the new version, GitHub download URL, SHA-256, and size, then refreshes
 the Desktop NEXUS-GitHub-Release folder.
+Add -CommitReleaseMetadata to commit the Worker release metadata after the
+standalone EXE is packaged. Add -CreateGitHubRelease to create/update the
+GitHub Release and upload the EXE; this requires GitHub CLI and gh auth login.
 
 GitHub Releases URL:
 https://github.com/3zva/NEXUSPROJECT/releases

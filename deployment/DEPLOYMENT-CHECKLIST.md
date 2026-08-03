@@ -37,6 +37,8 @@
 - [ ] Release x64 build created with no distributed PDB.
 - [ ] Runtime dependencies packaged.
 - [ ] Single-file EXE created with `deployment/BUILD-SINGLE-EXE.ps1`.
+- [ ] For automatic Git commit, build with `-CommitReleaseMetadata`.
+- [ ] For automatic GitHub upload, build with `-CreateGitHubRelease` after installing GitHub CLI and running `gh auth login`.
 - [ ] `NEXUS-VERSION.exe` uploaded to `https://github.com/3zva/NEXUSPROJECT/releases` under the matching `vVERSION` tag.
 - [ ] SHA-256 and size confirmed from `single-exe-release-values.json`.
 - [ ] Worker release variables updated.
