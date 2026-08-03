@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(NexusClient VERSION 1.6.13 LANGUAGES CXX)
+project(NexusClient VERSION 1.6.14 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

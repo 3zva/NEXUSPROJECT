@@ -223,7 +223,7 @@ footer { position: absolute; bottom: 25px; left: 0; width: 100%; text-align: cen
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #765bff, #9b89ff);
-  transition: width .32s ease;
+  transition: width .52s cubic-bezier(.22, .72, .18, 1);
 }
 
 .load-progress-meta {

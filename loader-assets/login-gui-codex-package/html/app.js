@@ -18,6 +18,8 @@
     resendBusy: false,
     selectingPath: false,
     loadingInstaller: false,
+    loadProgressTimer: null,
+    loadProgressValue: 0,
     selectedPath: "",
     pendingAccount: { fullName: "", email: "", username: "" }
   };
@@ -416,19 +418,21 @@
       return;
     }
 
-    showLoadProgress("STARTING", "Loading NEXUS client...", 22, "The application will open after readiness is complete.");
+    showLoadProgress("STARTING", "Loading NEXUS client...", 8, "The application will open after readiness is complete.");
     setStatus(elements.installStatus, "", "");
     const payload = { installPath: state.selectedPath };
     try {
-      updateLoadProgress("PREPARING", "Preparing files and runtime services...", 45, "Applying the selected installation path.");
+      startLoadProgressLoop();
       const result = await state.loadHandler(payload);
       assertSuccessfulResult(result, "Unable to continue installation.");
-      updateLoadProgress("FINALIZING", "NEXUS is almost ready...", 82, objectMessage(result) || "Finishing the client handoff.");
+      stopLoadProgressLoop();
+      updateLoadProgress("FINALIZING", "NEXUS is almost ready...", Math.max(state.loadProgressValue, 96), objectMessage(result) || "Finishing the client handoff.");
       document.dispatchEvent(new CustomEvent("installer:load", { detail: { result, installPath: state.selectedPath } }));
-      updateLoadProgress("READY", "NEXUS is ready.", 100, "Opening the application.");
+      window.setTimeout(() => updateLoadProgress("READY", "NEXUS is ready.", 100, "Opening the application."), 180);
     } catch (error) {
       const normalized = normalizeError(error, "Unable to continue installation.");
-      updateLoadProgress("LOAD FAILED", normalized.message, 100, "Return to the load page and try again.");
+      stopLoadProgressLoop();
+      updateLoadProgress("LOAD FAILED", normalized.message, state.loadProgressValue || 100, "Return to the load page and try again.");
       window.setTimeout(() => showInstallPage({ username: state.pendingAccount.username || "" }), 1200);
       setStatus(elements.installStatus, "error", normalized.message);
       document.dispatchEvent(new CustomEvent("installer:error", { detail: { error: normalized, installPath: state.selectedPath } }));
@@ -606,6 +610,8 @@
 
   function showLoadProgress(stage, status, percent, detail) {
     setLoadBusy(true);
+    state.loadProgressValue = 0;
+    stopLoadProgressLoop();
     updateLoadProgress(stage, status, percent, detail);
     showPage("load-progress");
   }
@@ -617,6 +623,34 @@
     elements.loadProgressPercent.textContent = `${Math.round(bounded)}%`;
     elements.loadProgressBar.style.width = `${bounded}%`;
     elements.loadProgressDetail.textContent = detail || "";
+    state.loadProgressValue = bounded;
+  }
+
+  function startLoadProgressLoop() {
+    stopLoadProgressLoop();
+    const stages = [
+      { at: 12, stage: "PREPARING", status: "Preparing files and runtime services...", detail: "Applying the selected installation path." },
+      { at: 34, stage: "CONFIGURING", status: "Configuring the client environment...", detail: "Copying required runtime files and saved settings." },
+      { at: 58, stage: "STARTING", status: "Starting NEXUS services...", detail: "Launching the client components." },
+      { at: 78, stage: "CONNECTING", status: "Connecting NEXUS to the launch flow...", detail: "Checking that the handoff is ready." },
+      { at: 90, stage: "FINALIZING", status: "Finalizing startup...", detail: "Waiting for the last startup tasks." }
+    ];
+
+    state.loadProgressTimer = window.setInterval(() => {
+      const current = state.loadProgressValue;
+      if (current >= 94) return;
+      const increment = current < 35 ? 2.4 : current < 70 ? 1.35 : 0.45;
+      const next = Math.min(94, current + increment);
+      const stage = stages.reduce((selected, item) => next >= item.at ? item : selected, stages[0]);
+      updateLoadProgress(stage.stage, stage.status, next, stage.detail);
+    }, 180);
+  }
+
+  function stopLoadProgressLoop() {
+    if (state.loadProgressTimer) {
+      window.clearInterval(state.loadProgressTimer);
+      state.loadProgressTimer = null;
+    }
   }
 
   function normalizePathResult(result) {
