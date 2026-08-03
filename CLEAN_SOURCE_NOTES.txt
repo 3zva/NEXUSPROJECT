@@ -35,6 +35,9 @@ the Desktop NEXUS-GitHub-Release folder.
 Add -CommitReleaseMetadata to commit the Worker release metadata after the
 standalone EXE is packaged. Add -CreateGitHubRelease to create/update the
 GitHub Release and upload the EXE; this requires GitHub CLI and gh auth login.
+Redeploy the Cloudflare Worker after every public release so the signed
+latest-release manifest and /download redirect use the new version, SHA-256,
+size, and URL.
 
 GitHub Releases URL:
 https://github.com/3zva/NEXUSPROJECT/releases

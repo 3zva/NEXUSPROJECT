@@ -42,6 +42,7 @@
 - [ ] `NEXUS.exe` uploaded to `https://github.com/3zva/NEXUSPROJECT/releases` under the matching `vVERSION` tag.
 - [ ] SHA-256 and size confirmed from `single-exe-release-values.json`.
 - [ ] Worker release variables updated.
+- [ ] Worker redeployed with `npm run deploy`. This is required on every public release.
 - [ ] Manifest signature verification tested.
 - [ ] Corrupted download rejected.
 - [ ] Interrupted update rolls back.
