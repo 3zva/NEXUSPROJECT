@@ -36,11 +36,12 @@
 
 - [ ] Release x64 build created with no distributed PDB.
 - [ ] Runtime dependencies packaged.
-- [ ] Application ZIP hash and size calculated.
-- [ ] Setup EXE and application ZIP uploaded to GitHub Release.
+- [ ] Single-file EXE created with `deployment/BUILD-SINGLE-EXE.ps1`.
+- [ ] `NEXUS-VERSION.exe` uploaded to `https://github.com/3zva/NEXUSPROJECT/releases` under the matching `vVERSION` tag.
+- [ ] SHA-256 and size confirmed from `single-exe-release-values.json`.
 - [ ] Worker release variables updated.
 - [ ] Manifest signature verification tested.
-- [ ] Corrupted ZIP rejected.
+- [ ] Corrupted download rejected.
 - [ ] Interrupted update rolls back.
 - [ ] Website Download button uses Worker `/download` URL.
 

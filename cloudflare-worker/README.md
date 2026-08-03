@@ -13,7 +13,7 @@
 7. Generate local secrets:
    `npm run secrets:generate`
 8. Put every secret into Cloudflare with `npx wrangler secret put NAME`.
-9. Set both real Stripe Price IDs and release URLs in `wrangler.jsonc`.
+9. Set both real Stripe Price IDs and release URLs in `wrangler.jsonc`. Public NEXUS release URLs should use `https://github.com/3zva/NEXUSPROJECT/releases`.
 10. Deploy with `npm run deploy`.
 
 ## Required secrets

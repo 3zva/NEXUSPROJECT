@@ -22,12 +22,12 @@
 		"STRIPE_TEST_PRICE_LIFETIME": "price_1TvANHP0C6hxVoRDWXzvd7Sb",
 		"STRIPE_LIVE_PRICE_30_DAY": "price_1TvmcS1P38omiwEhPcTbmOTs",
 		"STRIPE_LIVE_PRICE_LIFETIME": "price_1TvmcU1P38omiwEhnBQ1UMiy",
-		"LATEST_VERSION": "0.0.0",
-		"LATEST_PACKAGE_URL": "https://github.com/YOUR_ACCOUNT/YOUR_REPO/releases/download/v0.0.0/NEXUS-App.zip",
-		"LATEST_PACKAGE_SHA256": "REPLACE_SHA256",
-		"LATEST_PACKAGE_SIZE": "0",
+		"LATEST_VERSION": "1.6.4",
+		"LATEST_PACKAGE_URL": "https://github.com/3zva/NEXUSPROJECT/releases/download/v1.6.4/NEXUS-1.6.4.exe",
+		"LATEST_PACKAGE_SHA256": "5cf826dc444ff118aee39c641e25fe5f40ca7f865cf11bb1b282233d84bc8895",
+		"LATEST_PACKAGE_SIZE": "46301847",
 		"MINIMUM_WINDOWS_BUILD": "19045",
-		"SETUP_DOWNLOAD_URL": "https://github.com/YOUR_ACCOUNT/YOUR_REPO/releases/download/v0.0.0/NEXUS-Web-Setup.exe"
+		"SETUP_DOWNLOAD_URL": "https://github.com/3zva/NEXUSPROJECT/releases/download/v1.6.4/NEXUS-1.6.4.exe"
 	},
 	"secrets": {
 		"required": [

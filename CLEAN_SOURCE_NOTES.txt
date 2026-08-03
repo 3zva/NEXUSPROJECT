@@ -27,7 +27,11 @@ Run build.bat from this folder to rebuild the Desktop NEXUS output.
 Single-file release:
 Run deployment\BUILD-SINGLE-EXE.ps1 after build.bat to create one public EXE
 that contains the full Desktop NEXUS runtime and launches it after extraction.
-On first use, pass -GitHubOwner and -GitHubRepo. The script remembers them in
+Pass -GitHubOwner 3zva -GitHubRepo NEXUSPROJECT for public releases. The
+script remembers them in
 deployment\release-settings.json, updates cloudflare-worker\wrangler.jsonc
 with the new version, GitHub download URL, SHA-256, and size, then refreshes
 the Desktop NEXUS-GitHub-Release folder.
+
+GitHub Releases URL:
+https://github.com/3zva/NEXUSPROJECT/releases

@@ -5,7 +5,7 @@ This package replaces the always-on private server with:
 - Cloudflare Worker: private server-side API
 - Cloudflare D1: license and payment records
 - Stripe Payment Links: hosted checkout
-- GitHub Releases (recommended): free hosting for the public installer/app package
+- GitHub Releases: `https://github.com/3zva/NEXUSPROJECT/releases` hosts the public standalone NEXUS EXE
 - Native C++ NEXUS client: activation and validation only
 - Native C++ setup wizard: downloads and verifies the latest signed release
 
