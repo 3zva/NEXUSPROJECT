@@ -100,14 +100,19 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
         {QStringLiteral("operators"), QStringLiteral("Operators"), QStringLiteral("operators")},
         {QStringLiteral("sensitivity_converter"), QStringLiteral("Sensitivity & FOV"), QStringLiteral("target")},
         {QStringLiteral("save_files"), QStringLiteral("Save Files"), QStringLiteral("save")},
-        {QStringLiteral("client"), QStringLiteral("Client Settings"), QStringLiteral("client")},
+        {QStringLiteral("exit_client"), QStringLiteral("Exit Client"), QStringLiteral("logout")},
         {QStringLiteral("settings"), QStringLiteral("Settings"), QStringLiteral("settings")},
     };
     for (const auto& definition : navigation) {
         auto* button = new SidebarButton(definition.label, definition.icon, sidebar);
-        connect(button, &QPushButton::clicked, this, [this, key = definition.key]() {
-            showPage(key);
-        });
+        if (definition.key == QStringLiteral("exit_client")) {
+            button->setProperty("navDanger", true);
+            connect(button, &QPushButton::clicked, this, &AuthenticatedRoot::exitRequested);
+        } else {
+            connect(button, &QPushButton::clicked, this, [this, key = definition.key]() {
+                showPage(key);
+            });
+        }
         sidebarLayout->addWidget(button);
         m_navButtons.insert(definition.key, button);
     }

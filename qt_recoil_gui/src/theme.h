@@ -147,6 +147,14 @@ inline QString globalStyleSheet() {
             border-color: #765BFF;
             color: #F7F9FF;
         }
+        QPushButton[navDanger="true"] {
+            color: #FF8CA0;
+        }
+        QPushButton[navDanger="true"]:hover {
+            background: #26131C;
+            border-color: #FF6B82;
+            color: #FFFFFF;
+        }
         QLineEdit, QComboBox, QPlainTextEdit {
             min-height: 38px;
             padding: 0 12px;

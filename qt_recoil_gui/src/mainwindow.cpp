@@ -326,6 +326,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent) {
     setWindowTitle(QStringLiteral("NEXUS"));
     setWindowIcon(NexusTheme::icon(QStringLiteral("nexus_logo_64.png")));
+    setWindowFlag(Qt::FramelessWindowHint, true);
     resize(1086, 1086);
     setMinimumSize(980, 860);
 
@@ -1080,7 +1081,7 @@ void MainWindow::setAuthWindowMode(bool enabled) {
     m_authWindowMode = enabled;
 
     const bool wasVisible = isVisible();
-    setWindowFlag(Qt::FramelessWindowHint, enabled);
+    setWindowFlag(Qt::FramelessWindowHint, true);
     if (enabled) {
         setMinimumSize(QSize(640, 900));
         setMaximumSize(QSize(640, 900));
