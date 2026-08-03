@@ -234,6 +234,18 @@ if ($CreateGitHubRelease) {
     }
     $gh = Get-Command gh -ErrorAction SilentlyContinue
     if (!$gh) {
+        $ghCandidates = @(
+            "$env:ProgramFiles\GitHub CLI\gh.exe",
+            "$env:LOCALAPPDATA\Programs\GitHub CLI\gh.exe"
+        )
+        foreach ($candidate in $ghCandidates) {
+            if (Test-Path -LiteralPath $candidate) {
+                $gh = [pscustomobject]@{ Source = $candidate }
+                break
+            }
+        }
+    }
+    if (!$gh) {
         throw "GitHub CLI was not found. Install GitHub CLI and run 'gh auth login', then re-run with -CreateGitHubRelease."
     }
     & $gh.Source auth status *> $null
@@ -251,8 +263,12 @@ SHA256: $hash
 Size: $size bytes
 "@
     $releaseExists = $false
-    & $gh.Source release view $ReleaseTag --repo $repo *> $null
-    if ($LASTEXITCODE -eq 0) {
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    & $gh.Source release view $ReleaseTag --repo $repo 1>$null 2>$null
+    $releaseViewExitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    if ($releaseViewExitCode -eq 0) {
         $releaseExists = $true
     }
     if ($releaseExists) {
