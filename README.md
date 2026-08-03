@@ -76,12 +76,12 @@ Use of third-party games and services is subject to their own rules and terms. U
 
 Official Links
 
-Website: highcloudnexus.com/#home
+Website: https://highcloudnexus.com/#home
 
-Downloads: highcloudnexus.com/#loader
+Downloads: https://highcloudnexus.com/#loader
 
-Licensing: highcloudnexus.com/payment/
+Licensing: https://highcloudnexus.com/payment/
 
-Support: highcloudnexus.com/contact/
+Support: https://highcloudnexus.com/contact/
 
 Do not trust unofficial downloads, reuploads, or license sellers.
