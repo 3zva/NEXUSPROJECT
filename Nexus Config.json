@@ -1,1604 +1,3428 @@
 {
-  "format": "nexus-global-config",
-  "schema_version": 2,
-  "source_format": "NEXUS_CONFIG_V1",
-  "operator_count": 76,
-  "operators": {
-    "sledge": {
-      "operator_id": "sledge",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "thatcher": {
-      "operator_id": "thatcher",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "ash": {
-      "operator_id": "ash",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": true,
-      "rapid_fire_value": 2,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": -1,
-        "y_amount": -12,
-        "time_delay": 8
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -5,
-        "time_delay": 5
-      }
-    },
-    "thermite": {
-      "operator_id": "thermite",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": 0,
-        "time_delay": 1
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": 0,
-        "time_delay": 1
-      }
-    },
-    "twitch": {
-      "operator_id": "twitch",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": true,
-      "rapid_fire_value": 2,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": -1,
-        "y_amount": -16,
-        "time_delay": 11
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -2,
-        "time_delay": 5
-      }
-    },
-    "montagne": {
-      "operator_id": "montagne",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": -3,
-        "y_amount": -17,
-        "time_delay": 14
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -5,
-        "time_delay": 5
-      }
-    },
-    "glaz": {
-      "operator_id": "glaz",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "fuze": {
-      "operator_id": "fuze",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "iq": {
-      "operator_id": "iq",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "blitz": {
-      "operator_id": "blitz",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "buck": {
-      "operator_id": "buck",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": true,
-      "rapid_fire_value": 2,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": -1,
-        "y_amount": -23,
-        "time_delay": 18
-      },
-      "secondary": {
-        "x_amount": 1,
-        "y_amount": -7,
-        "time_delay": 11
-      }
-    },
-    "blackbeard": {
-      "operator_id": "blackbeard",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "capitao": {
-      "operator_id": "capitao",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "hibana": {
-      "operator_id": "hibana",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "jackal": {
-      "operator_id": "jackal",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "ying": {
-      "operator_id": "ying",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "zofia": {
-      "operator_id": "zofia",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "dokkaebi": {
-      "operator_id": "dokkaebi",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 4,
-        "y_amount": -13,
-        "time_delay": 15
-      },
-      "secondary": {
-        "x_amount": 9,
-        "y_amount": -31,
-        "time_delay": 21
-      }
-    },
-    "lion": {
-      "operator_id": "lion",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "finka": {
-      "operator_id": "finka",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "maverick": {
-      "operator_id": "maverick",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "nomad": {
-      "operator_id": "nomad",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "gridlock": {
-      "operator_id": "gridlock",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "nokk": {
-      "operator_id": "nokk",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "amaru": {
-      "operator_id": "amaru",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "kali": {
-      "operator_id": "kali",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "iana": {
-      "operator_id": "iana",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "ace": {
-      "operator_id": "ace",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": true,
-      "rapid_fire_value": 2,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": -2,
-        "y_amount": -22,
-        "time_delay": 18
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -2,
-        "time_delay": 5
-      }
-    },
-    "zero": {
-      "operator_id": "zero",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "flores": {
-      "operator_id": "flores",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "osa": {
-      "operator_id": "osa",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "sens": {
-      "operator_id": "sens",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "grim": {
-      "operator_id": "grim",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "brava": {
-      "operator_id": "brava",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "ram": {
-      "operator_id": "ram",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "deimos": {
-      "operator_id": "deimos",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "striker": {
-      "operator_id": "striker",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "rauora": {
-      "operator_id": "rauora",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "smoke": {
-      "operator_id": "smoke",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "mute": {
-      "operator_id": "mute",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "castle": {
-      "operator_id": "castle",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "pulse": {
-      "operator_id": "pulse",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "doc": {
-      "operator_id": "doc",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "rook": {
-      "operator_id": "rook",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "kapkan": {
-      "operator_id": "kapkan",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "tachanka": {
-      "operator_id": "tachanka",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "jager": {
-      "operator_id": "jager",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "bandit": {
-      "operator_id": "bandit",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 1,
-        "y_amount": -26,
-        "time_delay": 34
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "frost": {
-      "operator_id": "frost",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "valkyrie": {
-      "operator_id": "valkyrie",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": true,
-      "rapid_fire_value": 2,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -7,
-        "time_delay": 9
-      },
-      "secondary": {
-        "x_amount": -1,
-        "y_amount": -17,
-        "time_delay": 7
-      }
-    },
-    "caveira": {
-      "operator_id": "caveira",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "echo": {
-      "operator_id": "echo",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "mira": {
-      "operator_id": "mira",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "lesion": {
-      "operator_id": "lesion",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "ela": {
-      "operator_id": "ela",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": true,
-      "rapid_fire_value": 2,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 5,
-        "y_amount": -21,
-        "time_delay": 20
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -3,
-        "time_delay": 4
-      }
-    },
-    "vigil": {
-      "operator_id": "vigil",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": -1,
-        "y_amount": -7,
-        "time_delay": 8
-      },
-      "secondary": {
-        "x_amount": 9,
-        "y_amount": -31,
-        "time_delay": 21
-      }
-    },
-    "maestro": {
-      "operator_id": "maestro",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "alibi": {
-      "operator_id": "alibi",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 3,
-        "y_amount": -18,
-        "time_delay": 19
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "clash": {
-      "operator_id": "clash",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "kaid": {
-      "operator_id": "kaid",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "mozzie": {
-      "operator_id": "mozzie",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "warden": {
-      "operator_id": "warden",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -7,
-        "time_delay": 9
-      },
-      "secondary": {
-        "x_amount": 9,
-        "y_amount": -31,
-        "time_delay": 21
-      }
-    },
-    "goyo": {
-      "operator_id": "goyo",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "wamai": {
-      "operator_id": "wamai",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "oryx": {
-      "operator_id": "oryx",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "melusi": {
-      "operator_id": "melusi",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "aruni": {
-      "operator_id": "aruni",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": true,
-      "rapid_fire_value": 1,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": -2,
-        "y_amount": -7,
-        "time_delay": 8
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -11,
-        "time_delay": 40
-      }
-    },
-    "thunderbird": {
-      "operator_id": "thunderbird",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "thorn": {
-      "operator_id": "thorn",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "azami": {
-      "operator_id": "azami",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": true,
-      "rapid_fire_value": 2,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": -3,
-        "y_amount": -14,
-        "time_delay": 21
-      },
-      "secondary": {
-        "x_amount": 1,
-        "y_amount": -17,
-        "time_delay": 7
-      }
-    },
-    "solis": {
-      "operator_id": "solis",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "fenrir": {
-      "operator_id": "fenrir",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "tubarao": {
-      "operator_id": "tubarao",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "skopos": {
-      "operator_id": "skopos",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "sentry": {
-      "operator_id": "sentry",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    },
-    "denari": {
-      "operator_id": "denari",
-      "active_weapon": "primary",
-      "profile_enabled": true,
-      "auto_load": true,
-      "show_runtime_helper": true,
-      "monitor_while_active": true,
-      "rapid_fire_enabled": false,
-      "rapid_fire_value": 0,
-      "notes": "(Click to Edit)",
-      "primary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 30
-      },
-      "secondary": {
-        "x_amount": 0,
-        "y_amount": -1,
-        "time_delay": 40
-      }
-    }
-  }
+    "format": "nexus-global-config",
+    "operator_count": 76,
+    "operators": {
+        "ace": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "ace",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AK-12",
+                "time_delay": 18,
+                "vertical_ramp": 0,
+                "x_amount": -2,
+                "y_amount": -22
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P9",
+                "time_delay": 5,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -2
+            },
+            "show_runtime_helper": true
+        },
+        "alibi": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "alibi",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Mx4 Storm",
+                "time_delay": 19,
+                "vertical_ramp": 0,
+                "x_amount": 3,
+                "y_amount": -18
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "KERATOS .357",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "amaru": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "amaru",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "G8A1",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SMG-11",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "aruni": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "aruni",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P10 RONI",
+                "time_delay": 8,
+                "vertical_ramp": 0,
+                "x_amount": -2,
+                "y_amount": -7
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 1,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PRB92",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -11
+            },
+            "show_runtime_helper": true
+        },
+        "ash": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "ash",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "G36C",
+                "time_delay": 1,
+                "vertical_ramp": 0,
+                "x_amount": -1,
+                "y_amount": -12
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M45 MEUSOC",
+                "time_delay": 5,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -5
+            },
+            "show_runtime_helper": true
+        },
+        "azami": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "azami",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "9x19VSN",
+                "time_delay": 21,
+                "vertical_ramp": 0,
+                "x_amount": -3,
+                "y_amount": -14
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "D-50",
+                "time_delay": 7,
+                "vertical_ramp": 0,
+                "x_amount": 1,
+                "y_amount": -17
+            },
+            "show_runtime_helper": true
+        },
+        "bandit": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "bandit",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MP7",
+                "time_delay": 34,
+                "vertical_ramp": 0,
+                "x_amount": 1,
+                "y_amount": -26
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P12",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "blackbeard": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "blackbeard",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Shield",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MK17 CQB",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "blitz": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "blitz",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Shield",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P12",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "brava": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "brava",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PARA-308",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SUPER SHORTY",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "buck": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "buck",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "C8-SFW",
+                "time_delay": 18,
+                "vertical_ramp": 0,
+                "x_amount": -1,
+                "y_amount": -23
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MK1 9mm",
+                "time_delay": 11,
+                "vertical_ramp": 0,
+                "x_amount": 1,
+                "y_amount": -7
+            },
+            "show_runtime_helper": true
+        },
+        "capitao": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "capitao",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PARA-308",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PRB92",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "castle": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "castle",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "UMP45",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "5.7 USG",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "caveira": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "caveira",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M12",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "LUISON",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "clash": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "clash",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SUPER SHORTY",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "deimos": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "deimos",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AK-74M",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": ".44 Vendetta",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "denari": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "denari",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SCORPION EVO 3 A1",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Glaive-12",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "doc": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "doc",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SG-CQB",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P9",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "dokkaebi": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "dokkaebi",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Mk 14 EBR",
+                "time_delay": 15,
+                "vertical_ramp": 0,
+                "x_amount": 4,
+                "y_amount": -13
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SMG-12",
+                "time_delay": 21,
+                "vertical_ramp": 0,
+                "x_amount": 9,
+                "y_amount": -31
+            },
+            "show_runtime_helper": true
+        },
+        "echo": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "echo",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SUPERNOVA",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P229",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "ela": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "ela",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SCORPION EVO 3 A1",
+                "time_delay": 20,
+                "vertical_ramp": 0,
+                "x_amount": 5,
+                "y_amount": -21
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "RG15",
+                "time_delay": 4,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -3
+            },
+            "show_runtime_helper": true
+        },
+        "fenrir": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "fenrir",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MP7",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Bailiff 410",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "finka": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "finka",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SPEAR .308",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PMM",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "flores": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "flores",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AR33",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "GSH-18",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "frost": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "frost",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SUPER 90",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MK1 9mm",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "fuze": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "fuze",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Shield",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PMM",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "glaz": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "glaz",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "OTs-03",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PMM",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "goyo": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "goyo",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "VECTOR .45 ACP",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P229",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "gridlock": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "gridlock",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "F90",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SUPER SHORTY",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "grim": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "grim",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "552 COMMANDO",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P229",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "hibana": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "hibana",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "TYPE-89",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P229",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "iana": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "iana",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "ARX200",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MK1 9mm",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "iq": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "iq",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AUG A2",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P12",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "jackal": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "jackal",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "C7E",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "USP40",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "jager": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "jager",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M870",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P12",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "kaid": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "kaid",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AUG A3",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": ".44 Mag Semi-Auto",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "kali": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "kali",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "CSRX 300",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SPSMG9",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "kapkan": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "kapkan",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "9x19VSN",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PMM",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "lesion": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "lesion",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SIX12 SD",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Q-929",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "lion": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "lion",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "V308",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "LFP586",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "maestro": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "maestro",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "ALDA 5.56",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Bailiff 410",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "maverick": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "maverick",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AR-15.50",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "1911 TACOPS",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "melusi": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "melusi",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MP5",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "RG15",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "mira": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "mira",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "VECTOR .45 ACP",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "USP40",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "montagne": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "montagne",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Shield",
+                "time_delay": 14,
+                "vertical_ramp": 0,
+                "x_amount": -3,
+                "y_amount": -17
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P9",
+                "time_delay": 5,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -5
+            },
+            "show_runtime_helper": true
+        },
+        "mozzie": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "mozzie",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "COMMANDO 9",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SDP 9mm",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "mute": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "mute",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MP5K",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P226 MK 25",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "nokk": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "nokk",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "FMG-9",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "5.7 USG",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "nomad": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "nomad",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AK-74M",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": ".44 Mag Semi-Auto",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "oryx": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "oryx",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "T-5 SMG",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Bailiff 410",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "osa": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "osa",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "556XI",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PMM",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "pulse": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "pulse",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M1014",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M45 MEUSOC",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "ram": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "ram",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "R4-C",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MK1 9mm",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "rauora": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "rauora",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "417",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Reaper MK2",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "rook": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "rook",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P90",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "LFP586",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "sens": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "sens",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "POF-9",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SDP 9mm",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "sentry": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "sentry",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "COMMANDO 9",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "C75 Auto",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "skopos": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "skopos",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "PCX-33",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P229",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "sledge": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "sledge",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M590A1",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P226 MK 25",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "smoke": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "smoke",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "FMG-9",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P226 MK 25",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "solis": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "solis",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P90",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SMG-11",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "striker": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "striker",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M4",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "5.7 USG",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "tachanka": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "tachanka",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "DP27",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "GSH-18",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "thatcher": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "thatcher",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AR33",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P226 MK 25",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "thermite": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "thermite",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M1014",
+                "time_delay": 1,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": 0
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M45 MEUSOC",
+                "time_delay": 1,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": 0
+            },
+            "show_runtime_helper": true
+        },
+        "thorn": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "thorn",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "UZK50GI",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "1911 TACOPS",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "thunderbird": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "thunderbird",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SPEAR .308",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Q-929",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "tubarao": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "tubarao",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MPX",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P226 MK 25",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "twitch": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "twitch",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "F2",
+                "time_delay": 11,
+                "vertical_ramp": 0,
+                "x_amount": -1,
+                "y_amount": -16
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P9",
+                "time_delay": 5,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -2
+            },
+            "show_runtime_helper": true
+        },
+        "valkyrie": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "valkyrie",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "MPX",
+                "time_delay": 9,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -7
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "D-50",
+                "time_delay": 7,
+                "vertical_ramp": 0,
+                "x_amount": -1,
+                "y_amount": -17
+            },
+            "show_runtime_helper": true
+        },
+        "vigil": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "vigil",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "K1A",
+                "time_delay": 8,
+                "vertical_ramp": 0,
+                "x_amount": -1,
+                "y_amount": -7
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "C75 Auto",
+                "time_delay": 21,
+                "vertical_ramp": 0,
+                "x_amount": 9,
+                "y_amount": -31
+            },
+            "show_runtime_helper": true
+        },
+        "wamai": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "wamai",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "AUG A2",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "KERATOS .357",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "warden": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "warden",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "M590A1",
+                "time_delay": 9,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -7
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "P-10C",
+                "time_delay": 21,
+                "vertical_ramp": 0,
+                "x_amount": 9,
+                "y_amount": -31
+            },
+            "show_runtime_helper": true
+        },
+        "ying": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "ying",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "T-95 LSW",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "Q-929",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "zero": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "zero",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "SC3000K",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "5.7 USG",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        },
+        "zofia": {
+            "active_weapon": "primary",
+            "auto_load": true,
+            "monitor_while_active": true,
+            "notes": "(Click to Edit)",
+            "operator_id": "zofia",
+            "primary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "LMG-E",
+                "time_delay": 30,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "profile_enabled": true,
+            "rapid_fire_enabled": false,
+            "rapid_fire_value": 0,
+            "secondary": {
+                "attachments": {
+                    "ads_profile_key": "ads_1x",
+                    "barrel": "none",
+                    "grip": "none",
+                    "optic": "iron_1x",
+                    "optic_magnification": 1,
+                    "underbarrel": "none"
+                },
+                "horizontal_ramp": 0,
+                "ramp_start_seconds": 0.75,
+                "selected_weapon": "RG15",
+                "time_delay": 40,
+                "vertical_ramp": 0,
+                "x_amount": 0,
+                "y_amount": -1
+            },
+            "show_runtime_helper": true
+        }
+    },
+    "schema_version": 2,
+    "source_format": "NEXUS_CONFIG_V1"
 }

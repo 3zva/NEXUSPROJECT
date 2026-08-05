@@ -57,6 +57,7 @@ private:
     void setUiScale(const QVariant& value);
     void setAuthWindowMode(bool enabled);
     void updateFpsLabel();
+    int confirmExitSaveChoice();
     void exitClient();
     void checkForClientUpdatesIfEnabled();
     void beginClientUpdate(const QString& versionLabel);
@@ -117,4 +118,6 @@ private:
     bool m_reloadAfterSignIn = false;
     bool m_authWindowMode = false;
     bool m_updateCheckStarted = false;
+    bool m_exitSavePromptHandled = false;
+    bool m_saveSettingsOnExit = true;
 };

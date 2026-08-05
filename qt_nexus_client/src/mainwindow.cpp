@@ -483,10 +483,22 @@ void MainWindow::closeEvent(QCloseEvent* event) {
         return;
     }
 
-    if (m_authenticatedRoot != nullptr) {
+    if (!m_exitSavePromptHandled) {
+        const int choice = confirmExitSaveChoice();
+        if (choice == QMessageBox::Cancel) {
+            event->ignore();
+            return;
+        }
+        m_exitSavePromptHandled = true;
+        m_saveSettingsOnExit = choice == QMessageBox::Save;
+    }
+
+    if (m_saveSettingsOnExit && m_authenticatedRoot != nullptr) {
         m_authenticatedRoot->saveSafeConfigurationSnapshot();
     }
-    saveSafeApplicationSettingsSnapshot();
+    if (m_saveSettingsOnExit) {
+        saveSafeApplicationSettingsSnapshot();
+    }
     stopRuntimeHelper();
     {
         QNetworkAccessManager manager;
@@ -1373,12 +1385,45 @@ void MainWindow::updateFpsLabel() {
     m_fpsLabel->raise();
 }
 
+int MainWindow::confirmExitSaveChoice() {
+    QMessageBox dialog(this);
+    dialog.setWindowTitle(QStringLiteral("Exit NEXUS"));
+    dialog.setIconPixmap(NexusTheme::pixmap(QStringLiteral("nexus_logo_64.png"), 48, 48));
+    dialog.setText(QStringLiteral("Save current NEXUS settings before exiting?"));
+    dialog.setInformativeText(QStringLiteral(
+        "Saving keeps your operator setup, app settings, and safe recovery backups current."
+    ));
+    dialog.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    dialog.setDefaultButton(QMessageBox::Save);
+    dialog.button(QMessageBox::Save)->setText(QStringLiteral("Save & Exit"));
+    dialog.button(QMessageBox::Discard)->setText(QStringLiteral("Exit Without Saving"));
+    dialog.button(QMessageBox::Cancel)->setText(QStringLiteral("Cancel"));
+    dialog.button(QMessageBox::Save)->setProperty("accentButton", true);
+    dialog.button(QMessageBox::Discard)->setProperty("dangerButton", true);
+    for (auto* button : dialog.buttons()) {
+        button->style()->unpolish(button);
+        button->style()->polish(button);
+    }
+    return dialog.exec();
+}
+
 void MainWindow::exitClient() {
+    if (!m_exitSavePromptHandled) {
+        const int choice = confirmExitSaveChoice();
+        if (choice == QMessageBox::Cancel) {
+            return;
+        }
+        m_exitSavePromptHandled = true;
+        m_saveSettingsOnExit = choice == QMessageBox::Save;
+    }
+
     m_forceExit = true;
-    if (m_authenticatedRoot != nullptr) {
+    if (m_saveSettingsOnExit && m_authenticatedRoot != nullptr) {
         m_authenticatedRoot->saveSafeConfigurationSnapshot();
     }
-    saveSafeApplicationSettingsSnapshot();
+    if (m_saveSettingsOnExit) {
+        saveSafeApplicationSettingsSnapshot();
+    }
     if (m_launchReadiness != nullptr) {
         m_launchReadiness->stop();
     }
