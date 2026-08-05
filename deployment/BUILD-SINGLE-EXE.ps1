@@ -21,6 +21,23 @@ $stubSource = Join-Path $scriptDir 'single_exe_stub.cpp'
 $gxx = Join-Path $MingwRoot 'bin\g++.exe'
 $windres = Join-Path $MingwRoot 'bin\windres.exe'
 
+$cmakeListsPath = Join-Path $repoRoot 'qt_nexus_client\CMakeLists.txt'
+if (!(Test-Path -LiteralPath $cmakeListsPath)) { throw "CMakeLists.txt not found: $cmakeListsPath" }
+$cmakeListsText = Get-Content -Raw -LiteralPath $cmakeListsPath
+$cmakeVersionMatch = [regex]::Match($cmakeListsText, 'project\s*\(\s*NexusClient\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)')
+if (!$cmakeVersionMatch.Success) {
+    throw "Could not read the app version from qt_nexus_client\CMakeLists.txt."
+}
+$appVersion = $cmakeVersionMatch.Groups[1].Value
+if ($appVersion -ne $Version) {
+    throw "Release version $Version does not match app version $appVersion. Update qt_nexus_client\CMakeLists.txt first."
+}
+
+$buildScript = Join-Path $repoRoot 'build.bat'
+if (!(Test-Path -LiteralPath $buildScript)) { throw "Build script not found: $buildScript" }
+& cmd.exe /c "`"$buildScript`" < NUL"
+if ($LASTEXITCODE -ne 0) { throw "Native build failed." }
+
 if (!(Test-Path -LiteralPath $BuildDir)) { throw "Build output folder not found: $BuildDir" }
 if (!(Test-Path -LiteralPath $stubSource)) { throw "Stub source not found: $stubSource" }
 if (!(Test-Path -LiteralPath $gxx)) { throw "g++ not found: $gxx" }
