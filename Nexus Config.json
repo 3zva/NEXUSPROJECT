@@ -10,11 +10,11 @@
             "operator_id": "ace",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -31,7 +31,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -56,8 +56,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -76,7 +76,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -100,11 +100,11 @@
             "operator_id": "amaru",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "muzzle_brake",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -121,8 +121,8 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -145,16 +145,16 @@
             "operator_id": "aruni",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "horizontal_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P10 RONI",
+                "selected_weapon": "Mk 14 EBR",
                 "time_delay": 8,
                 "vertical_ramp": 0,
                 "x_amount": -2,
@@ -166,7 +166,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -190,11 +190,11 @@
             "operator_id": "ash",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "muzzle_brake",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -211,7 +211,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -236,8 +236,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "horizontal_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -256,7 +256,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -281,7 +281,7 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "extended_barrel",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -301,7 +301,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "flash_hider",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -346,8 +346,8 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -391,7 +391,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "flash_hider",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -415,11 +415,11 @@
             "operator_id": "brava",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "muzzle_brake",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -444,7 +444,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SUPER SHORTY",
+                "selected_weapon": "USP40",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -460,11 +460,11 @@
             "operator_id": "buck",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
                     "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -481,7 +481,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -526,7 +526,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -551,8 +551,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -571,7 +571,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -596,7 +596,7 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "muzzle_brake",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -685,11 +685,11 @@
             "operator_id": "deimos",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -731,8 +731,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -776,15 +776,15 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SG-CQB",
+                "selected_weapon": "MP5",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -804,7 +804,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P9",
+                "selected_weapon": "Bailiff 410",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -820,11 +820,11 @@
             "operator_id": "dokkaebi",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "horizontal_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -849,7 +849,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SMG-12",
+                "selected_weapon": "C75 Auto",
                 "time_delay": 21,
                 "vertical_ramp": 0,
                 "x_amount": 9,
@@ -867,14 +867,14 @@
                 "attachments": {
                     "ads_profile_key": "ads_1x",
                     "barrel": "none",
-                    "grip": "none",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SUPERNOVA",
+                "selected_weapon": "MP5SD",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -886,7 +886,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "flash_hider",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -894,7 +894,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P229",
+                "selected_weapon": "BEARING 9",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -911,8 +911,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -931,7 +931,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -943,7 +943,9 @@
                 "time_delay": 4,
                 "vertical_ramp": 0,
                 "x_amount": 0,
-                "y_amount": -3
+                "y_amount": -3,
+                "recoil_multiplier_x": 1,
+                "recoil_multiplier_y": 1
             },
             "show_runtime_helper": true
         },
@@ -956,7 +958,7 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1000,16 +1002,16 @@
             "operator_id": "finka",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SPEAR .308",
+                "selected_weapon": "6P41",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1021,7 +1023,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1045,11 +1047,11 @@
             "operator_id": "flores",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "muzzle_brake",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -1066,7 +1068,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1091,15 +1093,15 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "extended_barrel",
+                    "grip": "horizontal_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SUPER 90",
+                "selected_weapon": "9mm C1",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1111,7 +1113,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1156,7 +1158,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1180,11 +1182,11 @@
             "operator_id": "glaz",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -1209,7 +1211,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "PMM",
+                "selected_weapon": "GONNE-6",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1225,16 +1227,16 @@
             "operator_id": "goyo",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
+                    "ads_profile_key": "ads_2_5x",
                     "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "VECTOR .45 ACP",
+                "selected_weapon": "TCSG12",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1246,7 +1248,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1270,11 +1272,11 @@
             "operator_id": "gridlock",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -1299,7 +1301,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SUPER SHORTY",
+                "selected_weapon": "SDP 9mm",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1315,11 +1317,11 @@
             "operator_id": "grim",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "horizontal_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -1344,7 +1346,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P229",
+                "selected_weapon": "Bailiff 410",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1360,11 +1362,11 @@
             "operator_id": "hibana",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -1381,7 +1383,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "flash_hider",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1389,7 +1391,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P229",
+                "selected_weapon": "BEARING 9",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1426,7 +1428,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1450,16 +1452,16 @@
             "operator_id": "iq",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "AUG A2",
+                "selected_weapon": "552 COMMANDO",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1471,7 +1473,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "flash_hider",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1541,15 +1543,15 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "M870",
+                "selected_weapon": "416-C CARBINE",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1561,7 +1563,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "flash_hider",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1585,16 +1587,16 @@
             "operator_id": "kaid",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "AUG A3",
+                "selected_weapon": "TCSG12",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1614,7 +1616,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": ".44 Mag Semi-Auto",
+                "selected_weapon": "LFP586",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1651,7 +1653,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1676,8 +1678,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -1696,7 +1698,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1704,7 +1706,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "PMM",
+                "selected_weapon": "GSH-18",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1721,15 +1723,15 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SIX12 SD",
+                "selected_weapon": "T-5 SMG",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1741,7 +1743,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1753,7 +1755,9 @@
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
-                "y_amount": -1
+                "y_amount": -1,
+                "recoil_multiplier_x": 1,
+                "recoil_multiplier_y": 1
             },
             "show_runtime_helper": true
         },
@@ -1811,8 +1815,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -1831,7 +1835,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1839,7 +1843,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "Bailiff 410",
+                "selected_weapon": "KERATOS .357",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -1901,7 +1905,7 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1921,7 +1925,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -1933,7 +1937,9 @@
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
-                "y_amount": -1
+                "y_amount": -1,
+                "recoil_multiplier_x": 1,
+                "recoil_multiplier_y": 1
             },
             "show_runtime_helper": true
         },
@@ -1946,8 +1952,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -2011,7 +2017,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2036,15 +2042,15 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "extended_barrel",
+                    "grip": "horizontal_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "COMMANDO 9",
+                "selected_weapon": "P10 RONI",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2101,15 +2107,15 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P226 MK 25",
+                "selected_weapon": "SMG-11",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2146,7 +2152,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2170,11 +2176,11 @@
             "operator_id": "nomad",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -2191,7 +2197,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2199,7 +2205,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": ".44 Mag Semi-Auto",
+                "selected_weapon": "PRB92",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2216,8 +2222,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -2281,7 +2287,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2306,15 +2312,15 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "M1014",
+                "selected_weapon": "UMP45",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2326,7 +2332,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2350,11 +2356,11 @@
             "operator_id": "ram",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -2371,7 +2377,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2395,16 +2401,16 @@
             "operator_id": "rauora",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "extended_barrel",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "417",
+                "selected_weapon": "XK23",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2416,7 +2422,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2449,7 +2455,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P90",
+                "selected_weapon": "MP5",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2576,8 +2582,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "muzzle_brake",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -2596,7 +2602,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2620,16 +2626,16 @@
             "operator_id": "sledge",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "muzzle_brake",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "M590A1",
+                "selected_weapon": "L85A2",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2641,7 +2647,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2674,7 +2680,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "FMG-9",
+                "selected_weapon": "M590A1",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2686,15 +2692,15 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P226 MK 25",
+                "selected_weapon": "SMG-11",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2711,7 +2717,7 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "muzzle_brake",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2731,8 +2737,8 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "flash_hider",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -2776,7 +2782,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2809,7 +2815,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "DP27",
+                "selected_weapon": "9x19VSN",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2821,7 +2827,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2845,11 +2851,11 @@
             "operator_id": "thatcher",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "muzzle_brake",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
@@ -2866,7 +2872,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2911,7 +2917,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -2936,8 +2942,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "extended_barrel",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -2964,7 +2970,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "1911 TACOPS",
+                "selected_weapon": "C75 Auto",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -2981,8 +2987,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -3009,7 +3015,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "Q-929",
+                "selected_weapon": "ITA12S",
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -3025,16 +3031,16 @@
             "operator_id": "tubarao",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "horizontal_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "MPX",
+                "selected_weapon": "AR-15.50",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -3046,7 +3052,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -3070,16 +3076,16 @@
             "operator_id": "twitch",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "horizontal_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "F2",
+                "selected_weapon": "417",
                 "time_delay": 11,
                 "vertical_ramp": 0,
                 "x_amount": -1,
@@ -3091,7 +3097,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -3116,8 +3122,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -3136,7 +3142,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -3161,8 +3167,8 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
@@ -3182,18 +3188,20 @@
                 "attachments": {
                     "ads_profile_key": "ads_1x",
                     "barrel": "none",
-                    "grip": "none",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "C75 Auto",
+                "selected_weapon": "SMG-12",
                 "time_delay": 21,
                 "vertical_ramp": 0,
                 "x_amount": 9,
-                "y_amount": -31
+                "y_amount": -31,
+                "recoil_multiplier_x": 1.01,
+                "recoil_multiplier_y": 1
             },
             "show_runtime_helper": true
         },
@@ -3206,7 +3214,7 @@
             "primary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "flash_hider",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -3214,7 +3222,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "AUG A2",
+                "selected_weapon": "MP5K",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -3226,7 +3234,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -3259,7 +3267,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "M590A1",
+                "selected_weapon": "MPX",
                 "time_delay": 9,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -3272,18 +3280,20 @@
                 "attachments": {
                     "ads_profile_key": "ads_1x",
                     "barrel": "none",
-                    "grip": "none",
+                    "grip": "vertical_grip",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "P-10C",
+                "selected_weapon": "SMG-12",
                 "time_delay": 21,
                 "vertical_ramp": 0,
                 "x_amount": 9,
-                "y_amount": -31
+                "y_amount": -31,
+                "recoil_multiplier_x": 1.01,
+                "recoil_multiplier_y": 1
             },
             "show_runtime_helper": true
         },
@@ -3316,7 +3326,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -3328,7 +3338,9 @@
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
-                "y_amount": -1
+                "y_amount": -1,
+                "recoil_multiplier_x": 1,
+                "recoil_multiplier_y": 1
             },
             "show_runtime_helper": true
         },
@@ -3340,16 +3352,16 @@
             "operator_id": "zero",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
                     "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SC3000K",
+                "selected_weapon": "MP7",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -3361,7 +3373,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -3385,16 +3397,16 @@
             "operator_id": "zofia",
             "primary": {
                 "attachments": {
-                    "ads_profile_key": "ads_1x",
-                    "barrel": "none",
-                    "grip": "none",
-                    "optic": "iron_1x",
-                    "optic_magnification": 1,
+                    "ads_profile_key": "ads_2_5x",
+                    "barrel": "suppressor",
+                    "grip": "vertical_grip",
+                    "optic": "magnified_2_5x",
+                    "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "LMG-E",
+                "selected_weapon": "M762",
                 "time_delay": 30,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -3406,7 +3418,7 @@
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
-                    "barrel": "none",
+                    "barrel": "suppressor",
                     "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
@@ -3418,11 +3430,16 @@
                 "time_delay": 40,
                 "vertical_ramp": 0,
                 "x_amount": 0,
-                "y_amount": -1
+                "y_amount": -1,
+                "recoil_multiplier_x": 1,
+                "recoil_multiplier_y": 1
             },
             "show_runtime_helper": true
         }
     },
     "schema_version": 2,
-    "source_format": "NEXUS_CONFIG_V1"
+    "source_format": "NEXUS_CONFIG_V1",
+    "restored_from": "R6Attachments.ini + HighCloud tuned operator config",
+    "restored_at": "2026-08-05T23:37:49.951Z",
+    "restored_weapon_matching": "Prefer old INI weapon section when app weapon order differs"
 }
