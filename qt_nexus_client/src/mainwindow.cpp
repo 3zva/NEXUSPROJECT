@@ -1451,11 +1451,19 @@ bool MainWindow::saveSafeApplicationSettingsSnapshot() const {
     root.insert(QStringLiteral("saved_at_utc"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
     root.insert(QStringLiteral("settings"), savedSettings);
 
-    const QString directory = QStandardPaths::writableLocation(
-        QStandardPaths::AppConfigLocation
-    );
+    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    if (documents.trimmed().isEmpty()) {
+        documents = QDir::homePath();
+    }
+    const QString directory = QDir(documents).filePath(QStringLiteral("NEXUS/Config"));
     const QString backupDirectory = QDir(directory).filePath(QStringLiteral("config-backups"));
+    QString desktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    if (desktop.trimmed().isEmpty()) {
+        desktop = QDir::homePath();
+    }
+    const QString desktopBackupDirectory = QDir(desktop).filePath(QStringLiteral("NEXUS Config Backups"));
     QDir().mkpath(backupDirectory);
+    QDir().mkpath(desktopBackupDirectory);
 
     auto writeSnapshot = [&root](const QString& path) {
         QSaveFile file(path);
@@ -1477,7 +1485,12 @@ bool MainWindow::saveSafeApplicationSettingsSnapshot() const {
             QStringLiteral("client-settings-exit-%1.json").arg(stamp)
         )
     );
-    return safeSaved && backupSaved;
+    const bool desktopBackupSaved = writeSnapshot(
+        QDir(desktopBackupDirectory).filePath(
+            QStringLiteral("client-settings-exit-%1.json").arg(stamp)
+        )
+    );
+    return safeSaved && backupSaved && desktopBackupSaved;
 }
 
 void MainWindow::restoreSavedScreenRegion() {

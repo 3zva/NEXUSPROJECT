@@ -164,6 +164,9 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
     if (!configLoaded) {
         restoreFromSafeGlobalConfig();
     }
+    if (!QFileInfo::exists(m_activeConfigPath)) {
+        writeGlobalConfig(m_activeConfigPath, false);
+    }
     resetToPathSelection();
 }
 
@@ -599,28 +602,66 @@ void AuthenticatedRoot::handlePathLoad(const QString& path) {
 }
 
 
-QString AuthenticatedRoot::defaultGlobalConfigPath() const {
-    const QString directory = QStandardPaths::writableLocation(
-        QStandardPaths::AppConfigLocation
-    );
+QString AuthenticatedRoot::durableConfigDirectory() const {
+    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    if (documents.trimmed().isEmpty()) {
+        documents = QDir::homePath();
+    }
+    const QString directory = QDir(documents).filePath(QStringLiteral("NEXUS/Config"));
     QDir().mkpath(directory);
-    return QDir(directory).filePath(QStringLiteral("nexus-config.json"));
+    return directory;
+}
+
+QString AuthenticatedRoot::desktopBackupConfigDirectory() const {
+    QString desktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    if (desktop.trimmed().isEmpty()) {
+        desktop = QDir::homePath();
+    }
+    const QString directory = QDir(desktop).filePath(QStringLiteral("NEXUS Config Backups"));
+    QDir().mkpath(directory);
+    return directory;
+}
+
+QString AuthenticatedRoot::defaultGlobalConfigPath() const {
+    return QDir(durableConfigDirectory()).filePath(QStringLiteral("nexus-config.json"));
 }
 
 QString AuthenticatedRoot::safeGlobalConfigPath() const {
-    const QString directory = QStandardPaths::writableLocation(
-        QStandardPaths::AppConfigLocation
-    );
-    QDir().mkpath(directory);
-    return QDir(directory).filePath(QStringLiteral("nexus-config.safe.json"));
+    return QDir(durableConfigDirectory()).filePath(QStringLiteral("nexus-config.safe.json"));
 }
 
 QString AuthenticatedRoot::backupGlobalConfigDirectory() const {
-    const QString directory = QDir(QStandardPaths::writableLocation(
-        QStandardPaths::AppConfigLocation
-    )).filePath(QStringLiteral("config-backups"));
+    const QString directory = QDir(durableConfigDirectory()).filePath(QStringLiteral("config-backups"));
     QDir().mkpath(directory);
     return directory;
+}
+
+QStringList AuthenticatedRoot::legacyGlobalConfigCandidates() const {
+    QStringList candidates;
+    const QString appConfig = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    if (!appConfig.trimmed().isEmpty()) {
+        candidates
+            << QDir(appConfig).filePath(QStringLiteral("nexus-config.safe.json"))
+            << QDir(appConfig).filePath(QStringLiteral("nexus-config.json"));
+        const QFileInfoList backups = QDir(QDir(appConfig).filePath(QStringLiteral("config-backups"))).entryInfoList(
+            QStringList{QStringLiteral("*.json")},
+            QDir::Files,
+            QDir::Time
+        );
+        for (const QFileInfo& backup : backups) {
+            candidates << backup.absoluteFilePath();
+        }
+    }
+
+    const QStringList installCandidates{
+        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("Nexus Config.json")),
+        QDir(QDir::homePath()).filePath(QStringLiteral("Desktop/NEXUS/nexus-client/Nexus Config.json"))
+    };
+    for (const QString& candidate : installCandidates) {
+        candidates << candidate;
+    }
+    candidates.removeDuplicates();
+    return candidates;
 }
 
 QJsonObject AuthenticatedRoot::currentGlobalConfigObject() const {
@@ -653,7 +694,27 @@ bool AuthenticatedRoot::copyExistingConfigToBackup(
         QStringLiteral("nexus-config-%1-%2.json").arg(safeReason, stamp)
     );
     QFile::remove(backupPath);
-    return QFile::copy(path, backupPath);
+    const bool primaryCopied = QFile::copy(path, backupPath);
+    const QString desktopBackupPath = QDir(desktopBackupConfigDirectory()).filePath(
+        QStringLiteral("nexus-config-%1-%2.json").arg(safeReason, stamp)
+    );
+    QFile::remove(desktopBackupPath);
+    const bool desktopCopied = QFile::copy(path, desktopBackupPath);
+    return primaryCopied || desktopCopied;
+}
+
+bool AuthenticatedRoot::mirrorConfigBackup(const QJsonObject& root, const QString& reason) const {
+    QString safeReason = reason;
+    safeReason.replace(QRegularExpression(QStringLiteral("[^A-Za-z0-9_-]")), QStringLiteral("-"));
+    const QString stamp = QDateTime::currentDateTime().toString(
+        QStringLiteral("yyyyMMdd-HHmmss-zzz")
+    );
+    return writeConfigObject(
+        QDir(desktopBackupConfigDirectory()).filePath(
+            QStringLiteral("nexus-config-%1-%2.json").arg(safeReason, stamp)
+        ),
+        root
+    );
 }
 
 bool AuthenticatedRoot::writeConfigObject(
@@ -690,7 +751,8 @@ bool AuthenticatedRoot::saveSafeConfigurationSnapshot() {
         ),
         root
     );
-    return activeSaved && safeSaved && backupSaved;
+    const bool desktopBackupSaved = mirrorConfigBackup(root, QStringLiteral("exit"));
+    return activeSaved && safeSaved && backupSaved && desktopBackupSaved;
 }
 
 bool AuthenticatedRoot::writeGlobalConfig(
@@ -734,6 +796,7 @@ bool AuthenticatedRoot::writeGlobalConfig(
 
     if (savingPrimaryConfig) {
         writeConfigObject(safeGlobalConfigPath(), root);
+        mirrorConfigBackup(root, QStringLiteral("save"));
     }
 
     if (showFeedback) {
@@ -761,6 +824,16 @@ bool AuthenticatedRoot::restoreFromSafeGlobalConfig() {
     for (const QFileInfo& backup : backups) {
         candidates << backup.absoluteFilePath();
     }
+    candidates << legacyGlobalConfigCandidates();
+    const QFileInfoList desktopBackups = QDir(desktopBackupConfigDirectory()).entryInfoList(
+        QStringList{QStringLiteral("*.json")},
+        QDir::Files,
+        QDir::Time
+    );
+    for (const QFileInfo& backup : desktopBackups) {
+        candidates << backup.absoluteFilePath();
+    }
+    candidates.removeDuplicates();
 
     for (const QString& candidate : std::as_const(candidates)) {
         if (!QFileInfo::exists(candidate)) {

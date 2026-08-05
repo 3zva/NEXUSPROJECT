@@ -131,11 +131,15 @@ private:
     void setNavigationAvailable(bool available);
     void requestLogout();
     void handlePathLoad(const QString& path);
+    [[nodiscard]] QString durableConfigDirectory() const;
+    [[nodiscard]] QString desktopBackupConfigDirectory() const;
     [[nodiscard]] QString defaultGlobalConfigPath() const;
     [[nodiscard]] QString safeGlobalConfigPath() const;
     [[nodiscard]] QString backupGlobalConfigDirectory() const;
+    [[nodiscard]] QStringList legacyGlobalConfigCandidates() const;
     [[nodiscard]] QJsonObject currentGlobalConfigObject() const;
     bool copyExistingConfigToBackup(const QString& path, const QString& reason) const;
+    bool mirrorConfigBackup(const QJsonObject& root, const QString& reason) const;
     bool writeConfigObject(const QString& path, const QJsonObject& root) const;
     bool writeGlobalConfig(const QString& path, bool showFeedback);
     bool readGlobalConfig(const QString& path, bool showFeedback);
