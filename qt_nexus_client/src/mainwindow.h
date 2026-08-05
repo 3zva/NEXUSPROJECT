@@ -69,6 +69,7 @@ private:
     void setLoadClientReady();
     void finishLoadProgress();
     void failLoadProgress(const QString& message);
+    bool saveSafeApplicationSettingsSnapshot() const;
     void restoreSavedScreenRegion();
     void persistScreenRegion(const QRect& region, const QString& displayId);
     bool writeScreenRegionConfig(const QRect& region, const QString& displayId);

@@ -21,6 +21,7 @@
 #include <QComboBox>
 #include <QCoreApplication>
 #include <QCursor>
+#include <QDateTime>
 #include <QDialog>
 #include <QDir>
 #include <QEvent>
@@ -49,6 +50,7 @@
 #include <QResizeEvent>
 #include <QSettings>
 #include <QScreen>
+#include <QSaveFile>
 #include <QSize>
 #include <QStackedWidget>
 #include <QStandardPaths>
@@ -481,6 +483,10 @@ void MainWindow::closeEvent(QCloseEvent* event) {
         return;
     }
 
+    if (m_authenticatedRoot != nullptr) {
+        m_authenticatedRoot->saveSafeConfigurationSnapshot();
+    }
+    saveSafeApplicationSettingsSnapshot();
     stopRuntimeHelper();
     {
         QNetworkAccessManager manager;
@@ -1369,6 +1375,10 @@ void MainWindow::updateFpsLabel() {
 
 void MainWindow::exitClient() {
     m_forceExit = true;
+    if (m_authenticatedRoot != nullptr) {
+        m_authenticatedRoot->saveSafeConfigurationSnapshot();
+    }
+    saveSafeApplicationSettingsSnapshot();
     if (m_launchReadiness != nullptr) {
         m_launchReadiness->stop();
     }
@@ -1378,6 +1388,51 @@ void MainWindow::exitClient() {
     }
     close();
     QCoreApplication::quit();
+}
+
+bool MainWindow::saveSafeApplicationSettingsSnapshot() const {
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    settings.sync();
+
+    QJsonObject savedSettings;
+    const QStringList keys = settings.allKeys();
+    for (const QString& key : keys) {
+        savedSettings.insert(key, QJsonValue::fromVariant(settings.value(key)));
+    }
+
+    QJsonObject root;
+    root.insert(QStringLiteral("format"), QStringLiteral("nexus-client-settings"));
+    root.insert(QStringLiteral("schema_version"), 1);
+    root.insert(QStringLiteral("saved_at_utc"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+    root.insert(QStringLiteral("settings"), savedSettings);
+
+    const QString directory = QStandardPaths::writableLocation(
+        QStandardPaths::AppConfigLocation
+    );
+    const QString backupDirectory = QDir(directory).filePath(QStringLiteral("config-backups"));
+    QDir().mkpath(backupDirectory);
+
+    auto writeSnapshot = [&root](const QString& path) {
+        QSaveFile file(path);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            return false;
+        }
+        file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+        return file.commit();
+    };
+
+    const QString stamp = QDateTime::currentDateTime().toString(
+        QStringLiteral("yyyyMMdd-HHmmss-zzz")
+    );
+    const bool safeSaved = writeSnapshot(
+        QDir(directory).filePath(QStringLiteral("client-settings.safe.json"))
+    );
+    const bool backupSaved = writeSnapshot(
+        QDir(backupDirectory).filePath(
+            QStringLiteral("client-settings-exit-%1.json").arg(stamp)
+        )
+    );
+    return safeSaved && backupSaved;
 }
 
 void MainWindow::restoreSavedScreenRegion() {

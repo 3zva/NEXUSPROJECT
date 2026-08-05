@@ -8,6 +8,7 @@
 #include "theme.h"
 
 #include <QApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
@@ -23,6 +24,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QStackedWidget>
 #include <QStyle>
 #include <QTimer>
@@ -155,8 +157,12 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
 
     buildPages();
     m_activeConfigPath = defaultGlobalConfigPath();
+    bool configLoaded = false;
     if (QFileInfo::exists(m_activeConfigPath)) {
-        readGlobalConfig(m_activeConfigPath, false);
+        configLoaded = readGlobalConfig(m_activeConfigPath, false);
+    }
+    if (!configLoaded) {
+        restoreFromSafeGlobalConfig();
     }
     resetToPathSelection();
 }
@@ -601,14 +607,23 @@ QString AuthenticatedRoot::defaultGlobalConfigPath() const {
     return QDir(directory).filePath(QStringLiteral("nexus-config.json"));
 }
 
-bool AuthenticatedRoot::writeGlobalConfig(
-    const QString& path,
-    bool showFeedback
-) {
-    if (path.trimmed().isEmpty()) {
-        return false;
-    }
+QString AuthenticatedRoot::safeGlobalConfigPath() const {
+    const QString directory = QStandardPaths::writableLocation(
+        QStandardPaths::AppConfigLocation
+    );
+    QDir().mkpath(directory);
+    return QDir(directory).filePath(QStringLiteral("nexus-config.safe.json"));
+}
 
+QString AuthenticatedRoot::backupGlobalConfigDirectory() const {
+    const QString directory = QDir(QStandardPaths::writableLocation(
+        QStandardPaths::AppConfigLocation
+    )).filePath(QStringLiteral("config-backups"));
+    QDir().mkpath(directory);
+    return directory;
+}
+
+QJsonObject AuthenticatedRoot::currentGlobalConfigObject() const {
     QJsonObject root;
     root.insert(QStringLiteral("format"), QStringLiteral("nexus-global-config"));
     root.insert(QStringLiteral("schema_version"), 2);
@@ -618,6 +633,80 @@ bool AuthenticatedRoot::writeGlobalConfig(
         QStringLiteral("operators"),
         QJsonObject::fromVariantMap(m_operatorSettings->allOperatorSettings())
     );
+    return root;
+}
+
+bool AuthenticatedRoot::copyExistingConfigToBackup(
+    const QString& path,
+    const QString& reason
+) const {
+    if (!QFileInfo::exists(path)) {
+        return false;
+    }
+
+    const QString stamp = QDateTime::currentDateTime().toString(
+        QStringLiteral("yyyyMMdd-HHmmss-zzz")
+    );
+    QString safeReason = reason;
+    safeReason.replace(QRegularExpression(QStringLiteral("[^A-Za-z0-9_-]")), QStringLiteral("-"));
+    const QString backupPath = QDir(backupGlobalConfigDirectory()).filePath(
+        QStringLiteral("nexus-config-%1-%2.json").arg(safeReason, stamp)
+    );
+    QFile::remove(backupPath);
+    return QFile::copy(path, backupPath);
+}
+
+bool AuthenticatedRoot::writeConfigObject(
+    const QString& path,
+    const QJsonObject& root
+) const {
+    if (path.trimmed().isEmpty()) {
+        return false;
+    }
+
+    QSaveFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return false;
+    }
+
+    file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+    return file.commit();
+}
+
+bool AuthenticatedRoot::saveSafeConfigurationSnapshot() {
+    if (m_operatorSettings == nullptr || m_activeConfigPath.trimmed().isEmpty()) {
+        return false;
+    }
+
+    const QJsonObject root = currentGlobalConfigObject();
+    const bool activeSaved = writeGlobalConfig(m_activeConfigPath, false);
+    const bool safeSaved = writeConfigObject(safeGlobalConfigPath(), root);
+    const QString stamp = QDateTime::currentDateTime().toString(
+        QStringLiteral("yyyyMMdd-HHmmss-zzz")
+    );
+    const bool backupSaved = writeConfigObject(
+        QDir(backupGlobalConfigDirectory()).filePath(
+            QStringLiteral("nexus-config-exit-%1.json").arg(stamp)
+        ),
+        root
+    );
+    return activeSaved && safeSaved && backupSaved;
+}
+
+bool AuthenticatedRoot::writeGlobalConfig(
+    const QString& path,
+    bool showFeedback
+) {
+    if (path.trimmed().isEmpty()) {
+        return false;
+    }
+
+    const QJsonObject root = currentGlobalConfigObject();
+    const bool savingPrimaryConfig = QFileInfo(path).absoluteFilePath()
+        == QFileInfo(m_activeConfigPath).absoluteFilePath();
+    if (savingPrimaryConfig) {
+        copyExistingConfigToBackup(path, QStringLiteral("before-save"));
+    }
 
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
@@ -643,6 +732,10 @@ bool AuthenticatedRoot::writeGlobalConfig(
         return false;
     }
 
+    if (savingPrimaryConfig) {
+        writeConfigObject(safeGlobalConfigPath(), root);
+    }
+
     if (showFeedback) {
         QMessageBox::information(
             this,
@@ -653,6 +746,32 @@ bool AuthenticatedRoot::writeGlobalConfig(
         );
     }
     return true;
+}
+
+bool AuthenticatedRoot::restoreFromSafeGlobalConfig() {
+    QStringList candidates;
+    candidates << safeGlobalConfigPath();
+
+    QDir backupDirectory(backupGlobalConfigDirectory());
+    const QFileInfoList backups = backupDirectory.entryInfoList(
+        QStringList{QStringLiteral("*.json")},
+        QDir::Files,
+        QDir::Time
+    );
+    for (const QFileInfo& backup : backups) {
+        candidates << backup.absoluteFilePath();
+    }
+
+    for (const QString& candidate : std::as_const(candidates)) {
+        if (!QFileInfo::exists(candidate)) {
+            continue;
+        }
+        if (readGlobalConfig(candidate, false)) {
+            writeGlobalConfig(m_activeConfigPath, false);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool AuthenticatedRoot::readGlobalConfig(

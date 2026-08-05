@@ -3,6 +3,7 @@
 #include "authsession.h"
 
 #include <QHash>
+#include <QJsonObject>
 #include <QPixmap>
 #include <QRect>
 #include <QString>
@@ -73,6 +74,7 @@ public:
     void setLoadClientReady();
     void finishLoadProgress();
     void failLoadProgress(const QString& message);
+    bool saveSafeConfigurationSnapshot();
     [[nodiscard]] bool runtimeHelperMonitoringEnabled() const;
 
 Q_SIGNALS:
@@ -130,8 +132,14 @@ private:
     void requestLogout();
     void handlePathLoad(const QString& path);
     [[nodiscard]] QString defaultGlobalConfigPath() const;
+    [[nodiscard]] QString safeGlobalConfigPath() const;
+    [[nodiscard]] QString backupGlobalConfigDirectory() const;
+    [[nodiscard]] QJsonObject currentGlobalConfigObject() const;
+    bool copyExistingConfigToBackup(const QString& path, const QString& reason) const;
+    bool writeConfigObject(const QString& path, const QJsonObject& root) const;
     bool writeGlobalConfig(const QString& path, bool showFeedback);
     bool readGlobalConfig(const QString& path, bool showFeedback);
+    bool restoreFromSafeGlobalConfig();
 
     AuthSession m_session;
     QString m_installationPath;
