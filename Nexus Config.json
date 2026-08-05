@@ -3078,14 +3078,14 @@
                 "attachments": {
                     "ads_profile_key": "ads_2_5x",
                     "barrel": "suppressor",
-                    "grip": "horizontal_grip",
+                    "grip": "vertical_grip",
                     "optic": "magnified_2_5x",
                     "optic_magnification": 2.5,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "417",
+                "selected_weapon": "F2",
                 "time_delay": 11,
                 "vertical_ramp": 0,
                 "x_amount": -1,
@@ -3267,7 +3267,7 @@
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "MPX",
+                "selected_weapon": "M590A1",
                 "time_delay": 9,
                 "vertical_ramp": 0,
                 "x_amount": 0,
@@ -3280,14 +3280,14 @@
                 "attachments": {
                     "ads_profile_key": "ads_1x",
                     "barrel": "none",
-                    "grip": "vertical_grip",
+                    "grip": "none",
                     "optic": "iron_1x",
                     "optic_magnification": 1,
                     "underbarrel": "none"
                 },
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
-                "selected_weapon": "SMG-12",
+                "selected_weapon": "P-10C",
                 "time_delay": 21,
                 "vertical_ramp": 0,
                 "x_amount": 9,
@@ -3439,7 +3439,8 @@
     },
     "schema_version": 2,
     "source_format": "NEXUS_CONFIG_V1",
-    "restored_from": "R6Attachments.ini + HighCloud tuned operator config",
-    "restored_at": "2026-08-05T23:37:49.951Z",
-    "restored_weapon_matching": "Prefer old INI weapon section when app weapon order differs"
+    "restored_from": "Recovered staged movement config with corrected selected weapons and R6 attachment mapping",
+    "restored_at": "2026-08-05T23:53:50.330Z",
+    "restored_weapon_matching": "Prefer old INI weapon section when app weapon order differs",
+    "restored_weapon_corrections": "Twitch=F2, Warden=M590A1, Aruni=Mk 14 EBR"
 }
