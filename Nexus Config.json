@@ -155,7 +155,7 @@
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
                 "selected_weapon": "P10 RONI",
-                "time_delay": 7,
+                "time_delay": 8,
                 "vertical_ramp": 0,
                 "x_amount": -2,
                 "y_amount": -7
@@ -245,14 +245,14 @@
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
                 "selected_weapon": "9x19VSN",
-                "time_delay": 30,
+                "time_delay": 21,
                 "vertical_ramp": 0,
-                "x_amount": 0,
-                "y_amount": -1
+                "x_amount": -3,
+                "y_amount": -14
             },
             "profile_enabled": true,
-            "rapid_fire_enabled": false,
-            "rapid_fire_value": 0,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
@@ -265,10 +265,10 @@
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
                 "selected_weapon": "D-50",
-                "time_delay": 40,
+                "time_delay": 7,
                 "vertical_ramp": 0,
-                "x_amount": 0,
-                "y_amount": -1
+                "x_amount": 1,
+                "y_amount": -17
             },
             "show_runtime_helper": true
         },
@@ -290,10 +290,10 @@
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
                 "selected_weapon": "MP7",
-                "time_delay": 30,
+                "time_delay": 34,
                 "vertical_ramp": 0,
-                "x_amount": 0,
-                "y_amount": -1
+                "x_amount": 1,
+                "y_amount": -26
             },
             "profile_enabled": true,
             "rapid_fire_enabled": false,
@@ -3125,14 +3125,14 @@
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
                 "selected_weapon": "MPX",
-                "time_delay": 30,
+                "time_delay": 9,
                 "vertical_ramp": 0,
                 "x_amount": 0,
-                "y_amount": -1
+                "y_amount": -7
             },
             "profile_enabled": true,
-            "rapid_fire_enabled": false,
-            "rapid_fire_value": 0,
+            "rapid_fire_enabled": true,
+            "rapid_fire_value": 2,
             "secondary": {
                 "attachments": {
                     "ads_profile_key": "ads_1x",
@@ -3145,10 +3145,10 @@
                 "horizontal_ramp": 0,
                 "ramp_start_seconds": 0.75,
                 "selected_weapon": "D-50",
-                "time_delay": 40,
+                "time_delay": 7,
                 "vertical_ramp": 0,
-                "x_amount": 0,
-                "y_amount": -1
+                "x_amount": -1,
+                "y_amount": -17
             },
             "show_runtime_helper": true
         },
