@@ -431,9 +431,16 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
         {QStringLiteral("Outline crosshairs? (Glitchy)"), QStringLiteral("Experimental client-only outline rendering."), false, QStringLiteral("outline_crosshairs")},
         {QStringLiteral("Minimize to system tray?"), QStringLiteral("Keep NEXUS available without a taskbar window."), true, QStringLiteral("minimize_to_tray")},
         {QStringLiteral("Start NEXUS on system startup?"), QStringLiteral("Launch the client when Windows starts."), true, QStringLiteral("startup")},
+        {QStringLiteral("Start game when Load is pressed?"), QStringLiteral("Temporary testing switch. Off skips launching and waiting for Siege."), false, QStringLiteral("start_game_on_load")},
     };
+    QSettings storedSettings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
     for (const auto& toggle : toggles) {
-        auto* row = new ToggleRow(toggle.title, toggle.description, toggle.value, settings);
+        auto* row = new ToggleRow(
+            toggle.title,
+            toggle.description,
+            storedSettings.value(QStringLiteral("settings/") + toggle.key, toggle.value).toBool(),
+            settings
+        );
         connect(row, &ToggleRow::toggled, this, [this, key = toggle.key](bool value) {
             Q_EMIT settingChanged(key, value);
         });
@@ -456,7 +463,6 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
     rateLayout->addWidget(rateBox);
     settingsLayout->addWidget(rate);
 
-    QSettings storedSettings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
     auto* speech = new CardFrame(settings, false);
     auto* speechLayout = new QVBoxLayout(speech);
     speechLayout->setContentsMargins(16, 12, 16, 12);

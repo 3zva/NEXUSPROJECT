@@ -103,6 +103,7 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
         {QStringLiteral("operators"), QStringLiteral("Operators"), QStringLiteral("operators")},
         {QStringLiteral("sensitivity_converter"), QStringLiteral("Sensitivity & FOV"), QStringLiteral("target")},
         {QStringLiteral("save_files"), QStringLiteral("Save Files"), QStringLiteral("save")},
+        {QStringLiteral("client"), QStringLiteral("Client Settings"), QStringLiteral("settings")},
         {QStringLiteral("settings"), QStringLiteral("Settings"), QStringLiteral("settings")},
     };
     for (const auto& definition : navigation) {

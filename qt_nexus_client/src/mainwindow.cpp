@@ -767,12 +767,21 @@ void MainWindow::connectApplicationPages() {
             ).toStringList());
             m_launchReadiness->setClientReady(false);
             restoreSavedScreenRegion();
-            m_launchReadiness->beginWaitingForSiege();
-            launchRainbowSixSiege();
-            if (m_launchReadiness->siegeDetected()) {
+            const bool startGameOnLoad = settings.value(
+                QStringLiteral("settings/start_game_on_load"),
+                false
+            ).toBool();
+            if (startGameOnLoad) {
+                m_launchReadiness->beginWaitingForSiege();
+                launchRainbowSixSiege();
+                if (m_launchReadiness->siegeDetected()) {
+                    setLoadClientReady();
+                }
+                m_launchReadiness->setClientReady(true);
+            } else {
                 setLoadClientReady();
+                QTimer::singleShot(350, this, &MainWindow::finishLoadProgress);
             }
-            m_launchReadiness->setClientReady(true);
         });
     });
 
