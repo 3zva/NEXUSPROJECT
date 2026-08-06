@@ -425,10 +425,8 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
 
     struct ToggleDefinition { QString title; QString description; bool value; QString key; };
     const QList<ToggleDefinition> toggles{
-        {QStringLiteral("Mute all client sounds?"), QStringLiteral("Disable interface sounds only."), false, QStringLiteral("mute_sounds")},
         {QStringLiteral("Show FPS of client?"), QStringLiteral("Display the client rendering rate."), true, QStringLiteral("show_fps")},
         {QStringLiteral("Enable performance mode?"), QStringLiteral("Reduce decorative animation and background work."), true, QStringLiteral("performance_mode")},
-        {QStringLiteral("Outline crosshairs? (Glitchy)"), QStringLiteral("Experimental client-only outline rendering."), false, QStringLiteral("outline_crosshairs")},
         {QStringLiteral("Minimize to system tray?"), QStringLiteral("Keep NEXUS available without a taskbar window."), true, QStringLiteral("minimize_to_tray")},
         {QStringLiteral("Start NEXUS on system startup?"), QStringLiteral("Launch the client when Windows starts."), true, QStringLiteral("startup")},
         {QStringLiteral("Start game when Load is pressed?"), QStringLiteral("Temporary testing switch. Off skips launching and waiting for Siege."), false, QStringLiteral("start_game_on_load")},
