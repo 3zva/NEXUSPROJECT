@@ -713,7 +713,6 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
     createSlider(QStringLiteral("Target confidence required"), QStringLiteral("native_detector/confidence_percent"), 5, 95, 30, QStringLiteral("%"));
     createSlider(QStringLiteral("Maximum trigger FPS"), QStringLiteral("native_detector/fps_cap"), 0, 240, 0, QString());
     createSlider(QStringLiteral("Keep firing after target loss"), QStringLiteral("native_detector/hold_delay_ms"), 0, 500, 185, QStringLiteral("ms"));
-    createSlider(QStringLiteral("Delay before first shot"), QStringLiteral("native_detector/trigger_press_delay_ms"), 0, 800, 392, QStringLiteral("ms"));
     createSlider(QStringLiteral("Trigger zone width"), QStringLiteral("native_detector/activation_gate_width"), 20, 420, 120, QString());
     createSlider(QStringLiteral("Trigger zone height"), QStringLiteral("native_detector/activation_gate_height"), 20, 420, 120, QString());
 

@@ -84,6 +84,9 @@ private:
     bool writeNativeDetectorConfig();
     void updateNativeDetectorStatus();
     bool ensureNativeDetectorLoaded(const QString& detectorDir);
+    void configureNativeDetector();
+    void updateNativeDetectorLoadoutDelays(const QVariantMap& operatorSettings);
+    [[nodiscard]] int triggerDelayMsForWeapon(const QString& weaponName, const QVariantMap& attachments, const QString& weaponSlot) const;
     void launchRainbowSixSiege();
     bool shouldStartWindowDrag(QObject* watched, QEvent* event) const;
     void publishOperatorProfile(const QString& operatorId);
@@ -122,10 +125,25 @@ private:
         int lmbEnabled = 0;
         int mouseHolding = 0;
     };
+    struct NativeDetectorSettings {
+        int triggerEnabled = 1;
+        int lmbEnabled = 1;
+        int bHoldModeEnabled = 0;
+        double confidence = 0.30;
+        int fpsCap = 0;
+        int holdDelayMs = 185;
+        int primaryTriggerPressDelayMs = 382;
+        int secondaryTriggerPressDelayMs = 202;
+        int activationGateWidth = 120;
+        int activationGateHeight = 120;
+        int targetClass = 1;
+    };
     using NativeDetectorStatusFn = bool(__stdcall*)(NativeDetectorStatus*);
+    using NativeDetectorConfigureFn = bool(__stdcall*)(const NativeDetectorSettings*);
     NativeDetectorStartFn m_nativeDetectorStart = nullptr;
     NativeDetectorStopFn m_nativeDetectorStop = nullptr;
     NativeDetectorStatusFn m_nativeDetectorStatus = nullptr;
+    NativeDetectorConfigureFn m_nativeDetectorConfigure = nullptr;
     AuthSession m_pendingSession;
     QVariantMap m_lastPublishedOperatorSettings;
     QString m_startupInstallPath;

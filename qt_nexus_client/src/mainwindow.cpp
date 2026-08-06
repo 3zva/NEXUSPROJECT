@@ -827,6 +827,10 @@ void MainWindow::connectApplicationPages() {
     });
     connect(m_authenticatedRoot, &AuthenticatedRoot::operatorSettingsResetRequested,
             this, &MainWindow::publishOperatorProfile);
+    connect(m_authenticatedRoot, &AuthenticatedRoot::operatorLoadoutSelectionChanged,
+            this, [this](const QString& operatorId, const QString&, const QString&, const QVariantMap&, const QVariantMap&) {
+        updateNativeDetectorLoadoutDelays(m_authenticatedRoot->operatorSettingsFor(operatorId));
+    });
     connect(m_authenticatedRoot, &AuthenticatedRoot::resetOperatorsRequested,
             this, [this]() {
         publishRuntimeCommand(QStringLiteral("settings"), QStringLiteral("DISABLE"));
@@ -1158,13 +1162,14 @@ void MainWindow::applyClientSetting(const QString& key, const QVariant& value) {
         // Stored setting. Runtime audio feedback is handled by the native backend.
     } else if (key.startsWith(QStringLiteral("native_detector/"))) {
         writeNativeDetectorConfig();
+        configureNativeDetector();
         if (m_restoringClientSettings) {
             return;
         }
         if (key == QStringLiteral("native_detector/enabled") && !value.toBool()) {
             stopNativeDetector();
-        } else {
-            restartNativeDetector();
+        } else if (key == QStringLiteral("native_detector/enabled")) {
+            startNativeDetector();
         }
     } else if (key == QStringLiteral("auto_updates")) {
         if (value.toBool()) {
@@ -1769,6 +1774,8 @@ bool MainWindow::writeNativeDetectorConfig() {
     const int fpsCap = qMax(0, settings.value(QStringLiteral("settings/native_detector/fps_cap"), 0).toInt());
     const int holdDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/hold_delay_ms"), 185).toInt());
     const int pressDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/trigger_press_delay_ms"), 392).toInt());
+    const int primaryPressDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/primary_trigger_press_delay_ms"), 382).toInt());
+    const int secondaryPressDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/secondary_trigger_press_delay_ms"), 202).toInt());
     const int gateWidth = qMax(1, settings.value(QStringLiteral("settings/native_detector/activation_gate_width"), 120).toInt());
     const int gateHeight = qMax(1, settings.value(QStringLiteral("settings/native_detector/activation_gate_height"), 120).toInt());
     const int targetClass = qBound(-1, settings.value(QStringLiteral("settings/native_detector/target_class"), 1).toInt(), 1);
@@ -1815,6 +1822,8 @@ bool MainWindow::writeNativeDetectorConfig() {
         QStringLiteral("activation_gate_height=%1").arg(gateHeight),
         QStringLiteral("hold_delay_ms=%1").arg(holdDelay),
         QStringLiteral("trigger_press_delay_ms=%1").arg(pressDelay),
+        QStringLiteral("primary_trigger_press_delay_ms=%1").arg(primaryPressDelay),
+        QStringLiteral("secondary_trigger_press_delay_ms=%1").arg(secondaryPressDelay),
         QStringLiteral("target_class=%1").arg(targetClass),
         QStringLiteral("toggle_key=0x77"),
         QStringLiteral("lmb_toggle_key=0x76"),
@@ -1859,6 +1868,7 @@ void MainWindow::startNativeDetector() {
     }
 
     if (m_nativeDetectorStart(reinterpret_cast<const wchar_t*>(QDir::toNativeSeparators(detectorDir).utf16()))) {
+        configureNativeDetector();
         updateNativeDetectorStatus();
     }
 }
@@ -1892,7 +1902,7 @@ void MainWindow::updateNativeDetectorStatus() {
 }
 
 bool MainWindow::ensureNativeDetectorLoaded(const QString& detectorDir) {
-    if (m_nativeDetectorStart != nullptr && m_nativeDetectorStop != nullptr && m_nativeDetectorStatus != nullptr) {
+    if (m_nativeDetectorStart != nullptr && m_nativeDetectorStop != nullptr && m_nativeDetectorStatus != nullptr && m_nativeDetectorConfigure != nullptr) {
         return true;
     }
 
@@ -1922,7 +1932,128 @@ bool MainWindow::ensureNativeDetectorLoaded(const QString& detectorDir) {
     m_nativeDetectorStatus = reinterpret_cast<NativeDetectorStatusFn>(
         m_nativeDetectorLibrary->resolve("NexusNativeDetectorStatus")
     );
-    return m_nativeDetectorStart != nullptr && m_nativeDetectorStop != nullptr && m_nativeDetectorStatus != nullptr;
+    m_nativeDetectorConfigure = reinterpret_cast<NativeDetectorConfigureFn>(
+        m_nativeDetectorLibrary->resolve("NexusNativeDetectorConfigure")
+    );
+    return m_nativeDetectorStart != nullptr
+        && m_nativeDetectorStop != nullptr
+        && m_nativeDetectorStatus != nullptr
+        && m_nativeDetectorConfigure != nullptr;
+}
+
+void MainWindow::configureNativeDetector() {
+    if (m_nativeDetectorConfigure == nullptr) {
+        return;
+    }
+
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    NativeDetectorSettings liveSettings{};
+    liveSettings.triggerEnabled = settings.value(QStringLiteral("settings/native_detector/trigger_enabled"), true).toBool() ? 1 : 0;
+    liveSettings.lmbEnabled = settings.value(QStringLiteral("settings/native_detector/lmb_enabled"), true).toBool() ? 1 : 0;
+    liveSettings.bHoldModeEnabled = settings.value(QStringLiteral("settings/native_detector/b_hold_mode_enabled"), false).toBool() ? 1 : 0;
+    liveSettings.confidence = static_cast<double>(qBound(
+        5,
+        settings.value(QStringLiteral("settings/native_detector/confidence_percent"), 30).toInt(),
+        95
+    )) / 100.0;
+    liveSettings.fpsCap = qMax(0, settings.value(QStringLiteral("settings/native_detector/fps_cap"), 0).toInt());
+    liveSettings.holdDelayMs = qMax(0, settings.value(QStringLiteral("settings/native_detector/hold_delay_ms"), 185).toInt());
+    liveSettings.primaryTriggerPressDelayMs = qMax(0, settings.value(QStringLiteral("settings/native_detector/primary_trigger_press_delay_ms"), 382).toInt());
+    liveSettings.secondaryTriggerPressDelayMs = qMax(0, settings.value(QStringLiteral("settings/native_detector/secondary_trigger_press_delay_ms"), 202).toInt());
+    liveSettings.activationGateWidth = qMax(1, settings.value(QStringLiteral("settings/native_detector/activation_gate_width"), 120).toInt());
+    liveSettings.activationGateHeight = qMax(1, settings.value(QStringLiteral("settings/native_detector/activation_gate_height"), 120).toInt());
+    liveSettings.targetClass = qBound(-1, settings.value(QStringLiteral("settings/native_detector/target_class"), 1).toInt(), 1);
+    m_nativeDetectorConfigure(&liveSettings);
+}
+
+void MainWindow::updateNativeDetectorLoadoutDelays(const QVariantMap& operatorSettings) {
+    if (operatorSettings.isEmpty()) {
+        return;
+    }
+
+    const QVariantMap primary = operatorSettings.value(QStringLiteral("primary")).toMap();
+    const QVariantMap secondary = operatorSettings.value(QStringLiteral("secondary")).toMap();
+    const int primaryDelay = triggerDelayMsForWeapon(
+        primary.value(QStringLiteral("selected_weapon")).toString(),
+        primary.value(QStringLiteral("attachments")).toMap(),
+        QStringLiteral("primary")
+    );
+    const int secondaryDelay = triggerDelayMsForWeapon(
+        secondary.value(QStringLiteral("selected_weapon")).toString(),
+        secondary.value(QStringLiteral("attachments")).toMap(),
+        QStringLiteral("secondary")
+    );
+
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    settings.setValue(QStringLiteral("settings/native_detector/primary_trigger_press_delay_ms"), primaryDelay);
+    settings.setValue(QStringLiteral("settings/native_detector/secondary_trigger_press_delay_ms"), secondaryDelay);
+    settings.setValue(
+        QStringLiteral("settings/native_detector/trigger_press_delay_ms"),
+        operatorSettings.value(QStringLiteral("active_weapon")).toString().compare(QStringLiteral("secondary"), Qt::CaseInsensitive) == 0
+            ? secondaryDelay
+            : primaryDelay
+    );
+    settings.sync();
+    writeNativeDetectorConfig();
+    configureNativeDetector();
+}
+
+int MainWindow::triggerDelayMsForWeapon(const QString& weaponName, const QVariantMap& attachments, const QString& weaponSlot) const {
+    const QString normalized = weaponName.trimmed().toUpper();
+    const bool secondary = weaponSlot.compare(QStringLiteral("secondary"), Qt::CaseInsensitive) == 0;
+
+    const QStringList dmrOrSniper{
+        QStringLiteral("417"), QStringLiteral("CAMRS"), QStringLiteral("MK 14"), QStringLiteral("AR-15.50"),
+        QStringLiteral("OTs-03"), QStringLiteral("CSRX"), QStringLiteral("SR-25"), QStringLiteral("TCSG12")
+    };
+    const QStringList lmg{
+        QStringLiteral("6P41"), QStringLiteral("G8A1"), QStringLiteral("LMG-E"), QStringLiteral("ALDA"), QStringLiteral("M249")
+    };
+    const QStringList shotgun{
+        QStringLiteral("M590"), QStringLiteral("SG-CQB"), QStringLiteral("M1014"), QStringLiteral("SUPERNOVA"),
+        QStringLiteral("SASG"), QStringLiteral("ITA12"), QStringLiteral("FO-12"), QStringLiteral("BOSG"),
+        QStringLiteral("SUPER SHORTY"), QStringLiteral("BAILIFF")
+    };
+    const QStringList machinePistol{
+        QStringLiteral("SMG-11"), QStringLiteral("SMG-12"), QStringLiteral("BEARING"), QStringLiteral("SPSMG9"),
+        QStringLiteral("C75")
+    };
+    const QStringList smg{
+        QStringLiteral("MP5"), QStringLiteral("MP7"), QStringLiteral("MPX"), QStringLiteral("P10 RONI"),
+        QStringLiteral("9X19VSN"), QStringLiteral("T-5"), QStringLiteral("SCORPION"), QStringLiteral("VECTOR"),
+        QStringLiteral("Mx4"), QStringLiteral("UMP45"), QStringLiteral("M12"), QStringLiteral("FMG-9")
+    };
+
+    auto containsAny = [&normalized](const QStringList& needles) {
+        for (const QString& needle : needles) {
+            if (normalized.contains(needle.toUpper())) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    int delayMs = 382;
+    if (secondary && containsAny(machinePistol)) {
+        delayMs = 302;
+    } else if (secondary) {
+        delayMs = 202;
+    } else if (containsAny(dmrOrSniper) || containsAny(lmg)) {
+        delayMs = 452;
+    } else if (containsAny(shotgun)) {
+        delayMs = 342;
+    } else if (containsAny(smg)) {
+        delayMs = 302;
+    }
+
+    const bool hasLaser = attachments.value(QStringLiteral("underbarrel")).toString().compare(
+        QStringLiteral("laser"),
+        Qt::CaseInsensitive
+    ) == 0;
+    if (hasLaser) {
+        delayMs = qRound(static_cast<double>(delayMs) * 0.90);
+    }
+    return qMax(0, delayMs);
 }
 
 void MainWindow::launchRainbowSixSiege() {
@@ -2201,11 +2332,15 @@ void MainWindow::publishOperatorProfile(const QString& operatorId) {
 }
 
 void MainWindow::publishOperatorSettings(const QVariantMap& settings) {
-    if (settings.isEmpty() || m_runtimeNetwork == nullptr) {
+    if (settings.isEmpty()) {
         return;
     }
 
     m_lastPublishedOperatorSettings = settings;
+    updateNativeDetectorLoadoutDelays(settings);
+    if (m_runtimeNetwork == nullptr) {
+        return;
+    }
     publishRuntimeCommand(QStringLiteral("settings"), automationPayloadForSettings(settings));
 
     const QVariantMap primary = settings.value(QStringLiteral("primary")).toMap();
