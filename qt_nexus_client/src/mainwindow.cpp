@@ -1784,7 +1784,7 @@ bool MainWindow::writeNativeDetectorConfig() {
         QStringLiteral("training_capture_height=1080"),
         QString(),
         QStringLiteral("[Model]"),
-        QStringLiteral("path=models\\best.engine"),
+        QStringLiteral("path=models\\NEXUS.engine"),
         QStringLiteral("input_size=416"),
         QStringLiteral("confidence=%1").arg(confidence, 0, 'f', 2),
         QStringLiteral("iou=0.45"),
