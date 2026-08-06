@@ -102,6 +102,7 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
         {QStringLiteral("dashboard"), QStringLiteral("Dashboard"), QStringLiteral("dashboard")},
         {QStringLiteral("operators"), QStringLiteral("Operators"), QStringLiteral("operators")},
         {QStringLiteral("sensitivity_converter"), QStringLiteral("Sensitivity & FOV"), QStringLiteral("target")},
+        {QStringLiteral("native_detector"), QStringLiteral("Native Detector"), QStringLiteral("target")},
         {QStringLiteral("save_files"), QStringLiteral("Save Files"), QStringLiteral("save")},
         {QStringLiteral("client"), QStringLiteral("Client Settings"), QStringLiteral("settings")},
         {QStringLiteral("settings"), QStringLiteral("Settings"), QStringLiteral("settings")},
@@ -177,6 +178,7 @@ void AuthenticatedRoot::buildPages() {
     m_operators = new OperatorsPage(m_stack);
     m_saveFiles = new SaveFilesPage(m_stack);
     m_clientSettings = new ClientSettingsPage(m_stack);
+    m_nativeDetector = new NativeDetectorPage(m_stack);
     m_settings = new SettingsPage(m_stack);
     m_moreOptions = new MoreOptionsPage(m_stack);
     m_sensitivityConverter = new SensitivityFovConverterPage(m_stack);
@@ -188,6 +190,7 @@ void AuthenticatedRoot::buildPages() {
     m_stack->addWidget(m_operators);
     m_stack->addWidget(m_saveFiles);
     m_stack->addWidget(m_clientSettings);
+    m_stack->addWidget(m_nativeDetector);
     m_stack->addWidget(m_settings);
     m_stack->addWidget(m_moreOptions);
     m_stack->addWidget(m_sensitivityConverter);
@@ -197,6 +200,7 @@ void AuthenticatedRoot::buildPages() {
     m_pages.insert(QStringLiteral("operators"), m_operators);
     m_pages.insert(QStringLiteral("save_files"), m_saveFiles);
     m_pages.insert(QStringLiteral("client"), m_clientSettings);
+    m_pages.insert(QStringLiteral("native_detector"), m_nativeDetector);
     m_pages.insert(QStringLiteral("settings"), m_settings);
     m_pages.insert(QStringLiteral("more_options"), m_moreOptions);
     m_pages.insert(QStringLiteral("sensitivity_converter"), m_sensitivityConverter);
@@ -329,6 +333,9 @@ void AuthenticatedRoot::buildPages() {
             this, &AuthenticatedRoot::settingChanged);
     connect(m_clientSettings, &ClientSettingsPage::exitRequested,
             this, &AuthenticatedRoot::exitRequested);
+
+    connect(m_nativeDetector, &NativeDetectorPage::settingChanged,
+            this, &AuthenticatedRoot::settingChanged);
 
     connect(m_settings, &SettingsPage::settingChanged,
             this, &AuthenticatedRoot::settingChanged);

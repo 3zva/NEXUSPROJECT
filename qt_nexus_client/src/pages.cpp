@@ -690,6 +690,139 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
     bodyLayout->addStretch();
 }
 
+NativeDetectorPage::NativeDetectorPage(QWidget* parent)
+    : QWidget(parent) {
+    auto* root = new QVBoxLayout(this);
+    root->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout* bodyLayout = nullptr;
+    root->addWidget(createScrollableBody(this, bodyLayout));
+    bodyLayout->addWidget(new PageHeading(
+        QStringLiteral("NATIVE DETECTOR"),
+        QStringLiteral("Configure the bundled body/head detector helper."),
+        this
+    ));
+
+    QSettings storedSettings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    auto* detector = new CardFrame(this, true);
+    auto* detectorLayout = new QVBoxLayout(detector);
+    detectorLayout->setContentsMargins(18, 16, 18, 16);
+    detectorLayout->setSpacing(12);
+
+    auto* detectorHeader = new QHBoxLayout();
+    auto* detectorText = new QVBoxLayout();
+    detectorText->setSpacing(2);
+    auto* detectorLabel = new QLabel(QStringLiteral("Native detector runtime"), detector);
+    detectorLabel->setFont(NexusTheme::font(11, QFont::Bold));
+    detectorText->addWidget(detectorLabel);
+    detectorText->addWidget(bodyText(
+        QStringLiteral("Enable the bundled detector, tune target filtering, and control the native input trigger behavior."),
+        detector
+    ));
+    auto* detectorEnabled = new QCheckBox(detector);
+    detectorEnabled->setChecked(storedSettings.value(QStringLiteral("settings/native_detector/enabled"), false).toBool());
+    detectorEnabled->setCursor(Qt::PointingHandCursor);
+    connect(detectorEnabled, &QCheckBox::toggled, this, [this](bool enabled) {
+        Q_EMIT settingChanged(QStringLiteral("native_detector/enabled"), enabled);
+    });
+    detectorHeader->addLayout(detectorText, 1);
+    detectorHeader->addWidget(detectorEnabled, 0, Qt::AlignTop);
+    detectorLayout->addLayout(detectorHeader);
+
+    auto createToggle = [this, detector, detectorLayout, &storedSettings](
+        const QString& label,
+        const QString& key,
+        bool defaultValue
+    ) {
+        auto* row = new ToggleRow(
+            label,
+            QString(),
+            storedSettings.value(QStringLiteral("settings/") + key, defaultValue).toBool(),
+            detector
+        );
+        connect(row, &ToggleRow::toggled, this, [this, key](bool value) {
+            Q_EMIT settingChanged(key, value);
+        });
+        detectorLayout->addWidget(row);
+    };
+
+    createToggle(QStringLiteral("Show preview window?"), QStringLiteral("native_detector/preview"), false);
+    createToggle(QStringLiteral("Show status window?"), QStringLiteral("native_detector/status_window"), true);
+    createToggle(QStringLiteral("Enable trigger logic?"), QStringLiteral("native_detector/trigger_enabled"), true);
+    createToggle(QStringLiteral("Enable automated LMB?"), QStringLiteral("native_detector/lmb_enabled"), true);
+    createToggle(QStringLiteral("Use hold-B activation mode?"), QStringLiteral("native_detector/b_hold_mode_enabled"), false);
+
+    auto createSlider = [this, detector, detectorLayout, &storedSettings](
+        const QString& label,
+        const QString& key,
+        int minimum,
+        int maximum,
+        int defaultValue,
+        const QString& suffix
+    ) {
+        auto* row = new QHBoxLayout();
+        auto* title = new QLabel(label, detector);
+        title->setProperty("muted", true);
+        auto* valueLabel = new QLabel(detector);
+        valueLabel->setProperty("accent", true);
+        valueLabel->setMinimumWidth(54);
+        valueLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        auto* slider = new QSlider(Qt::Horizontal, detector);
+        slider->setRange(minimum, maximum);
+        slider->setValue(storedSettings.value(QStringLiteral("settings/") + key, defaultValue).toInt());
+        slider->setCursor(Qt::PointingHandCursor);
+        slider->setStyleSheet(QStringLiteral(R"QSS(
+            QSlider::groove:horizontal { height: 8px; border-radius: 4px; background: #252D40; }
+            QSlider::sub-page:horizontal { border-radius: 4px; background: #765BFF; }
+            QSlider::add-page:horizontal { border-radius: 4px; background: #131A2A; }
+            QSlider::handle:horizontal {
+                width: 18px; height: 18px; margin: -6px 0;
+                border-radius: 9px; background: #F7F9FF; border: 2px solid #765BFF;
+            }
+            QSlider::handle:horizontal:hover { background: #A898FF; }
+        )QSS"));
+        auto updateValue = [valueLabel, suffix](int value) {
+            valueLabel->setText(QStringLiteral("%1%2").arg(value).arg(suffix));
+        };
+        updateValue(slider->value());
+        connect(slider, &QSlider::valueChanged, this, [this, key, updateValue](int value) {
+            updateValue(value);
+            Q_EMIT settingChanged(key, value);
+        });
+        row->addWidget(title);
+        row->addWidget(slider, 1);
+        row->addWidget(valueLabel);
+        detectorLayout->addLayout(row);
+    };
+
+    createSlider(QStringLiteral("Confidence"), QStringLiteral("native_detector/confidence_percent"), 5, 95, 30, QStringLiteral("%"));
+    createSlider(QStringLiteral("FPS cap"), QStringLiteral("native_detector/fps_cap"), 0, 240, 0, QString());
+    createSlider(QStringLiteral("Hold delay"), QStringLiteral("native_detector/hold_delay_ms"), 0, 500, 185, QStringLiteral("ms"));
+    createSlider(QStringLiteral("Press delay"), QStringLiteral("native_detector/trigger_press_delay_ms"), 0, 800, 392, QStringLiteral("ms"));
+    createSlider(QStringLiteral("Gate width"), QStringLiteral("native_detector/activation_gate_width"), 20, 420, 120, QString());
+    createSlider(QStringLiteral("Gate height"), QStringLiteral("native_detector/activation_gate_height"), 20, 420, 120, QString());
+
+    auto* targetRow = new QHBoxLayout();
+    auto* targetLabel = new QLabel(QStringLiteral("Target class"), detector);
+    targetLabel->setFont(NexusTheme::font(10, QFont::DemiBold));
+    auto* targetBox = new QComboBox(detector);
+    targetBox->addItem(QStringLiteral("Any"), -1);
+    targetBox->addItem(QStringLiteral("Body"), 0);
+    targetBox->addItem(QStringLiteral("Head"), 1);
+    const int targetClass = storedSettings.value(QStringLiteral("settings/native_detector/target_class"), 1).toInt();
+    const int targetIndex = targetBox->findData(targetClass);
+    targetBox->setCurrentIndex(targetIndex >= 0 ? targetIndex : 2);
+    targetBox->setFixedWidth(110);
+    connect(targetBox, &QComboBox::currentIndexChanged, this, [this, targetBox](int) {
+        Q_EMIT settingChanged(QStringLiteral("native_detector/target_class"), targetBox->currentData().toInt());
+    });
+    targetRow->addWidget(targetLabel, 1);
+    targetRow->addWidget(targetBox);
+    detectorLayout->addLayout(targetRow);
+
+    bodyLayout->addWidget(detector);
+    bodyLayout->addStretch();
+}
+
 SettingsPage::SettingsPage(QWidget* parent)
     : QWidget(parent) {
     auto* root = new QVBoxLayout(this);

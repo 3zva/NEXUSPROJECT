@@ -63,6 +63,14 @@ Q_SIGNALS:
     void exitRequested();
 };
 
+class NativeDetectorPage final : public QWidget {
+    Q_OBJECT
+public:
+    explicit NativeDetectorPage(QWidget* parent = nullptr);
+Q_SIGNALS:
+    void settingChanged(const QString& key, const QVariant& value);
+};
+
 class SettingsPage final : public QWidget {
     Q_OBJECT
 public:

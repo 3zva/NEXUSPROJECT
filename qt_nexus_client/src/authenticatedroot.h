@@ -20,6 +20,7 @@ class DashboardPage;
 class OperatorsPage;
 class SaveFilesPage;
 class ClientSettingsPage;
+class NativeDetectorPage;
 class SettingsPage;
 class OperatorSettingsPage;
 class MoreOptionsPage;
@@ -154,6 +155,7 @@ private:
     OperatorsPage* m_operators = nullptr;
     SaveFilesPage* m_saveFiles = nullptr;
     ClientSettingsPage* m_clientSettings = nullptr;
+    NativeDetectorPage* m_nativeDetector = nullptr;
     SettingsPage* m_settings = nullptr;
     OperatorSettingsPage* m_operatorSettings = nullptr;
     MoreOptionsPage* m_moreOptions = nullptr;
