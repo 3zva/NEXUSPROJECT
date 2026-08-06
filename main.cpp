@@ -27,6 +27,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cctype>
+#include <cwctype>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
@@ -200,6 +201,7 @@ std::wstring QuoteArg(const std::wstring& value);
 std::wstring PowerShellSingleQuoted(const std::wstring& value);
 void LaunchHiddenUtility(const std::wstring& commandLine);
 bool LaunchRainbowSixSiege(std::wstring* errorMessage = nullptr);
+bool ShouldStartGameWhenLoadIsPressed();
 bool IsRainbowSixSiegeRunning();
 void KillRainbowSixSiegeProcesses();
 void StartRuntimeThreads();
@@ -1105,6 +1107,46 @@ bool LaunchRainbowSixSiege(std::wstring* errorMessage) {
         *errorMessage = L"Rainbow Six Siege was found, but Windows could not launch it.";
     }
     return false;
+}
+
+bool ShouldStartGameWhenLoadIsPressed() {
+    DWORD type = 0;
+    wchar_t buffer[32] = L"";
+    DWORD bufferSize = sizeof(buffer);
+    const LSTATUS status = RegGetValueW(
+        HKEY_CURRENT_USER,
+        L"Software\\NEXUS\\NEXUS Client\\settings",
+        L"start_game_on_load",
+        RRF_RT_REG_SZ | RRF_RT_REG_DWORD,
+        &type,
+        buffer,
+        &bufferSize
+    );
+    if (status != ERROR_SUCCESS) {
+        return false;
+    }
+    if (type == REG_DWORD) {
+        DWORD value = 0;
+        DWORD valueSize = sizeof(value);
+        if (RegGetValueW(
+                HKEY_CURRENT_USER,
+                L"Software\\NEXUS\\NEXUS Client\\settings",
+                L"start_game_on_load",
+                RRF_RT_REG_DWORD,
+                nullptr,
+                &value,
+                &valueSize
+            ) == ERROR_SUCCESS) {
+            return value != 0;
+        }
+        return false;
+    }
+
+    std::wstring value = buffer;
+    std::transform(value.begin(), value.end(), value.begin(), [](wchar_t ch) {
+        return static_cast<wchar_t>(std::towlower(ch));
+    });
+    return value == L"true" || value == L"1" || value == L"yes";
 }
 
 std::vector<std::wstring> RainbowSixProcessNames() {
@@ -2869,7 +2911,8 @@ std::string HandleLoaderApi(const std::string& path, const std::string& body) {
         g_installDir = Utf8ToWide(JsonStringValue(body, "installPath"));
         if (g_installDir.empty()) return JsonError("Select an installation folder first.");
         try {
-            if (IsRainbowSixSiegeRunning()) {
+            const bool startGameOnLoad = ShouldStartGameWhenLoadIsPressed();
+            if (startGameOnLoad && IsRainbowSixSiegeRunning()) {
                 MessageBoxW(
                     g_hwnd,
                     L"Never load NEXUS while Rainbow Six Siege is open.\n\nRainbow Six Siege will be closed first.",
@@ -2881,8 +2924,10 @@ std::string HandleLoaderApi(const std::string& path, const std::string& body) {
             }
             SaveLastInstallPath(g_installDir);
             fs::path installedExe = InstallAndLaunchClientCopy(g_installDir);
-            std::wstring gameLaunchError;
-            LaunchRainbowSixSiege(&gameLaunchError);
+            if (startGameOnLoad) {
+                std::wstring gameLaunchError;
+                LaunchRainbowSixSiege(&gameLaunchError);
+            }
             std::thread([] {
                 std::this_thread::sleep_for(std::chrono::milliseconds(650));
                 PostMessageW(g_hwnd, WM_CLOSE, 0, 0);
