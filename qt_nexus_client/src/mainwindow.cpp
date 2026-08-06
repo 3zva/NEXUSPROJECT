@@ -1166,6 +1166,7 @@ void MainWindow::restoreSavedClientSettings() {
     m_restoringClientSettings = false;
     writeNativeDetectorConfig();
     startNativeDetector();
+    applyPerformanceMode(settings.value(QStringLiteral("settings/performance_mode"), false).toBool());
 }
 
 void MainWindow::applyClientSetting(const QString& key, const QVariant& value) {
@@ -1393,7 +1394,14 @@ void MainWindow::setClientRefreshRate(int refreshRate) {
 void MainWindow::applyPerformanceMode(bool enabled) {
     setClientRefreshRate(enabled ? 30 : 60);
     writeNativeDetectorConfig();
-    configureNativeDetector();
+
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    const bool detectorEnabled = settings.value(QStringLiteral("settings/native_detector/enabled"), false).toBool();
+    if (!m_restoringClientSettings && detectorEnabled && isNativeDetectorRunning()) {
+        restartNativeDetector();
+    } else {
+        configureNativeDetector();
+    }
 
     QRect region;
     QString displayId;
@@ -1985,6 +1993,15 @@ void MainWindow::updateNativeDetectorStatus() {
         status.inferenceMs,
         status.detections
     );
+}
+
+bool MainWindow::isNativeDetectorRunning() const {
+    if (m_nativeDetectorStatus == nullptr) {
+        return false;
+    }
+
+    NativeDetectorStatus status{};
+    return m_nativeDetectorStatus(&status) && status.running != 0;
 }
 
 bool MainWindow::ensureNativeDetectorLoaded(const QString& detectorDir) {

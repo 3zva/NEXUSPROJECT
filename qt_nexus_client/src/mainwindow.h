@@ -88,6 +88,7 @@ private:
     void restartNativeDetector();
     bool writeNativeDetectorConfig();
     void updateNativeDetectorStatus();
+    [[nodiscard]] bool isNativeDetectorRunning() const;
     bool ensureNativeDetectorLoaded(const QString& detectorDir);
     void configureNativeDetector();
     void updateNativeDetectorLoadoutDelays(const QVariantMap& operatorSettings);
