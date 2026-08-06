@@ -35,6 +35,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QLibrary>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -1832,31 +1833,9 @@ bool MainWindow::writeNativeDetectorConfig() {
 }
 
 void MainWindow::stopNativeDetector() {
-    const QString rootPath = m_authenticatedRoot->installationPath().isEmpty()
-        ? packageRootDirectory()
-        : m_authenticatedRoot->installationPath();
-    const QString detectorDir = QDir(runtimeDirectoryForRoot(rootPath)).filePath(QStringLiteral("native-detector"));
-    const QString pidMarker = QDir(detectorDir).filePath(QStringLiteral("current_native_detector_pid.txt"));
-    const QString statusPath = QDir(detectorDir).filePath(QStringLiteral("detector_status.json"));
-    QFile pidFile(pidMarker);
-    if (pidFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        const QString pid = QString::fromUtf8(pidFile.readAll()).trimmed();
-        if (!pid.isEmpty()) {
-            QProcess::execute(QStringLiteral("taskkill.exe"), {
-                QStringLiteral("/PID"),
-                pid,
-                QStringLiteral("/F"),
-                QStringLiteral("/T")
-            });
-        }
+    if (m_nativeDetectorStop != nullptr) {
+        m_nativeDetectorStop();
     }
-    QProcess::execute(QStringLiteral("taskkill.exe"), {
-        QStringLiteral("/IM"),
-        QStringLiteral("R6NativeDetector.exe"),
-        QStringLiteral("/F")
-    });
-    QFile::remove(pidMarker);
-    QFile::remove(statusPath);
     if (m_authenticatedRoot != nullptr) {
         m_authenticatedRoot->setNativeDetectorStatus(false, 0.0, 0.0, 0);
     }
@@ -1875,17 +1854,11 @@ void MainWindow::startNativeDetector() {
         ? packageRootDirectory()
         : m_authenticatedRoot->installationPath();
     const QString detectorDir = QDir(runtimeDirectoryForRoot(rootPath)).filePath(QStringLiteral("native-detector"));
-    const QString toolPath = QDir(detectorDir).filePath(QStringLiteral("R6NativeDetector.exe"));
-    if (!QFileInfo::exists(toolPath)) {
+    if (!ensureNativeDetectorLoaded(detectorDir) || m_nativeDetectorStart == nullptr) {
         return;
     }
 
-    qint64 pid = 0;
-    if (QProcess::startDetached(toolPath, QStringList{}, detectorDir, &pid) && pid > 0) {
-        QFile marker(QDir(detectorDir).filePath(QStringLiteral("current_native_detector_pid.txt")));
-        if (marker.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-            marker.write(QString::number(pid).toUtf8());
-        }
+    if (m_nativeDetectorStart(reinterpret_cast<const wchar_t*>(QDir::toNativeSeparators(detectorDir).utf16()))) {
         updateNativeDetectorStatus();
     }
 }
@@ -1900,35 +1873,56 @@ void MainWindow::updateNativeDetectorStatus() {
         return;
     }
 
-    const QString rootPath = m_authenticatedRoot->installationPath().isEmpty()
-        ? packageRootDirectory()
-        : m_authenticatedRoot->installationPath();
-    const QString statusPath = QDir(QDir(runtimeDirectoryForRoot(rootPath)).filePath(
-        QStringLiteral("native-detector")
-    )).filePath(QStringLiteral("detector_status.json"));
-
-    QFileInfo statusInfo(statusPath);
-    if (!statusInfo.exists()
-        || statusInfo.lastModified().msecsTo(QDateTime::currentDateTime()) > 3000) {
+    if (m_nativeDetectorStatus == nullptr) {
         m_authenticatedRoot->setNativeDetectorStatus(false, 0.0, 0.0, 0);
         return;
     }
 
-    QFile statusFile(statusPath);
-    if (!statusFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    NativeDetectorStatus status{};
+    if (!m_nativeDetectorStatus(&status) || status.running == 0) {
         m_authenticatedRoot->setNativeDetectorStatus(false, 0.0, 0.0, 0);
         return;
     }
-
-    const QJsonDocument document = QJsonDocument::fromJson(statusFile.readAll());
-    const QJsonObject object = document.object();
-    const bool running = object.value(QStringLiteral("running")).toBool(false);
     m_authenticatedRoot->setNativeDetectorStatus(
-        running,
-        object.value(QStringLiteral("fps")).toDouble(0.0),
-        object.value(QStringLiteral("inference_ms")).toDouble(0.0),
-        object.value(QStringLiteral("detections")).toInt(0)
+        true,
+        status.fps,
+        status.inferenceMs,
+        status.detections
     );
+}
+
+bool MainWindow::ensureNativeDetectorLoaded(const QString& detectorDir) {
+    if (m_nativeDetectorStart != nullptr && m_nativeDetectorStop != nullptr && m_nativeDetectorStatus != nullptr) {
+        return true;
+    }
+
+    const QString libraryPath = QDir(detectorDir).filePath(QStringLiteral("NEXUSNativeDetector.dll"));
+    if (!QFileInfo::exists(libraryPath)) {
+        return false;
+    }
+
+#ifdef Q_OS_WIN
+    SetDllDirectoryW(reinterpret_cast<const wchar_t*>(QDir::toNativeSeparators(detectorDir).utf16()));
+#endif
+    if (m_nativeDetectorLibrary == nullptr) {
+        m_nativeDetectorLibrary = new QLibrary(libraryPath, this);
+    } else {
+        m_nativeDetectorLibrary->setFileName(libraryPath);
+    }
+    if (!m_nativeDetectorLibrary->isLoaded() && !m_nativeDetectorLibrary->load()) {
+        return false;
+    }
+
+    m_nativeDetectorStart = reinterpret_cast<NativeDetectorStartFn>(
+        m_nativeDetectorLibrary->resolve("NexusNativeDetectorStart")
+    );
+    m_nativeDetectorStop = reinterpret_cast<NativeDetectorStopFn>(
+        m_nativeDetectorLibrary->resolve("NexusNativeDetectorStop")
+    );
+    m_nativeDetectorStatus = reinterpret_cast<NativeDetectorStatusFn>(
+        m_nativeDetectorLibrary->resolve("NexusNativeDetectorStatus")
+    );
+    return m_nativeDetectorStart != nullptr && m_nativeDetectorStop != nullptr && m_nativeDetectorStatus != nullptr;
 }
 
 void MainWindow::launchRainbowSixSiege() {
