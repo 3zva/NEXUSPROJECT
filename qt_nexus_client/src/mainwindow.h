@@ -81,6 +81,7 @@ private:
     void startNativeDetector();
     void restartNativeDetector();
     bool writeNativeDetectorConfig();
+    void updateNativeDetectorStatus();
     void launchRainbowSixSiege();
     bool shouldStartWindowDrag(QObject* watched, QEvent* event) const;
     void publishOperatorProfile(const QString& operatorId);
@@ -105,6 +106,7 @@ private:
     QSystemTrayIcon* m_trayIcon = nullptr;
     QLabel* m_fpsLabel = nullptr;
     QTimer* m_fpsTimer = nullptr;
+    QTimer* m_detectorStatusTimer = nullptr;
     AuthSession m_pendingSession;
     QVariantMap m_lastPublishedOperatorSettings;
     QString m_startupInstallPath;

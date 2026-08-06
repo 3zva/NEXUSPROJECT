@@ -365,6 +365,10 @@ MainWindow::MainWindow(QWidget* parent)
     m_fpsLabel->hide();
     m_fpsTimer = new QTimer(this);
     connect(m_fpsTimer, &QTimer::timeout, this, &MainWindow::updateFpsLabel);
+    m_detectorStatusTimer = new QTimer(this);
+    m_detectorStatusTimer->setInterval(1000);
+    connect(m_detectorStatusTimer, &QTimer::timeout, this, &MainWindow::updateNativeDetectorStatus);
+    m_detectorStatusTimer->start();
     qApp->installEventFilter(this);
 
     m_rootStack->addWidget(m_authFlow);
@@ -378,6 +382,7 @@ MainWindow::MainWindow(QWidget* parent)
     connectApplicationPages();
     connectUpdater();
     connect(qApp, &QCoreApplication::aboutToQuit, this, [this]() {
+        stopNativeDetector();
         stopRuntimeHelper();
     });
     startOperatorDetectionServer();
@@ -1832,6 +1837,7 @@ void MainWindow::stopNativeDetector() {
         : m_authenticatedRoot->installationPath();
     const QString detectorDir = QDir(runtimeDirectoryForRoot(rootPath)).filePath(QStringLiteral("native-detector"));
     const QString pidMarker = QDir(detectorDir).filePath(QStringLiteral("current_native_detector_pid.txt"));
+    const QString statusPath = QDir(detectorDir).filePath(QStringLiteral("detector_status.json"));
     QFile pidFile(pidMarker);
     if (pidFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         const QString pid = QString::fromUtf8(pidFile.readAll()).trimmed();
@@ -1850,6 +1856,10 @@ void MainWindow::stopNativeDetector() {
         QStringLiteral("/F")
     });
     QFile::remove(pidMarker);
+    QFile::remove(statusPath);
+    if (m_authenticatedRoot != nullptr) {
+        m_authenticatedRoot->setNativeDetectorStatus(false, 0.0, 0.0, 0);
+    }
 }
 
 void MainWindow::startNativeDetector() {
@@ -1876,12 +1886,49 @@ void MainWindow::startNativeDetector() {
         if (marker.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
             marker.write(QString::number(pid).toUtf8());
         }
+        updateNativeDetectorStatus();
     }
 }
 
 void MainWindow::restartNativeDetector() {
     stopNativeDetector();
     startNativeDetector();
+}
+
+void MainWindow::updateNativeDetectorStatus() {
+    if (m_authenticatedRoot == nullptr) {
+        return;
+    }
+
+    const QString rootPath = m_authenticatedRoot->installationPath().isEmpty()
+        ? packageRootDirectory()
+        : m_authenticatedRoot->installationPath();
+    const QString statusPath = QDir(QDir(runtimeDirectoryForRoot(rootPath)).filePath(
+        QStringLiteral("native-detector")
+    )).filePath(QStringLiteral("detector_status.json"));
+
+    QFileInfo statusInfo(statusPath);
+    if (!statusInfo.exists()
+        || statusInfo.lastModified().msecsTo(QDateTime::currentDateTime()) > 3000) {
+        m_authenticatedRoot->setNativeDetectorStatus(false, 0.0, 0.0, 0);
+        return;
+    }
+
+    QFile statusFile(statusPath);
+    if (!statusFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        m_authenticatedRoot->setNativeDetectorStatus(false, 0.0, 0.0, 0);
+        return;
+    }
+
+    const QJsonDocument document = QJsonDocument::fromJson(statusFile.readAll());
+    const QJsonObject object = document.object();
+    const bool running = object.value(QStringLiteral("running")).toBool(false);
+    m_authenticatedRoot->setNativeDetectorStatus(
+        running,
+        object.value(QStringLiteral("fps")).toDouble(0.0),
+        object.value(QStringLiteral("inference_ms")).toDouble(0.0),
+        object.value(QStringLiteral("detections")).toInt(0)
+    );
 }
 
 void MainWindow::launchRainbowSixSiege() {

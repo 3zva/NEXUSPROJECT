@@ -67,8 +67,19 @@ class NativeDetectorPage final : public QWidget {
     Q_OBJECT
 public:
     explicit NativeDetectorPage(QWidget* parent = nullptr);
+    void setDetectorStatus(
+        bool running,
+        double fps,
+        double inferenceMs,
+        int detections
+    );
 Q_SIGNALS:
     void settingChanged(const QString& key, const QVariant& value);
+private:
+    QLabel* m_fpsValue = nullptr;
+    QLabel* m_inferenceValue = nullptr;
+    QLabel* m_detectionValue = nullptr;
+    QLabel* m_statusValue = nullptr;
 };
 
 class SettingsPage final : public QWidget {

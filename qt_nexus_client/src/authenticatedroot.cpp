@@ -448,6 +448,17 @@ void AuthenticatedRoot::setSensitivityConversionError(const QString& message) {
     }
 }
 
+void AuthenticatedRoot::setNativeDetectorStatus(
+    bool running,
+    double fps,
+    double inferenceMs,
+    int detections
+) {
+    if (m_nativeDetector != nullptr) {
+        m_nativeDetector->setDetectorStatus(running, fps, inferenceMs, detections);
+    }
+}
+
 void AuthenticatedRoot::showOperatorDetail(const QString& operatorName) {
     const auto* record = OperatorCatalog::findByDisplayName(operatorName);
     if (record != nullptr) {

@@ -69,6 +69,7 @@ public:
     void setGeneralAppSettings(const QVariantMap& settings);
     void setSensitivityScaleFactors(double horizontalScale, double verticalScale);
     void setSensitivityConversionError(const QString& message);
+    void setNativeDetectorStatus(bool running, double fps, double inferenceMs, int detections);
     void beginLoadProgress();
     void setLoadWaitingForGame();
     void setLoadGameDetected(qint64 pid, const QString& executableName);

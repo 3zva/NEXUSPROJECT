@@ -613,6 +613,39 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
     detectorHeader->addWidget(detectorEnabled, 0, Qt::AlignTop);
     detectorLayout->addLayout(detectorHeader);
 
+    auto* statusGrid = new QGridLayout();
+    statusGrid->setContentsMargins(0, 2, 0, 2);
+    statusGrid->setHorizontalSpacing(10);
+    statusGrid->setVerticalSpacing(8);
+    auto createStatusTile = [detector, statusGrid](
+        const QString& label,
+        const QString& value,
+        int column
+    ) {
+        auto* tile = new CardFrame(detector, false);
+        auto* tileLayout = new QVBoxLayout(tile);
+        tileLayout->setContentsMargins(14, 10, 14, 10);
+        tileLayout->setSpacing(2);
+        auto* valueLabel = new QLabel(value, tile);
+        valueLabel->setFont(NexusTheme::font(17, QFont::Bold));
+        valueLabel->setProperty("accent", true);
+        auto* titleLabel = new QLabel(label, tile);
+        titleLabel->setProperty("muted", true);
+        titleLabel->setFont(NexusTheme::font(8, QFont::DemiBold));
+        tileLayout->addWidget(valueLabel);
+        tileLayout->addWidget(titleLabel);
+        statusGrid->addWidget(tile, 0, column);
+        return valueLabel;
+    };
+    m_fpsValue = createStatusTile(QStringLiteral("DETECTOR FPS"), QStringLiteral("--"), 0);
+    m_inferenceValue = createStatusTile(QStringLiteral("INFERENCE"), QStringLiteral("--"), 1);
+    m_detectionValue = createStatusTile(QStringLiteral("DETECTIONS"), QStringLiteral("--"), 2);
+    m_statusValue = createStatusTile(QStringLiteral("STATUS"), QStringLiteral("OFF"), 3);
+    for (int column = 0; column < 4; ++column) {
+        statusGrid->setColumnStretch(column, 1);
+    }
+    detectorLayout->addLayout(statusGrid);
+
     auto createToggle = [this, detector, detectorLayout, &storedSettings](
         const QString& label,
         const QString& key,
@@ -704,6 +737,25 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
 
     bodyLayout->addWidget(detector);
     bodyLayout->addStretch();
+}
+
+void NativeDetectorPage::setDetectorStatus(
+    bool running,
+    double fps,
+    double inferenceMs,
+    int detections
+) {
+    if (m_fpsValue == nullptr) {
+        return;
+    }
+    m_fpsValue->setText(running ? QString::number(fps, 'f', 1) : QStringLiteral("--"));
+    m_inferenceValue->setText(running ? QStringLiteral("%1 ms").arg(inferenceMs, 0, 'f', 1) : QStringLiteral("--"));
+    m_detectionValue->setText(running ? QString::number(detections) : QStringLiteral("--"));
+    m_statusValue->setText(running ? QStringLiteral("LIVE") : QStringLiteral("OFF"));
+    m_statusValue->setProperty("success", running);
+    m_statusValue->setProperty("accent", !running);
+    m_statusValue->style()->unpolish(m_statusValue);
+    m_statusValue->style()->polish(m_statusValue);
 }
 
 SettingsPage::SettingsPage(QWidget* parent)
