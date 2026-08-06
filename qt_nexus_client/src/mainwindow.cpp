@@ -1102,8 +1102,6 @@ void MainWindow::restoreSavedClientSettings() {
         {QStringLiteral("tts_enabled"), settings.value(QStringLiteral("settings/tts_enabled"), true)},
         {QStringLiteral("tts_volume"), settings.value(QStringLiteral("settings/tts_volume"), 80)},
         {QStringLiteral("native_detector/enabled"), settings.value(QStringLiteral("settings/native_detector/enabled"), false)},
-        {QStringLiteral("native_detector/preview"), settings.value(QStringLiteral("settings/native_detector/preview"), false)},
-        {QStringLiteral("native_detector/status_window"), settings.value(QStringLiteral("settings/native_detector/status_window"), true)},
         {QStringLiteral("native_detector/trigger_enabled"), settings.value(QStringLiteral("settings/native_detector/trigger_enabled"), true)},
         {QStringLiteral("native_detector/lmb_enabled"), settings.value(QStringLiteral("settings/native_detector/lmb_enabled"), true)},
         {QStringLiteral("native_detector/b_hold_mode_enabled"), settings.value(QStringLiteral("settings/native_detector/b_hold_mode_enabled"), false)},
@@ -1762,8 +1760,6 @@ bool MainWindow::writeNativeDetectorConfig() {
         95
     );
     const double confidence = static_cast<double>(confidencePercent) / 100.0;
-    const bool preview = settings.value(QStringLiteral("settings/native_detector/preview"), false).toBool();
-    const bool statusWindow = settings.value(QStringLiteral("settings/native_detector/status_window"), true).toBool();
     const int fpsCap = qMax(0, settings.value(QStringLiteral("settings/native_detector/fps_cap"), 0).toInt());
     const int holdDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/hold_delay_ms"), 185).toInt());
     const int pressDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/trigger_press_delay_ms"), 392).toInt());
@@ -1795,8 +1791,8 @@ bool MainWindow::writeNativeDetectorConfig() {
         QStringLiteral("minimum_fps=60"),
         QStringLiteral("warmup_iterations=10"),
         QStringLiteral("preview_fps=15"),
-        QStringLiteral("no_preview=%1").arg(preview ? QStringLiteral("false") : QStringLiteral("true")),
-        QStringLiteral("status_window=%1").arg(statusWindow ? QStringLiteral("true") : QStringLiteral("false")),
+        QStringLiteral("no_preview=true"),
+        QStringLiteral("status_window=false"),
         QString(),
         QStringLiteral("[Preview]"),
         QStringLiteral("width=640"),

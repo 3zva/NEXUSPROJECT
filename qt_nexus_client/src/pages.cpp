@@ -630,8 +630,6 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
         detectorLayout->addWidget(row);
     };
 
-    createToggle(QStringLiteral("Show preview window?"), QStringLiteral("native_detector/preview"), false);
-    createToggle(QStringLiteral("Show status window?"), QStringLiteral("native_detector/status_window"), true);
     createToggle(QStringLiteral("Enable trigger logic?"), QStringLiteral("native_detector/trigger_enabled"), true);
     createToggle(QStringLiteral("Enable automated LMB?"), QStringLiteral("native_detector/lmb_enabled"), true);
     createToggle(QStringLiteral("Use hold-B activation mode?"), QStringLiteral("native_detector/b_hold_mode_enabled"), false);
