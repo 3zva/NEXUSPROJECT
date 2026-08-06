@@ -211,11 +211,11 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
         preferencesCard
     );
     auto* activeWindowToggle = new ToggleRow(
-        QStringLiteral("Require the target window to be active"),
+        QStringLiteral("Slow capture rate"),
         QStringLiteral(
-            "Keeps monitoring in the quieter default mode."
+            "Caps region capture to 20 FPS."
         ),
-        true,
+        false,
         preferencesCard
     );
 

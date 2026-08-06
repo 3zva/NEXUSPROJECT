@@ -55,6 +55,7 @@ private:
     void setTrayEnabled(bool enabled);
     void setFpsVisible(bool visible);
     void setClientRefreshRate(int refreshRate);
+    void applyPerformanceMode(bool enabled);
     void setUiScale(const QVariant& value);
     void setAuthWindowMode(bool enabled);
     void updateFpsLabel();
@@ -76,6 +77,8 @@ private:
     void persistScreenRegion(const QRect& region, const QString& displayId);
     bool writeScreenRegionConfig(const QRect& region, const QString& displayId);
     bool writeScreenRegionConfigForRoot(const QString& rootPath, const QRect& region, const QString& displayId);
+    [[nodiscard]] int effectiveNativeDetectorFpsCap() const;
+    [[nodiscard]] int effectiveRuntimeHelperFps() const;
     void stopRuntimeHelper();
     void startRuntimeHelper();
     bool ensureRuntimeHelperLoaded(const QString& runtimeDir);

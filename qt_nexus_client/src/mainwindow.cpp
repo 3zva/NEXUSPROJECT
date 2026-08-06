@@ -1123,7 +1123,7 @@ void MainWindow::restoreSavedAppSettings() {
         settings.value(QStringLiteral("runtime_helper/enabled"), true).toBool(),
         settings.value(QStringLiteral("runtime_helper/showBorder"), true).toBool(),
         settings.value(QStringLiteral("runtime_helper/idleWhenCursorHidden"), true).toBool(),
-        settings.value(QStringLiteral("runtime_helper/lowResourceMode"), true).toBool()
+        settings.value(QStringLiteral("runtime_helper/lowResourceMode"), false).toBool()
     );
 }
 
@@ -1132,11 +1132,9 @@ void MainWindow::restoreSavedClientSettings() {
     const QVariantMap values{
         {QStringLiteral("mute_sounds"), settings.value(QStringLiteral("settings/mute_sounds"), false)},
         {QStringLiteral("show_fps"), settings.value(QStringLiteral("settings/show_fps"), true)},
-        {QStringLiteral("performance_mode"), settings.value(QStringLiteral("settings/performance_mode"), true)},
+        {QStringLiteral("performance_mode"), settings.value(QStringLiteral("settings/performance_mode"), false)},
         {QStringLiteral("outline_crosshairs"), settings.value(QStringLiteral("settings/outline_crosshairs"), false)},
-        {QStringLiteral("minimize_to_tray"), settings.value(QStringLiteral("settings/minimize_to_tray"), true)},
-        {QStringLiteral("startup"), settings.value(QStringLiteral("settings/startup"), true)},
-        {QStringLiteral("refresh_rate"), settings.value(QStringLiteral("settings/refresh_rate"), 60)},
+        {QStringLiteral("refresh_rate"), 60},
         {QStringLiteral("tts_enabled"), settings.value(QStringLiteral("settings/tts_enabled"), true)},
         {QStringLiteral("tts_volume"), settings.value(QStringLiteral("settings/tts_volume"), 80)},
         {QStringLiteral("native_detector/enabled"), settings.value(QStringLiteral("settings/native_detector/enabled"), false)},
@@ -1144,7 +1142,6 @@ void MainWindow::restoreSavedClientSettings() {
         {QStringLiteral("native_detector/lmb_enabled"), settings.value(QStringLiteral("settings/native_detector/lmb_enabled"), true)},
         {QStringLiteral("native_detector/b_hold_mode_enabled"), settings.value(QStringLiteral("settings/native_detector/b_hold_mode_enabled"), false)},
         {QStringLiteral("native_detector/confidence_percent"), settings.value(QStringLiteral("settings/native_detector/confidence_percent"), 30)},
-        {QStringLiteral("native_detector/fps_cap"), settings.value(QStringLiteral("settings/native_detector/fps_cap"), 0)},
         {QStringLiteral("native_detector/hold_delay_ms"), settings.value(QStringLiteral("settings/native_detector/hold_delay_ms"), 185)},
         {QStringLiteral("native_detector/trigger_press_delay_ms"), settings.value(QStringLiteral("settings/native_detector/trigger_press_delay_ms"), 392)},
         {QStringLiteral("native_detector/activation_gate_width"), settings.value(QStringLiteral("settings/native_detector/activation_gate_width"), 120)},
@@ -1183,7 +1180,7 @@ void MainWindow::applyClientSetting(const QString& key, const QVariant& value) {
     } else if (key == QStringLiteral("ui_scale")) {
         setUiScale(value);
     } else if (key == QStringLiteral("performance_mode")) {
-        setUpdatesEnabled(true);
+        applyPerformanceMode(value.toBool());
     } else if (key == QStringLiteral("mute_sounds")) {
         // Stored setting. The current client has no sound playback path to mute.
     } else if (key == QStringLiteral("tts_enabled") || key == QStringLiteral("tts_volume")) {
@@ -1391,6 +1388,30 @@ void MainWindow::setClientRefreshRate(int refreshRate) {
     }
     m_clientRefreshRate = refreshRate;
     updateFpsLabel();
+}
+
+void MainWindow::applyPerformanceMode(bool enabled) {
+    setClientRefreshRate(enabled ? 30 : 60);
+    writeNativeDetectorConfig();
+    configureNativeDetector();
+
+    QRect region;
+    QString displayId;
+    if (savedRuntimeHelperMonitoringEnabled() && savedRegionFromSettings(region, displayId) && writeScreenRegionConfig(region, displayId)) {
+        configureRuntimeHelper();
+    }
+}
+
+int MainWindow::effectiveNativeDetectorFpsCap() const {
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    return settings.value(QStringLiteral("settings/performance_mode"), false).toBool() ? 60 : 0;
+}
+
+int MainWindow::effectiveRuntimeHelperFps() const {
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    const bool performanceMode = settings.value(QStringLiteral("settings/performance_mode"), false).toBool();
+    const bool slowCapture = settings.value(QStringLiteral("runtime_helper/lowResourceMode"), false).toBool();
+    return (performanceMode || slowCapture) ? 20 : 120;
 }
 
 void MainWindow::setUiScale(const QVariant& value) {
@@ -1673,11 +1694,10 @@ bool MainWindow::writeScreenRegionConfigForRoot(const QString& rootPath, const Q
 
     QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
     const bool pauseWhenHidden = settings.value(QStringLiteral("runtime_helper/idleWhenCursorHidden"), true).toBool();
-    const bool lowResourceMode = settings.value(QStringLiteral("runtime_helper/lowResourceMode"), true).toBool();
     const double currentAspectRatio = settings.value(QStringLiteral("converter/currentAspectRatio"), 4.0 / 3.0).toDouble();
     const double nativeAspectRatio = settings.value(QStringLiteral("converter/nativeAspectRatio"), 16.0 / 9.0).toDouble();
     upsertLine(QStringLiteral("pause_when_cursor_hidden"), pauseWhenHidden ? QStringLiteral("true") : QStringLiteral("false"));
-    upsertLine(QStringLiteral("fps"), lowResourceMode ? QStringLiteral("6") : QStringLiteral("12"));
+    upsertLine(QStringLiteral("fps"), QString::number(effectiveRuntimeHelperFps()));
     upsertLine(QStringLiteral("current_aspect_ratio"), QString::number(currentAspectRatio, 'g', 12));
     upsertLine(QStringLiteral("native_aspect_ratio"), QString::number(nativeAspectRatio, 'g', 12));
 
@@ -1837,7 +1857,7 @@ bool MainWindow::writeNativeDetectorConfig() {
         95
     );
     const double confidence = static_cast<double>(confidencePercent) / 100.0;
-    const int fpsCap = qMax(0, settings.value(QStringLiteral("settings/native_detector/fps_cap"), 0).toInt());
+    const int fpsCap = effectiveNativeDetectorFpsCap();
     const int holdDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/hold_delay_ms"), 185).toInt());
     const int pressDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/trigger_press_delay_ms"), 392).toInt());
     const int primaryPressDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/primary_trigger_press_delay_ms"), 382).toInt());
@@ -2022,7 +2042,7 @@ void MainWindow::configureNativeDetector() {
         settings.value(QStringLiteral("settings/native_detector/confidence_percent"), 30).toInt(),
         95
     )) / 100.0;
-    liveSettings.fpsCap = qMax(0, settings.value(QStringLiteral("settings/native_detector/fps_cap"), 0).toInt());
+    liveSettings.fpsCap = effectiveNativeDetectorFpsCap();
     liveSettings.holdDelayMs = qMax(0, settings.value(QStringLiteral("settings/native_detector/hold_delay_ms"), 185).toInt());
     liveSettings.primaryTriggerPressDelayMs = qMax(0, settings.value(QStringLiteral("settings/native_detector/primary_trigger_press_delay_ms"), 382).toInt());
     liveSettings.secondaryTriggerPressDelayMs = qMax(0, settings.value(QStringLiteral("settings/native_detector/secondary_trigger_press_delay_ms"), 202).toInt());

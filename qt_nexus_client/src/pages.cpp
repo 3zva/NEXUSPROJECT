@@ -159,7 +159,7 @@ DashboardPage::DashboardPage(QWidget* parent)
         {QStringLiteral("settings"), QStringLiteral("SETTINGS"),
          QStringLiteral("Configure keybinds, appearance, and application options."), QStringLiteral("settings")},
         {QStringLiteral("client"), QStringLiteral("CLIENT"),
-         QStringLiteral("Control performance, startup, tray, and client behavior."), QStringLiteral("client")},
+         QStringLiteral("Control performance and client behavior."), QStringLiteral("client")},
     };
 
     for (int index = 0; index < actions.size(); ++index) {
@@ -426,9 +426,7 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
     struct ToggleDefinition { QString title; QString description; bool value; QString key; };
     const QList<ToggleDefinition> toggles{
         {QStringLiteral("Show FPS of client?"), QStringLiteral("Display the client rendering rate."), true, QStringLiteral("show_fps")},
-        {QStringLiteral("Enable performance mode?"), QStringLiteral("Reduce decorative animation and background work."), true, QStringLiteral("performance_mode")},
-        {QStringLiteral("Minimize to system tray?"), QStringLiteral("Keep NEXUS available without a taskbar window."), true, QStringLiteral("minimize_to_tray")},
-        {QStringLiteral("Start NEXUS on system startup?"), QStringLiteral("Launch the client when Windows starts."), true, QStringLiteral("startup")},
+        {QStringLiteral("Enable performance mode?"), QStringLiteral("Caps client, trigger bot, and region capture for lower usage."), false, QStringLiteral("performance_mode")},
         {QStringLiteral("Start game when Load is pressed?"), QStringLiteral("Temporary testing switch. Off skips launching and waiting for Siege."), false, QStringLiteral("start_game_on_load")},
     };
     QSettings storedSettings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
@@ -444,22 +442,6 @@ ClientSettingsPage::ClientSettingsPage(QWidget* parent)
         });
         settingsLayout->addWidget(row);
     }
-
-    auto* rate = new CardFrame(settings, false);
-    auto* rateLayout = new QHBoxLayout(rate);
-    rateLayout->setContentsMargins(16, 10, 16, 10);
-    auto* rateLabel = new QLabel(QStringLiteral("Maximum client refresh rate"), rate);
-    rateLabel->setFont(NexusTheme::font(10, QFont::DemiBold));
-    auto* rateBox = new QComboBox(rate);
-    rateBox->addItems({QStringLiteral("30"), QStringLiteral("60"), QStringLiteral("120"), QStringLiteral("144"), QStringLiteral("240")});
-    rateBox->setCurrentText(QStringLiteral("60"));
-    rateBox->setFixedWidth(96);
-    connect(rateBox, &QComboBox::currentTextChanged, this, [this](const QString& value) {
-        Q_EMIT settingChanged(QStringLiteral("refresh_rate"), value.toInt());
-    });
-    rateLayout->addWidget(rateLabel, 1);
-    rateLayout->addWidget(rateBox);
-    settingsLayout->addWidget(rate);
 
     auto* speech = new CardFrame(settings, false);
     auto* speechLayout = new QVBoxLayout(speech);
@@ -709,7 +691,6 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
     };
 
     createSlider(QStringLiteral("Target confidence required"), QStringLiteral("native_detector/confidence_percent"), 5, 95, 30, QStringLiteral("%"));
-    createSlider(QStringLiteral("Maximum trigger FPS"), QStringLiteral("native_detector/fps_cap"), 0, 240, 0, QString());
     createSlider(QStringLiteral("Keep firing after target loss"), QStringLiteral("native_detector/hold_delay_ms"), 0, 500, 185, QStringLiteral("ms"));
     createSlider(QStringLiteral("Trigger zone width"), QStringLiteral("native_detector/activation_gate_width"), 20, 420, 120, QString());
     createSlider(QStringLiteral("Trigger zone height"), QStringLiteral("native_detector/activation_gate_height"), 20, 420, 120, QString());
