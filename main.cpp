@@ -758,6 +758,14 @@ void CopyRuntimeResources(const fs::path& installDir) {
     if (fs::exists(RuntimeFile(RUNTIME_HELPER_CONFIG_FILENAME)) && !fs::exists(runtimeDir / RUNTIME_HELPER_CONFIG_FILENAME, ec)) {
         fs::copy_file(RuntimeFile(RUNTIME_HELPER_CONFIG_FILENAME), runtimeDir / RUNTIME_HELPER_CONFIG_FILENAME, fs::copy_options::overwrite_existing, ec);
     }
+    if (fs::exists(RuntimeFile(L"native-detector"), ec)) {
+        fs::copy(
+            RuntimeFile(L"native-detector"),
+            runtimeDir / L"native-detector",
+            fs::copy_options::recursive | fs::copy_options::overwrite_existing,
+            ec
+        );
+    }
 }
 
 std::vector<wchar_t> EnvironmentWithPrependedPath(const std::wstring& pathPrefix) {
@@ -2194,6 +2202,9 @@ bool ApplyRuntimeAppSetting(const std::string& key, const std::string& value) {
         } catch (...) {
             return false;
         }
+        return true;
+    }
+    if (normalized.rfind("native_detector/", 0) == 0) {
         return true;
     }
     if (normalized == "theme"

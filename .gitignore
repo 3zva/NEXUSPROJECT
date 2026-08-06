@@ -8,4 +8,5 @@ cloudflare-worker/.dev.vars
 cloudflare-worker/.env
 cloudflare-worker/.generated-secrets.local.txt
 deployment/release-settings.json
+runtime/native-detector/
 *.log

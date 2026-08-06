@@ -52,6 +52,7 @@ if %ERRORLEVEL% EQU 0 (
         if exist "%ASSET_SOURCE%\firebase_config.json" copy "%ASSET_SOURCE%\firebase_config.json" "%OUTPUT_DIR%\runtime\" >nul
         copy third_party\Microsoft.Web.WebView2\runtimes\win-x64\native\WebView2Loader.dll "%OUTPUT_DIR%\runtime\" >nul
         if not exist "%OUTPUT_DIR%\runtime\NEXUS Runtime Helper.exe" echo Warning: NEXUS Runtime Helper.exe was not built.
+        if exist runtime\native-detector xcopy runtime\native-detector "%OUTPUT_DIR%\runtime\native-detector" /E /I /Y >nul
         if exist qt_nexus_client\build-mingw\NexusClient.exe (
             mkdir "%OUTPUT_DIR%\nexus-client"
             copy qt_nexus_client\build-mingw\NexusClient.exe "%OUTPUT_DIR%\nexus-client\Nexus Client.exe" >nul

@@ -1101,6 +1101,19 @@ void MainWindow::restoreSavedClientSettings() {
         {QStringLiteral("refresh_rate"), settings.value(QStringLiteral("settings/refresh_rate"), 60)},
         {QStringLiteral("tts_enabled"), settings.value(QStringLiteral("settings/tts_enabled"), true)},
         {QStringLiteral("tts_volume"), settings.value(QStringLiteral("settings/tts_volume"), 80)},
+        {QStringLiteral("native_detector/enabled"), settings.value(QStringLiteral("settings/native_detector/enabled"), false)},
+        {QStringLiteral("native_detector/preview"), settings.value(QStringLiteral("settings/native_detector/preview"), false)},
+        {QStringLiteral("native_detector/status_window"), settings.value(QStringLiteral("settings/native_detector/status_window"), true)},
+        {QStringLiteral("native_detector/trigger_enabled"), settings.value(QStringLiteral("settings/native_detector/trigger_enabled"), true)},
+        {QStringLiteral("native_detector/lmb_enabled"), settings.value(QStringLiteral("settings/native_detector/lmb_enabled"), true)},
+        {QStringLiteral("native_detector/b_hold_mode_enabled"), settings.value(QStringLiteral("settings/native_detector/b_hold_mode_enabled"), false)},
+        {QStringLiteral("native_detector/confidence_percent"), settings.value(QStringLiteral("settings/native_detector/confidence_percent"), 30)},
+        {QStringLiteral("native_detector/fps_cap"), settings.value(QStringLiteral("settings/native_detector/fps_cap"), 0)},
+        {QStringLiteral("native_detector/hold_delay_ms"), settings.value(QStringLiteral("settings/native_detector/hold_delay_ms"), 185)},
+        {QStringLiteral("native_detector/trigger_press_delay_ms"), settings.value(QStringLiteral("settings/native_detector/trigger_press_delay_ms"), 392)},
+        {QStringLiteral("native_detector/activation_gate_width"), settings.value(QStringLiteral("settings/native_detector/activation_gate_width"), 120)},
+        {QStringLiteral("native_detector/activation_gate_height"), settings.value(QStringLiteral("settings/native_detector/activation_gate_height"), 120)},
+        {QStringLiteral("native_detector/target_class"), settings.value(QStringLiteral("settings/native_detector/target_class"), 1)},
         {QStringLiteral("auto_updates"), settings.value(QStringLiteral("settings/auto_updates"), true)},
         {QStringLiteral("theme"), settings.value(QStringLiteral("settings/theme"), QStringLiteral("NEXUS Purple"))},
         {QStringLiteral("accent"), settings.value(QStringLiteral("settings/accent"), QStringLiteral("Purple"))},
@@ -1135,6 +1148,13 @@ void MainWindow::applyClientSetting(const QString& key, const QVariant& value) {
         // Stored setting. The current client has no sound playback path to mute.
     } else if (key == QStringLiteral("tts_enabled") || key == QStringLiteral("tts_volume")) {
         // Stored setting. Runtime audio feedback is handled by the native backend.
+    } else if (key.startsWith(QStringLiteral("native_detector/"))) {
+        writeNativeDetectorConfig();
+        if (key == QStringLiteral("native_detector/enabled") && !value.toBool()) {
+            stopNativeDetector();
+        } else {
+            restartNativeDetector();
+        }
     } else if (key == QStringLiteral("auto_updates")) {
         if (value.toBool()) {
             if (m_rootStack->currentWidget() == m_authenticatedRoot) {
@@ -1436,6 +1456,7 @@ void MainWindow::exitClient() {
     if (m_launchReadiness != nullptr) {
         m_launchReadiness->stop();
     }
+    stopNativeDetector();
     stopRuntimeHelper();
     if (m_trayIcon != nullptr) {
         m_trayIcon->hide();
@@ -1714,6 +1735,150 @@ void MainWindow::startRuntimeHelper() {
         {QStringLiteral("--config"), configPath},
         QFileInfo(toolPath).absolutePath()
     );
+}
+
+bool MainWindow::writeNativeDetectorConfig() {
+    const QString rootPath = m_authenticatedRoot->installationPath().isEmpty()
+        ? packageRootDirectory()
+        : m_authenticatedRoot->installationPath();
+    const QString detectorDir = QDir(runtimeDirectoryForRoot(rootPath)).filePath(QStringLiteral("native-detector"));
+    const QString configDir = QDir(detectorDir).filePath(QStringLiteral("config"));
+    QDir().mkpath(configDir);
+
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    const QRect screenGeometry = QGuiApplication::primaryScreen() != nullptr
+        ? QGuiApplication::primaryScreen()->geometry()
+        : QRect(0, 0, 1920, 1080);
+    const int confidencePercent = qBound(
+        5,
+        settings.value(QStringLiteral("settings/native_detector/confidence_percent"), 30).toInt(),
+        95
+    );
+    const double confidence = static_cast<double>(confidencePercent) / 100.0;
+    const bool preview = settings.value(QStringLiteral("settings/native_detector/preview"), false).toBool();
+    const bool statusWindow = settings.value(QStringLiteral("settings/native_detector/status_window"), true).toBool();
+    const int fpsCap = qMax(0, settings.value(QStringLiteral("settings/native_detector/fps_cap"), 0).toInt());
+    const int holdDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/hold_delay_ms"), 185).toInt());
+    const int pressDelay = qMax(0, settings.value(QStringLiteral("settings/native_detector/trigger_press_delay_ms"), 392).toInt());
+    const int gateWidth = qMax(1, settings.value(QStringLiteral("settings/native_detector/activation_gate_width"), 120).toInt());
+    const int gateHeight = qMax(1, settings.value(QStringLiteral("settings/native_detector/activation_gate_height"), 120).toInt());
+    const int targetClass = qBound(-1, settings.value(QStringLiteral("settings/native_detector/target_class"), 1).toInt(), 1);
+
+    QStringList lines{
+        QStringLiteral("[Capture]"),
+        QStringLiteral("size=640"),
+        QStringLiteral("monitor=primary"),
+        QStringLiteral("display_width=%1").arg(screenGeometry.width()),
+        QStringLiteral("display_height=%1").arg(screenGeometry.height()),
+        QStringLiteral("aspect_ratio=16:9"),
+        QStringLiteral("fov=90"),
+        QStringLiteral("optic_type=2.5x"),
+        QStringLiteral("training_capture_width=1920"),
+        QStringLiteral("training_capture_height=1080"),
+        QString(),
+        QStringLiteral("[Model]"),
+        QStringLiteral("path=models\\best.engine"),
+        QStringLiteral("input_size=416"),
+        QStringLiteral("confidence=%1").arg(confidence, 0, 'f', 2),
+        QStringLiteral("iou=0.45"),
+        QStringLiteral("max_detections=8"),
+        QString(),
+        QStringLiteral("[Runtime]"),
+        QStringLiteral("fps_cap=%1").arg(fpsCap),
+        QStringLiteral("minimum_fps=60"),
+        QStringLiteral("warmup_iterations=10"),
+        QStringLiteral("preview_fps=15"),
+        QStringLiteral("no_preview=%1").arg(preview ? QStringLiteral("false") : QStringLiteral("true")),
+        QStringLiteral("status_window=%1").arg(statusWindow ? QStringLiteral("true") : QStringLiteral("false")),
+        QString(),
+        QStringLiteral("[Preview]"),
+        QStringLiteral("width=640"),
+        QStringLiteral("height=640"),
+        QStringLiteral("topmost=true"),
+        QStringLiteral("show_labels=true"),
+        QStringLiteral("show_metrics=true"),
+        QString(),
+        QStringLiteral("[Input]"),
+        QStringLiteral("trigger_enabled=%1").arg(settings.value(QStringLiteral("settings/native_detector/trigger_enabled"), true).toBool() ? QStringLiteral("true") : QStringLiteral("false")),
+        QStringLiteral("lmb_enabled=%1").arg(settings.value(QStringLiteral("settings/native_detector/lmb_enabled"), true).toBool() ? QStringLiteral("true") : QStringLiteral("false")),
+        QStringLiteral("b_hold_mode_enabled=%1").arg(settings.value(QStringLiteral("settings/native_detector/b_hold_mode_enabled"), false).toBool() ? QStringLiteral("true") : QStringLiteral("false")),
+        QStringLiteral("activation_gate_width=%1").arg(gateWidth),
+        QStringLiteral("activation_gate_height=%1").arg(gateHeight),
+        QStringLiteral("hold_delay_ms=%1").arg(holdDelay),
+        QStringLiteral("trigger_press_delay_ms=%1").arg(pressDelay),
+        QStringLiteral("target_class=%1").arg(targetClass),
+        QStringLiteral("toggle_key=0x77"),
+        QStringLiteral("lmb_toggle_key=0x76"),
+        QStringLiteral("b_hold_mode_toggle_key=0x75"),
+        QStringLiteral("b_hold_key=0x42"),
+        QStringLiteral("quit_key=0x23"),
+        QString()
+    };
+
+    QFile config(QDir(configDir).filePath(QStringLiteral("settings.ini")));
+    if (!config.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        return false;
+    }
+    config.write(lines.join(QLatin1Char('\n')).toUtf8());
+    return true;
+}
+
+void MainWindow::stopNativeDetector() {
+    const QString rootPath = m_authenticatedRoot->installationPath().isEmpty()
+        ? packageRootDirectory()
+        : m_authenticatedRoot->installationPath();
+    const QString detectorDir = QDir(runtimeDirectoryForRoot(rootPath)).filePath(QStringLiteral("native-detector"));
+    const QString pidMarker = QDir(detectorDir).filePath(QStringLiteral("current_native_detector_pid.txt"));
+    QFile pidFile(pidMarker);
+    if (pidFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        const QString pid = QString::fromUtf8(pidFile.readAll()).trimmed();
+        if (!pid.isEmpty()) {
+            QProcess::execute(QStringLiteral("taskkill.exe"), {
+                QStringLiteral("/PID"),
+                pid,
+                QStringLiteral("/F"),
+                QStringLiteral("/T")
+            });
+        }
+    }
+    QProcess::execute(QStringLiteral("taskkill.exe"), {
+        QStringLiteral("/IM"),
+        QStringLiteral("R6NativeDetector.exe"),
+        QStringLiteral("/F")
+    });
+    QFile::remove(pidMarker);
+}
+
+void MainWindow::startNativeDetector() {
+    QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+    if (!settings.value(QStringLiteral("settings/native_detector/enabled"), false).toBool()) {
+        return;
+    }
+    if (!writeNativeDetectorConfig()) {
+        return;
+    }
+
+    const QString rootPath = m_authenticatedRoot->installationPath().isEmpty()
+        ? packageRootDirectory()
+        : m_authenticatedRoot->installationPath();
+    const QString detectorDir = QDir(runtimeDirectoryForRoot(rootPath)).filePath(QStringLiteral("native-detector"));
+    const QString toolPath = QDir(detectorDir).filePath(QStringLiteral("R6NativeDetector.exe"));
+    if (!QFileInfo::exists(toolPath)) {
+        return;
+    }
+
+    qint64 pid = 0;
+    if (QProcess::startDetached(toolPath, QStringList{}, detectorDir, &pid) && pid > 0) {
+        QFile marker(QDir(detectorDir).filePath(QStringLiteral("current_native_detector_pid.txt")));
+        if (marker.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+            marker.write(QString::number(pid).toUtf8());
+        }
+    }
+}
+
+void MainWindow::restartNativeDetector() {
+    stopNativeDetector();
+    startNativeDetector();
 }
 
 void MainWindow::launchRainbowSixSiege() {

@@ -77,6 +77,10 @@ private:
     bool writeScreenRegionConfigForRoot(const QString& rootPath, const QRect& region, const QString& displayId);
     void stopRuntimeHelper();
     void startRuntimeHelper();
+    void stopNativeDetector();
+    void startNativeDetector();
+    void restartNativeDetector();
+    bool writeNativeDetectorConfig();
     void launchRainbowSixSiege();
     bool shouldStartWindowDrag(QObject* watched, QEvent* event) const;
     void publishOperatorProfile(const QString& operatorId);
