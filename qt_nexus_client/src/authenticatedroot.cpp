@@ -102,7 +102,7 @@ AuthenticatedRoot::AuthenticatedRoot(QWidget* parent)
         {QStringLiteral("dashboard"), QStringLiteral("Dashboard"), QStringLiteral("dashboard")},
         {QStringLiteral("operators"), QStringLiteral("Operators"), QStringLiteral("operators")},
         {QStringLiteral("sensitivity_converter"), QStringLiteral("Sensitivity & FOV"), QStringLiteral("target")},
-        {QStringLiteral("native_detector"), QStringLiteral("Native Detector"), QStringLiteral("target")},
+        {QStringLiteral("native_detector"), QStringLiteral("Trigger Bot"), QStringLiteral("target")},
         {QStringLiteral("save_files"), QStringLiteral("Save Files"), QStringLiteral("save")},
         {QStringLiteral("client"), QStringLiteral("Client Settings"), QStringLiteral("settings")},
         {QStringLiteral("settings"), QStringLiteral("Settings"), QStringLiteral("settings")},

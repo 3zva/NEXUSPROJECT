@@ -582,8 +582,8 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
     QVBoxLayout* bodyLayout = nullptr;
     root->addWidget(createScrollableBody(this, bodyLayout));
     bodyLayout->addWidget(new PageHeading(
-        QStringLiteral("NATIVE DETECTOR"),
-        QStringLiteral("Configure the bundled body/head detector helper."),
+        QStringLiteral("TRIGGER BOT"),
+        QStringLiteral("Tune automatic firing behavior while NEXUS runs the trigger engine in the background."),
         this
     ));
 
@@ -596,11 +596,11 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
     auto* detectorHeader = new QHBoxLayout();
     auto* detectorText = new QVBoxLayout();
     detectorText->setSpacing(2);
-    auto* detectorLabel = new QLabel(QStringLiteral("Native detector runtime"), detector);
+    auto* detectorLabel = new QLabel(QStringLiteral("Trigger bot master switch"), detector);
     detectorLabel->setFont(NexusTheme::font(11, QFont::Bold));
     detectorText->addWidget(detectorLabel);
     detectorText->addWidget(bodyText(
-        QStringLiteral("Enable the bundled detector, tune target filtering, and control the native input trigger behavior."),
+        QStringLiteral("Turn the trigger system on or off. When enabled, it runs silently inside NEXUS with no separate window."),
         detector
     ));
     auto* detectorEnabled = new QCheckBox(detector);
@@ -637,10 +637,10 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
         statusGrid->addWidget(tile, 0, column);
         return valueLabel;
     };
-    m_fpsValue = createStatusTile(QStringLiteral("DETECTOR FPS"), QStringLiteral("--"), 0);
-    m_inferenceValue = createStatusTile(QStringLiteral("INFERENCE"), QStringLiteral("--"), 1);
-    m_detectionValue = createStatusTile(QStringLiteral("DETECTIONS"), QStringLiteral("--"), 2);
-    m_statusValue = createStatusTile(QStringLiteral("STATUS"), QStringLiteral("OFF"), 3);
+    m_fpsValue = createStatusTile(QStringLiteral("TRIGGER FPS"), QStringLiteral("--"), 0);
+    m_inferenceValue = createStatusTile(QStringLiteral("FRAME TIME"), QStringLiteral("--"), 1);
+    m_detectionValue = createStatusTile(QStringLiteral("TARGETS"), QStringLiteral("--"), 2);
+    m_statusValue = createStatusTile(QStringLiteral("STATE"), QStringLiteral("OFF"), 3);
     for (int column = 0; column < 4; ++column) {
         statusGrid->setColumnStretch(column, 1);
     }
@@ -663,9 +663,9 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
         detectorLayout->addWidget(row);
     };
 
-    createToggle(QStringLiteral("Enable trigger logic?"), QStringLiteral("native_detector/trigger_enabled"), true);
-    createToggle(QStringLiteral("Enable automated LMB?"), QStringLiteral("native_detector/lmb_enabled"), true);
-    createToggle(QStringLiteral("Use hold-B activation mode?"), QStringLiteral("native_detector/b_hold_mode_enabled"), false);
+    createToggle(QStringLiteral("Fire only when a target is inside the trigger zone"), QStringLiteral("native_detector/trigger_enabled"), true);
+    createToggle(QStringLiteral("Allow automatic left-click firing"), QStringLiteral("native_detector/lmb_enabled"), true);
+    createToggle(QStringLiteral("Use B key instead of right mouse to arm"), QStringLiteral("native_detector/b_hold_mode_enabled"), false);
 
     auto createSlider = [this, detector, detectorLayout, &storedSettings](
         const QString& label,
@@ -710,15 +710,15 @@ NativeDetectorPage::NativeDetectorPage(QWidget* parent)
         detectorLayout->addLayout(row);
     };
 
-    createSlider(QStringLiteral("Confidence"), QStringLiteral("native_detector/confidence_percent"), 5, 95, 30, QStringLiteral("%"));
-    createSlider(QStringLiteral("FPS cap"), QStringLiteral("native_detector/fps_cap"), 0, 240, 0, QString());
-    createSlider(QStringLiteral("Hold delay"), QStringLiteral("native_detector/hold_delay_ms"), 0, 500, 185, QStringLiteral("ms"));
-    createSlider(QStringLiteral("Press delay"), QStringLiteral("native_detector/trigger_press_delay_ms"), 0, 800, 392, QStringLiteral("ms"));
-    createSlider(QStringLiteral("Gate width"), QStringLiteral("native_detector/activation_gate_width"), 20, 420, 120, QString());
-    createSlider(QStringLiteral("Gate height"), QStringLiteral("native_detector/activation_gate_height"), 20, 420, 120, QString());
+    createSlider(QStringLiteral("Target confidence required"), QStringLiteral("native_detector/confidence_percent"), 5, 95, 30, QStringLiteral("%"));
+    createSlider(QStringLiteral("Maximum trigger FPS"), QStringLiteral("native_detector/fps_cap"), 0, 240, 0, QString());
+    createSlider(QStringLiteral("Keep firing after target loss"), QStringLiteral("native_detector/hold_delay_ms"), 0, 500, 185, QStringLiteral("ms"));
+    createSlider(QStringLiteral("Delay before first shot"), QStringLiteral("native_detector/trigger_press_delay_ms"), 0, 800, 392, QStringLiteral("ms"));
+    createSlider(QStringLiteral("Trigger zone width"), QStringLiteral("native_detector/activation_gate_width"), 20, 420, 120, QString());
+    createSlider(QStringLiteral("Trigger zone height"), QStringLiteral("native_detector/activation_gate_height"), 20, 420, 120, QString());
 
     auto* targetRow = new QHBoxLayout();
-    auto* targetLabel = new QLabel(QStringLiteral("Target class"), detector);
+    auto* targetLabel = new QLabel(QStringLiteral("Target hitbox"), detector);
     targetLabel->setFont(NexusTheme::font(10, QFont::DemiBold));
     auto* targetBox = new QComboBox(detector);
     targetBox->addItem(QStringLiteral("Any"), -1);
