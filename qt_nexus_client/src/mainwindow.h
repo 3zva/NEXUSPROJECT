@@ -124,4 +124,5 @@ private:
     bool m_updateCheckStarted = false;
     bool m_exitSavePromptHandled = false;
     bool m_saveSettingsOnExit = true;
+    bool m_restoringClientSettings = false;
 };

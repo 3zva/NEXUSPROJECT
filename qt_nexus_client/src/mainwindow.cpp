@@ -1123,12 +1123,16 @@ void MainWindow::restoreSavedClientSettings() {
 
     m_authenticatedRoot->setClientAppSettings(values);
     m_authenticatedRoot->setGeneralAppSettings(values);
+    m_restoringClientSettings = true;
     for (auto iterator = values.begin(); iterator != values.end(); ++iterator) {
         applyClientSetting(iterator.key(), iterator.value());
         if (iterator.key() == QStringLiteral("tts_enabled") || iterator.key() == QStringLiteral("tts_volume")) {
             publishRuntimeSetting(iterator.key(), iterator.value());
         }
     }
+    m_restoringClientSettings = false;
+    writeNativeDetectorConfig();
+    startNativeDetector();
 }
 
 void MainWindow::applyClientSetting(const QString& key, const QVariant& value) {
@@ -1150,6 +1154,9 @@ void MainWindow::applyClientSetting(const QString& key, const QVariant& value) {
         // Stored setting. Runtime audio feedback is handled by the native backend.
     } else if (key.startsWith(QStringLiteral("native_detector/"))) {
         writeNativeDetectorConfig();
+        if (m_restoringClientSettings) {
+            return;
+        }
         if (key == QStringLiteral("native_detector/enabled") && !value.toBool()) {
             stopNativeDetector();
         } else {
