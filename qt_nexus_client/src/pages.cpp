@@ -154,6 +154,12 @@ DashboardPage::DashboardPage(QWidget* parent)
     const QList<ActionDefinition> actions{
         {QStringLiteral("operators"), QStringLiteral("OPERATORS"),
          QStringLiteral("Browse the operator library and manage configurations."), QStringLiteral("operators")},
+        {QStringLiteral("target"), QStringLiteral("TRIGGER BOT"),
+         QStringLiteral("Tune detection, firing, and trigger zone behavior."), QStringLiteral("native_detector")},
+        {QStringLiteral("target"), QStringLiteral("SENSITIVITY & FOV"),
+         QStringLiteral("Convert sensitivity, aspect ratio, and FOV scale factors."), QStringLiteral("sensitivity_converter")},
+        {QStringLiteral("settings"), QStringLiteral("REGION CAPTURE"),
+         QStringLiteral("Open the runtime helper screen-region monitor settings."), QStringLiteral("more_options")},
         {QStringLiteral("save"), QStringLiteral("SAVE FILES"),
          QStringLiteral("Import, export, and protect your NEXUS configuration."), QStringLiteral("save_files")},
         {QStringLiteral("settings"), QStringLiteral("SETTINGS"),

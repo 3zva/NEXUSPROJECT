@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QScreen>
 #include <QSizePolicy>
+#include <QSettings>
 #include <QStyle>
 #include <QScrollArea>
 #include <QVariant>
@@ -59,6 +60,8 @@ QWidget* createRegionField(
 
 MoreOptionsPage::MoreOptionsPage(QWidget* parent)
     : QWidget(parent) {
+    QSettings storedSettings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+
     auto* root = new QVBoxLayout(this);
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
@@ -199,7 +202,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
             "Allows the built-in monitoring helper to use the saved region. "
             "Unavailable until a valid region has been selected."
         ),
-        true,
+        storedSettings.value(QStringLiteral("runtime_helper/enabled"), true).toBool(),
         preferencesCard
     );
     auto* cursorToggle = new ToggleRow(
@@ -207,7 +210,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
         QStringLiteral(
             "Pauses monitoring while the cursor is hidden."
         ),
-        true,
+        storedSettings.value(QStringLiteral("runtime_helper/idleWhenCursorHidden"), true).toBool(),
         preferencesCard
     );
     auto* activeWindowToggle = new ToggleRow(
@@ -215,7 +218,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
         QStringLiteral(
             "Caps region capture to 20 FPS."
         ),
-        false,
+        storedSettings.value(QStringLiteral("runtime_helper/lowResourceMode"), false).toBool(),
         preferencesCard
     );
 
