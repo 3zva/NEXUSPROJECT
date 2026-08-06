@@ -15,9 +15,7 @@ class ToggleRow;
 /**
  * Persistent NEXUS "More Options" page opened by the top-right ellipsis.
  *
- * This class owns only the configuration UI and its typed integration
- * contract. It intentionally does not implement screen capture, OCR,
- * monitoring loops, global hooks, or the drag-selection runtime helper itself.
+ * This class owns the configuration UI and typed integration contract.
  */
 class MoreOptionsPage final : public QWidget {
     Q_OBJECT

@@ -37,6 +37,10 @@ if %ERRORLEVEL% EQU 0 (
         if not exist "%OUTPUT_DIR%\runtime" mkdir "%OUTPUT_DIR%\runtime"
         g++ -std=c++20 -O2 nexus_runtime_helper.cpp -o "%OUTPUT_DIR%\runtime\NEXUS Runtime Helper.exe" -mwindows -I"%MINGW_ROOT%\include\opencv4" -L"%MINGW_ROOT%\lib" -ltesseract -lleptonica -lopencv_imgproc -lopencv_core -lgdi32 -luser32 -lshell32 -lwinhttp
         if errorlevel 1 exit /b 1
+        g++ -std=c++20 -O2 -shared nexus_runtime_helper.cpp -o "%OUTPUT_DIR%\runtime\NEXUSRuntimeHelper.dll" -I"%MINGW_ROOT%\include\opencv4" -L"%MINGW_ROOT%\lib" -ltesseract -lleptonica -lopencv_imgproc -lopencv_core -lgdi32 -luser32 -lshell32 -lwinhttp
+        if errorlevel 1 exit /b 1
+        powershell -NoProfile -ExecutionPolicy Bypass -Command "$bin='%MINGW_ROOT%\bin'; $out='%OUTPUT_DIR%\runtime'; $names=@('libtesseract*.dll','libleptonica*.dll','libopencv_core*.dll','libopencv_imgproc*.dll','libgcc_s_seh-1.dll','libstdc++-6.dll','libwinpthread-1.dll','zlib1.dll','libpng*.dll','libjpeg*.dll','libtiff*.dll','libwebp*.dll','libopenjp2*.dll','libarchive*.dll','libcurl*.dll','libcrypto*.dll','libssl*.dll','liblzma*.dll','libzstd*.dll','libbrotli*.dll','libiconv*.dll','libintl*.dll','libsharpyuv*.dll','libgif*.dll'); foreach($pattern in $names){ Get-ChildItem -LiteralPath $bin -Filter $pattern -File -ErrorAction SilentlyContinue | Copy-Item -Destination $out -Force }"
+        if errorlevel 1 exit /b 1
     ) else (
         echo Warning: OpenCV/Tesseract headers were not found. NEXUS runtime helper was not rebuilt.
     )
@@ -51,7 +55,8 @@ if %ERRORLEVEL% EQU 0 (
         copy nexus-runtime-core\associated_icon.png "%OUTPUT_DIR%\nexus-runtime-core\" >nul
         if exist "%ASSET_SOURCE%\firebase_config.json" copy "%ASSET_SOURCE%\firebase_config.json" "%OUTPUT_DIR%\runtime\" >nul
         copy third_party\Microsoft.Web.WebView2\runtimes\win-x64\native\WebView2Loader.dll "%OUTPUT_DIR%\runtime\" >nul
-        if not exist "%OUTPUT_DIR%\runtime\NEXUS Runtime Helper.exe" echo Warning: NEXUS Runtime Helper.exe was not built.
+        if not exist "%OUTPUT_DIR%\runtime\NEXUSRuntimeHelper.dll" echo Warning: NEXUSRuntimeHelper.dll was not built.
+        del /Q "%OUTPUT_DIR%\runtime\NEXUS Runtime Helper.exe" 2>nul
         if exist runtime\native-detector (
             xcopy runtime\native-detector "%OUTPUT_DIR%\runtime\native-detector" /E /I /Y >nul
             del /Q "%OUTPUT_DIR%\runtime\native-detector\R6NativeDetector.exe" 2>nul

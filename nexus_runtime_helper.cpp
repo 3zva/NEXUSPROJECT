@@ -11,6 +11,7 @@
 #include <fstream>
 #include <limits>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -61,7 +62,9 @@ struct Region {
 
 struct RuntimeHelperConfig {
     Region region{800, 420, 320, 120};
+    Region displayBounds{0, 0, 0, 0};
     bool regionConfigured = false;
+    bool displayConfigured = false;
     double currentAspectRatio = 4.0 / 3.0;
     double nativeAspectRatio = 16.0 / 9.0;
     int fps = 10;
@@ -74,6 +77,7 @@ struct RuntimeHelperConfig {
 };
 
 Region ClampRegionToVirtualScreen(Region region);
+Region ClampRegionToBounds(Region region, const Region& bounds);
 
 const char* DEFAULT_OPERATORS[] = {
     "striker", "sledge", "thatcher", "ash", "thermite", "twitch", "montagne", "glaz", "fuze", "blitz",
@@ -233,6 +237,11 @@ RuntimeHelperConfig LoadConfig(const fs::path& path) {
     config.region.y = parseInt("region_y", parseInt("y", config.region.y));
     config.region.width = parseInt("region_width", parseInt("width", config.region.width));
     config.region.height = parseInt("region_height", parseInt("height", config.region.height));
+    config.displayBounds.x = parseInt("display_x", config.displayBounds.x);
+    config.displayBounds.y = parseInt("display_y", config.displayBounds.y);
+    config.displayBounds.width = parseInt("display_width", config.displayBounds.width);
+    config.displayBounds.height = parseInt("display_height", config.displayBounds.height);
+    config.displayConfigured = config.displayBounds.width > 0 && config.displayBounds.height > 0;
     config.currentAspectRatio = parseDouble("current_aspect_ratio", config.currentAspectRatio);
     config.nativeAspectRatio = parseDouble("native_aspect_ratio", config.nativeAspectRatio);
     config.fps = std::max(1, parseInt("fps", config.fps));
@@ -250,7 +259,9 @@ RuntimeHelperConfig LoadConfig(const fs::path& path) {
         if (!parsed.empty()) config.operators = parsed;
     }
 
-    config.region = ClampRegionToVirtualScreen(config.region);
+    config.region = config.displayConfigured
+        ? ClampRegionToBounds(config.region, config.displayBounds)
+        : ClampRegionToVirtualScreen(config.region);
     if (config.region.width <= 0 || config.region.height <= 0) {
         config.regionConfigured = false;
     }
@@ -275,6 +286,26 @@ Region ClampRegionToVirtualScreen(Region region) {
     const int top = std::clamp(region.y, virtualY, virtualBottom);
     const int right = std::clamp(region.x + region.width, virtualX, virtualRight);
     const int bottom = std::clamp(region.y + region.height, virtualY, virtualBottom);
+
+    return Region{
+        left,
+        top,
+        std::max(0, right - left),
+        std::max(0, bottom - top)
+    };
+}
+
+Region ClampRegionToBounds(Region region, const Region& bounds) {
+    if (bounds.width <= 0 || bounds.height <= 0) {
+        return ClampRegionToVirtualScreen(region);
+    }
+
+    const int boundsRight = bounds.x + bounds.width;
+    const int boundsBottom = bounds.y + bounds.height;
+    const int left = std::clamp(region.x, bounds.x, boundsRight);
+    const int top = std::clamp(region.y, bounds.y, boundsBottom);
+    const int right = std::clamp(region.x + region.width, bounds.x, boundsRight);
+    const int bottom = std::clamp(region.y + region.height, bounds.y, boundsBottom);
 
     return Region{
         left,
@@ -1170,6 +1201,49 @@ bool HasArg(int argc, wchar_t** argv, const std::wstring& wanted) {
         if (std::wstring(argv[i]) == wanted) return true;
     }
     return false;
+}
+
+std::mutex g_runtimeMutex;
+std::thread g_runtimeThread;
+std::wstring g_runtimeConfigPath;
+
+extern "C" __declspec(dllexport) bool __stdcall NexusRuntimeHelperStart(const wchar_t* configPath) {
+    std::lock_guard<std::mutex> lock(g_runtimeMutex);
+    if (configPath == nullptr || configPath[0] == L'\0') {
+        return false;
+    }
+    if (g_runtimeThread.joinable()) {
+        g_running = false;
+        g_runtimeThread.join();
+    }
+    g_runtimeConfigPath = configPath;
+    g_running = true;
+    g_runtimeThread = std::thread([] {
+        try {
+            RuntimeHelperConfig config = WaitForConfiguredRegion(fs::path(g_runtimeConfigPath));
+            if (HasUsableRegion(config) && g_running) {
+                Log("NEXUS runtime helper DLL started with " + std::to_string(config.operators.size()) + " operators.");
+                RunRuntimeHelper(config);
+            }
+        } catch (const std::exception& error) {
+            Log(std::string("Runtime helper DLL fatal error: ") + error.what());
+            g_running = false;
+        }
+    });
+    return true;
+}
+
+extern "C" __declspec(dllexport) void __stdcall NexusRuntimeHelperStop() {
+    std::lock_guard<std::mutex> lock(g_runtimeMutex);
+    g_running = false;
+    if (g_runtimeThread.joinable()) {
+        g_runtimeThread.join();
+    }
+}
+
+extern "C" __declspec(dllexport) bool __stdcall NexusRuntimeHelperConfigure(const wchar_t* configPath) {
+    NexusRuntimeHelperStop();
+    return NexusRuntimeHelperStart(configPath);
 }
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {

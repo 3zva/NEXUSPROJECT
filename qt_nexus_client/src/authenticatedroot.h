@@ -110,7 +110,7 @@ Q_SIGNALS:
     );
     // Emitted after one global config imports and normalizes all 76 records.
     void globalOperatorConfigurationImported(const QVariantMap& operators);
-    // UI integration surface for the separate runtime helper controller.
+    // UI integration surface for the built-in runtime helper controller.
     void screenRegionPageRequested(); // compatibility notification
     void regionSelectionRequested();
     void regionClearRequested();

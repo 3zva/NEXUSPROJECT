@@ -127,6 +127,27 @@ bool savedRuntimeHelperMonitoringEnabled() {
     return settings.value(QStringLiteral("runtime_helper/enabled"), true).toBool();
 }
 
+QScreen* screenForDisplayId(const QString& displayId) {
+    const QString normalized = displayId.trimmed();
+    if (normalized.isEmpty() || normalized.compare(QStringLiteral("primary"), Qt::CaseInsensitive) == 0) {
+        return QGuiApplication::primaryScreen();
+    }
+    const auto screens = QGuiApplication::screens();
+    for (auto* screen : screens) {
+        if (screen != nullptr && screen->name().compare(normalized, Qt::CaseInsensitive) == 0) {
+            return screen;
+        }
+    }
+    return QGuiApplication::primaryScreen();
+}
+
+QString displayIdForScreen(QScreen* screen) {
+    if (screen == nullptr || screen == QGuiApplication::primaryScreen() || screen->name().trimmed().isEmpty()) {
+        return QStringLiteral("primary");
+    }
+    return screen->name();
+}
+
 std::optional<QString> licenseApiBaseUrl() {
     const QStringList candidates{
         QCoreApplication::applicationDirPath() + QStringLiteral("/config/license_config.json"),
@@ -843,9 +864,13 @@ void MainWindow::connectApplicationPages() {
 
     connect(m_authenticatedRoot, &AuthenticatedRoot::regionSelectionRequested,
             this, [this]() {
-        QScreen* targetScreen = QGuiApplication::screenAt(QCursor::pos());
+        QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+        QScreen* targetScreen = screenForDisplayId(settings.value(
+            QStringLiteral("runtime_helper/displayId"),
+            QStringLiteral("primary")
+        ).toString());
         if (targetScreen == nullptr) {
-            targetScreen = screen() != nullptr ? screen() : QGuiApplication::primaryScreen();
+            targetScreen = QGuiApplication::primaryScreen();
         }
         if (targetScreen == nullptr) {
             m_authenticatedRoot->setScreenRegionSaveResult(false, QStringLiteral("No display was available for region selection."));
@@ -864,15 +889,12 @@ void MainWindow::connectApplicationPages() {
             return;
         }
 
-        const QString displayId = targetScreen->name().isEmpty()
-            ? QStringLiteral("primary")
-            : targetScreen->name();
+        const QString displayId = displayIdForScreen(targetScreen);
         m_authenticatedRoot->setScreenRegion(region, displayId);
         persistScreenRegion(region, displayId);
         if (writeScreenRegionConfig(region, displayId)) {
-            stopRuntimeHelper();
             if (savedRuntimeHelperMonitoringEnabled()) {
-                startRuntimeHelper();
+                configureRuntimeHelper();
             }
             m_authenticatedRoot->setScreenRegionSaveResult(true, QStringLiteral("Region saved and operator detection updated."));
         } else {
@@ -884,9 +906,8 @@ void MainWindow::connectApplicationPages() {
             this, [this](const QRect& region, const QString& displayId) {
         persistScreenRegion(region, displayId);
         if (writeScreenRegionConfig(region, displayId)) {
-            stopRuntimeHelper();
             if (savedRuntimeHelperMonitoringEnabled()) {
-                startRuntimeHelper();
+                configureRuntimeHelper();
             }
             m_authenticatedRoot->setScreenRegionSaveResult(true, QStringLiteral("Region saved and runtime helper config updated."));
         } else {
@@ -944,8 +965,7 @@ void MainWindow::connectApplicationPages() {
             QRect region;
             QString displayId;
             if (savedRegionFromSettings(region, displayId) && writeScreenRegionConfig(region, displayId)) {
-                stopRuntimeHelper();
-                startRuntimeHelper();
+                configureRuntimeHelper();
             }
         } else {
             stopRuntimeHelper();
@@ -965,8 +985,7 @@ void MainWindow::connectApplicationPages() {
         QRect region;
         QString displayId;
         if (savedRuntimeHelperMonitoringEnabled() && savedRegionFromSettings(region, displayId) && writeScreenRegionConfig(region, displayId)) {
-            stopRuntimeHelper();
-            startRuntimeHelper();
+            configureRuntimeHelper();
         }
     });
     connect(m_authenticatedRoot, &AuthenticatedRoot::lowResourceMonitoringChanged,
@@ -977,14 +996,23 @@ void MainWindow::connectApplicationPages() {
         QRect region;
         QString displayId;
         if (savedRuntimeHelperMonitoringEnabled() && savedRegionFromSettings(region, displayId) && writeScreenRegionConfig(region, displayId)) {
-            stopRuntimeHelper();
-            startRuntimeHelper();
+            configureRuntimeHelper();
         }
     });
 
     connect(m_authenticatedRoot, &AuthenticatedRoot::settingChanged,
             this, [this](const QString& key, const QVariant& value) {
         QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
+        if (key == QStringLiteral("runtime_helper/displayId")) {
+            settings.setValue(QStringLiteral("runtime_helper/displayId"), value.toString().trimmed().isEmpty() ? QStringLiteral("primary") : value.toString());
+            settings.sync();
+            QRect region;
+            QString displayId;
+            if (savedRuntimeHelperMonitoringEnabled() && savedRegionFromSettings(region, displayId) && writeScreenRegionConfig(region, displayId)) {
+                configureRuntimeHelper();
+            }
+            return;
+        }
         settings.setValue(QStringLiteral("settings/") + key, value);
         applyClientSetting(key, value);
         publishRuntimeSetting(key, value);
@@ -1094,8 +1122,8 @@ void MainWindow::restoreSavedAppSettings() {
     m_authenticatedRoot->setRuntimeHelperAppSettings(
         settings.value(QStringLiteral("runtime_helper/enabled"), true).toBool(),
         settings.value(QStringLiteral("runtime_helper/showBorder"), true).toBool(),
-        settings.value(QStringLiteral("runtime_helper/idleWhenCursorHidden"), false).toBool(),
-        settings.value(QStringLiteral("runtime_helper/lowResourceMode"), false).toBool()
+        settings.value(QStringLiteral("runtime_helper/idleWhenCursorHidden"), true).toBool(),
+        settings.value(QStringLiteral("runtime_helper/lowResourceMode"), true).toBool()
     );
 }
 
@@ -1551,9 +1579,8 @@ void MainWindow::restoreSavedScreenRegion() {
 
     m_authenticatedRoot->setScreenRegion(region, displayId);
     if (writeScreenRegionConfig(region, displayId)) {
-        stopRuntimeHelper();
         if (savedRuntimeHelperMonitoringEnabled()) {
-            startRuntimeHelper();
+            configureRuntimeHelper();
         }
         m_authenticatedRoot->setScreenRegionSaveResult(true, QStringLiteral("Saved region restored."));
     } else {
@@ -1624,17 +1651,29 @@ bool MainWindow::writeScreenRegionConfigForRoot(const QString& rootPath, const Q
     };
 
     const QRect normalized = region.normalized();
+    QScreen* selectedScreen = screenForDisplayId(displayId);
+    const QRect displayGeometry = selectedScreen != nullptr
+        ? selectedScreen->geometry()
+        : QGuiApplication::primaryScreen() != nullptr
+            ? QGuiApplication::primaryScreen()->geometry()
+            : QRect();
     upsertLine(QStringLiteral("region_configured"), QStringLiteral("true"));
     upsertLine(QStringLiteral("region_x"), QString::number(normalized.x()));
     upsertLine(QStringLiteral("region_y"), QString::number(normalized.y()));
     upsertLine(QStringLiteral("region_width"), QString::number(normalized.width()));
     upsertLine(QStringLiteral("region_height"), QString::number(normalized.height()));
     upsertLine(QStringLiteral("region_display"), displayId.trimmed().isEmpty() ? QStringLiteral("primary") : displayId);
+    if (displayGeometry.isValid()) {
+        upsertLine(QStringLiteral("display_x"), QString::number(displayGeometry.x()));
+        upsertLine(QStringLiteral("display_y"), QString::number(displayGeometry.y()));
+        upsertLine(QStringLiteral("display_width"), QString::number(displayGeometry.width()));
+        upsertLine(QStringLiteral("display_height"), QString::number(displayGeometry.height()));
+    }
     upsertLine(QStringLiteral("server_port"), QStringLiteral("20112"));
 
     QSettings settings(QStringLiteral("NEXUS"), QStringLiteral("NEXUS Client"));
-    const bool pauseWhenHidden = settings.value(QStringLiteral("runtime_helper/idleWhenCursorHidden"), false).toBool();
-    const bool lowResourceMode = settings.value(QStringLiteral("runtime_helper/lowResourceMode"), false).toBool();
+    const bool pauseWhenHidden = settings.value(QStringLiteral("runtime_helper/idleWhenCursorHidden"), true).toBool();
+    const bool lowResourceMode = settings.value(QStringLiteral("runtime_helper/lowResourceMode"), true).toBool();
     const double currentAspectRatio = settings.value(QStringLiteral("converter/currentAspectRatio"), 4.0 / 3.0).toDouble();
     const double nativeAspectRatio = settings.value(QStringLiteral("converter/nativeAspectRatio"), 16.0 / 9.0).toDouble();
     upsertLine(QStringLiteral("pause_when_cursor_hidden"), pauseWhenHidden ? QStringLiteral("true") : QStringLiteral("false"));
@@ -1652,27 +1691,12 @@ bool MainWindow::writeScreenRegionConfigForRoot(const QString& rootPath, const Q
 }
 
 void MainWindow::stopRuntimeHelper() {
+    if (m_runtimeHelperStop != nullptr) {
+        m_runtimeHelperStop();
+    }
     const QString installPath = m_authenticatedRoot->installationPath().isEmpty()
         ? packageRootDirectory()
         : m_authenticatedRoot->installationPath();
-    const QStringList pidMarkers{
-        QDir(runtimeDirectoryForRoot(installPath)).filePath(QStringLiteral("current_runtime_helper_pid.txt")),
-        QDir(installPath).filePath(QStringLiteral("current_runtime_helper_pid.txt")),
-    };
-    for (const QString& pidMarker : pidMarkers) {
-        QFile pidFile(pidMarker);
-        if (pidFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            const QString pid = QString::fromUtf8(pidFile.readAll()).trimmed();
-            if (!pid.isEmpty()) {
-                QProcess::execute(QStringLiteral("taskkill.exe"), {
-                    QStringLiteral("/PID"),
-                    pid,
-                    QStringLiteral("/F"),
-                    QStringLiteral("/T")
-                });
-            }
-        }
-    }
 
     QProcess::execute(QStringLiteral("powershell.exe"), {
         QStringLiteral("-NoProfile"),
@@ -1734,10 +1758,6 @@ void MainWindow::startRuntimeHelper() {
     const QString rootPath = m_authenticatedRoot->installationPath().isEmpty()
         ? packageRootDirectory()
         : m_authenticatedRoot->installationPath();
-    const QString toolPath = runtimeFileForRoot(rootPath, QStringLiteral("NEXUS Runtime Helper.exe"));
-    if (!QFileInfo::exists(toolPath)) {
-        return;
-    }
 
     QRect savedRegion;
     QString savedDisplayId;
@@ -1746,11 +1766,57 @@ void MainWindow::startRuntimeHelper() {
     }
 
     const QString configPath = writableRuntimeFileForRoot(rootPath, QStringLiteral("nexus_runtime_helper_config.txt"));
-    QProcess::startDetached(
-        toolPath,
-        {QStringLiteral("--config"), configPath},
-        QFileInfo(toolPath).absolutePath()
+    const QString runtimeDir = runtimeDirectoryForRoot(rootPath);
+    if (!ensureRuntimeHelperLoaded(runtimeDir) || m_runtimeHelperStart == nullptr) {
+        return;
+    }
+    m_runtimeHelperStart(reinterpret_cast<const wchar_t*>(QDir::toNativeSeparators(configPath).utf16()));
+}
+
+bool MainWindow::ensureRuntimeHelperLoaded(const QString& runtimeDir) {
+    if (m_runtimeHelperStart != nullptr && m_runtimeHelperStop != nullptr && m_runtimeHelperConfigure != nullptr) {
+        return true;
+    }
+
+    const QString libraryPath = QDir(runtimeDir).filePath(QStringLiteral("NEXUSRuntimeHelper.dll"));
+    if (!QFileInfo::exists(libraryPath)) {
+        return false;
+    }
+
+#ifdef Q_OS_WIN
+    SetDllDirectoryW(reinterpret_cast<const wchar_t*>(QDir::toNativeSeparators(runtimeDir).utf16()));
+#endif
+    if (m_runtimeHelperLibrary == nullptr) {
+        m_runtimeHelperLibrary = new QLibrary(libraryPath, this);
+    } else {
+        m_runtimeHelperLibrary->setFileName(libraryPath);
+    }
+    if (!m_runtimeHelperLibrary->isLoaded() && !m_runtimeHelperLibrary->load()) {
+        return false;
+    }
+
+    m_runtimeHelperStart = reinterpret_cast<RuntimeHelperStartFn>(
+        m_runtimeHelperLibrary->resolve("NexusRuntimeHelperStart")
     );
+    m_runtimeHelperStop = reinterpret_cast<RuntimeHelperStopFn>(
+        m_runtimeHelperLibrary->resolve("NexusRuntimeHelperStop")
+    );
+    m_runtimeHelperConfigure = reinterpret_cast<RuntimeHelperConfigureFn>(
+        m_runtimeHelperLibrary->resolve("NexusRuntimeHelperConfigure")
+    );
+    return m_runtimeHelperStart != nullptr && m_runtimeHelperStop != nullptr && m_runtimeHelperConfigure != nullptr;
+}
+
+void MainWindow::configureRuntimeHelper() {
+    const QString rootPath = m_authenticatedRoot->installationPath().isEmpty()
+        ? packageRootDirectory()
+        : m_authenticatedRoot->installationPath();
+    const QString runtimeDir = runtimeDirectoryForRoot(rootPath);
+    const QString configPath = writableRuntimeFileForRoot(rootPath, QStringLiteral("nexus_runtime_helper_config.txt"));
+    if (!ensureRuntimeHelperLoaded(runtimeDir) || m_runtimeHelperConfigure == nullptr) {
+        return;
+    }
+    m_runtimeHelperConfigure(reinterpret_cast<const wchar_t*>(QDir::toNativeSeparators(configPath).utf16()));
 }
 
 bool MainWindow::writeNativeDetectorConfig() {

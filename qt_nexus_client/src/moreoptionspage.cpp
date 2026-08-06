@@ -90,7 +90,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
     body->addWidget(new PageHeading(
         QStringLiteral("MORE OPTIONS"),
         QStringLiteral(
-            "Choose the screen region used by the separate NEXUS runtime helper monitor "
+            "Choose the screen region used by the NEXUS runtime helper monitor "
             "and manage its UI-facing preferences."
         ),
         content
@@ -107,8 +107,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
     monitorLayout->addWidget(cardTitle);
     monitorLayout->addWidget(mutedText(
         QStringLiteral(
-            "Select the exact area that your existing runtime helper module should watch. "
-            "This page stores and exposes the region; it does not perform capture or detection."
+            "Select the exact area that the built-in runtime helper should watch."
         ),
         monitorCard
     ));
@@ -125,7 +124,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
             return;
         }
         m_displayId = m_displayCombo->currentData().toString();
-        Q_EMIT settingChanged(QStringLiteral("runtime_helper/display_id"), m_displayId);
+        Q_EMIT settingChanged(QStringLiteral("runtime_helper/displayId"), m_displayId);
     });
     displayRow->addWidget(displayLabel);
     displayRow->addWidget(m_displayCombo, 1);
@@ -155,7 +154,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
     actions->setSpacing(8);
     auto* selectButton = createAccentButton(QStringLiteral("SELECT REGION"), monitorCard);
     selectButton->setToolTip(QStringLiteral(
-        "Request region selection from the existing runtime helper controller."
+        "Select a region on the chosen display."
     ));
     m_clearButton = new QPushButton(QStringLiteral("CLEAR REGION"), monitorCard);
     m_saveButton = new QPushButton(QStringLiteral("SAVE REGION"), monitorCard);
@@ -170,7 +169,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
             updateStatus(QStringLiteral("Select a valid region before saving."));
             return;
         }
-        updateStatus(QStringLiteral("Waiting for the runtime helper integration to confirm the save..."));
+        updateStatus(QStringLiteral("Saving the region for the built-in runtime helper..."));
         Q_EMIT regionSaveRequested(m_region, m_displayId);
     });
     actions->addWidget(selectButton, 1);
@@ -197,16 +196,16 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
     m_monitoringToggle = new ToggleRow(
         QStringLiteral("Enable region monitoring"),
         QStringLiteral(
-            "Allows the separate monitoring controller to use the saved region. "
+            "Allows the built-in monitoring helper to use the saved region. "
             "Unavailable until a valid region has been selected."
         ),
-        false,
+        true,
         preferencesCard
     );
     auto* cursorToggle = new ToggleRow(
         QStringLiteral("Check only while the cursor is visible"),
         QStringLiteral(
-            "UI preference for your existing monitor. This page does not inspect the cursor."
+            "Pauses monitoring while the cursor is hidden."
         ),
         true,
         preferencesCard
@@ -214,7 +213,7 @@ MoreOptionsPage::MoreOptionsPage(QWidget* parent)
     auto* activeWindowToggle = new ToggleRow(
         QStringLiteral("Require the target window to be active"),
         QStringLiteral(
-            "UI preference for pausing the separate monitor when the target is not focused."
+            "Keeps monitoring in the quieter default mode."
         ),
         true,
         preferencesCard
@@ -273,7 +272,9 @@ void MoreOptionsPage::refreshDisplays() {
     for (int index = 0; index < screens.size(); ++index) {
         const auto* screen = screens.at(index);
         const QRect geometry = screen->geometry();
-        const QString id = screen->name().isEmpty()
+        const QString id = screen == QGuiApplication::primaryScreen()
+            ? QStringLiteral("primary")
+            : screen->name().isEmpty()
             ? QStringLiteral("display_%1").arg(index)
             : screen->name();
         const QString label = QStringLiteral("%1 — %2 × %3 at %4, %5")
@@ -285,7 +286,7 @@ void MoreOptionsPage::refreshDisplays() {
         m_displayCombo->addItem(label, id);
     }
 
-    int selected = previous.isEmpty() ? 0 : m_displayCombo->findData(previous);
+    int selected = previous.isEmpty() ? m_displayCombo->findData(QStringLiteral("primary")) : m_displayCombo->findData(previous);
     if (selected < 0) {
         selected = 0;
     }
@@ -316,7 +317,7 @@ void MoreOptionsPage::setSelectedRegion(
     updateStatus(
         hasValidRegion()
             ? QStringLiteral("Region received. Review the values, then press Save Region.")
-            : QStringLiteral("The runtime helper controller returned an invalid region.")
+            : QStringLiteral("The selected region was invalid.")
     );
 }
 
@@ -368,7 +369,7 @@ void MoreOptionsPage::updatePreview(const QPixmap& preview) {
                 ? QStringLiteral("Selected region\n%1 × %2")
                       .arg(m_region.width())
                       .arg(m_region.height())
-                : QStringLiteral("No region selected\nPress Select Region to open your runtime helper selector.")
+                : QStringLiteral("No region selected\nPress Select Region to choose an area.")
         );
         return;
     }

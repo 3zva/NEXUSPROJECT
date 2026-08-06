@@ -78,6 +78,8 @@ private:
     bool writeScreenRegionConfigForRoot(const QString& rootPath, const QRect& region, const QString& displayId);
     void stopRuntimeHelper();
     void startRuntimeHelper();
+    bool ensureRuntimeHelperLoaded(const QString& runtimeDir);
+    void configureRuntimeHelper();
     void stopNativeDetector();
     void startNativeDetector();
     void restartNativeDetector();
@@ -113,6 +115,13 @@ private:
     QTimer* m_fpsTimer = nullptr;
     QTimer* m_detectorStatusTimer = nullptr;
     QLibrary* m_nativeDetectorLibrary = nullptr;
+    QLibrary* m_runtimeHelperLibrary = nullptr;
+    using RuntimeHelperStartFn = bool(__stdcall*)(const wchar_t*);
+    using RuntimeHelperStopFn = void(__stdcall*)();
+    using RuntimeHelperConfigureFn = bool(__stdcall*)(const wchar_t*);
+    RuntimeHelperStartFn m_runtimeHelperStart = nullptr;
+    RuntimeHelperStopFn m_runtimeHelperStop = nullptr;
+    RuntimeHelperConfigureFn m_runtimeHelperConfigure = nullptr;
     using NativeDetectorStartFn = bool(__stdcall*)(const wchar_t*);
     using NativeDetectorStopFn = void(__stdcall*)();
     struct NativeDetectorStatus {
