@@ -1,5 +1,3 @@
-<div align="center">
-
 # NEXUS
 
 ### A centralized desktop configuration hub for Rainbow Six Siege
@@ -132,3 +130,9 @@ Only download NEXUS from the official website.
 Do not trust unofficial mirrors, reuploads, modified builds, or third-party license sellers.
 
 Security concerns can be reported through the official [support page](https://highcloudnexus.com/contact/).
+
+
+
+
+<img width="1672" height="941" alt="NEXUS Instructions" src="https://github.com/user-attachments/assets/6a862eff-4cd7-41ab-bcca-0e68a02b3612" />
+<div align="center">
