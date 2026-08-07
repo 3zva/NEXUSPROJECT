@@ -1,6 +1,0 @@
-# Local development only. Copy to .dev.vars and never commit it.
-STRIPE_SECRET_KEY=sk_test_REPLACE
-STRIPE_WEBHOOK_SECRET=whsec_REPLACE
-LICENSE_HASH_PEPPER=REPLACE
-LICENSE_ENCRYPTION_KEY_B64=REPLACE
-LICENSE_SIGNING_PRIVATE_JWK={"kty":"EC","crv":"P-256","x":"...","y":"...","d":"..."}
